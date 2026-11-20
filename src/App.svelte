@@ -1,0 +1,114 @@
+<script lang="ts">
+  import { RotateCw, Smartphone } from '@lucide/svelte';
+  import { onMount } from 'svelte';
+  import { app } from './lib/app.svelte';
+  import FlagEditor from './components/FlagEditor.svelte';
+  import GameCountry from './components/GuessCountry.svelte';
+  import GameFlag from './components/GuessFlag.svelte';
+  import GamePicker from './components/GamePicker.svelte';
+  import ProfileMenu from './components/ProfileMenu.svelte';
+  import FilterModal from './components/FilterModal.svelte';
+  import StatsModal from './components/StatsModal.svelte';
+  import Streaks from './components/Streaks.svelte';
+  import UserPicker from './components/UserPicker.svelte';
+
+  onMount(() => {
+    void app.init();
+  });
+</script>
+
+<div class="app">
+  <header>
+    <Streaks />
+    <ProfileMenu />
+  </header>
+
+  <main>
+    {#if app.phase === 'playing'}
+      {#if app.game === 'flag'}
+        <GameFlag />
+      {:else}
+        <GameCountry />
+      {/if}
+    {/if}
+  </main>
+
+  {#if app.editor}
+    <FlagEditor mode={app.editor} />
+  {:else if app.statsOpen}
+    <StatsModal />
+  {:else if app.filterOpen}
+    <FilterModal />
+  {:else if app.phase === 'pickUser'}
+    <UserPicker />
+  {:else if app.phase === 'pickGame'}
+    <GamePicker />
+  {/if}
+
+  <div class="rotate" aria-hidden="true">
+    <span class="phone"><Smartphone size="100%" /></span>
+    <RotateCw size={48} />
+  </div>
+</div>
+
+<style>
+  .app {
+    --header-h: clamp(40px, 9vmin, 64px);
+    --side-reserve: clamp(130px, 21vw, 260px);
+    position: relative;
+    height: 100%;
+    display: grid;
+    padding: max(var(--gutter), env(safe-area-inset-top)) max(var(--gutter), env(safe-area-inset-right))
+      max(var(--gutter), env(safe-area-inset-bottom)) max(var(--gutter), env(safe-area-inset-left));
+  }
+  header {
+    position: absolute;
+    inset: max(var(--gutter), env(safe-area-inset-top)) max(var(--gutter), env(safe-area-inset-right)) auto
+      max(var(--gutter), env(safe-area-inset-left));
+    z-index: 10;
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    pointer-events: none;
+  }
+  header > :global(*) {
+    pointer-events: auto;
+  }
+  main {
+    min-height: 0;
+    min-width: 0;
+  }
+  .rotate {
+    display: none;
+  }
+  @media (orientation: portrait) and (max-width: 700px) {
+    .rotate {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: grid;
+      place-content: center;
+      justify-items: center;
+      gap: 24px;
+      background: var(--bg);
+      color: var(--green);
+    }
+    .phone {
+      width: 96px;
+      height: 96px;
+      animation: turn 2s ease-in-out infinite;
+    }
+  }
+  @keyframes turn {
+    0%,
+    30% {
+      transform: rotate(0);
+    }
+    60%,
+    100% {
+      transform: rotate(-90deg);
+    }
+  }
+</style>
