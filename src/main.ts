@@ -1,3 +1,5 @@
+// First, so that the early `beforeinstallprompt` event is not missed.
+import './lib/install.svelte';
 import '@fontsource-variable/inter';
 import './app.css';
 import { mount } from 'svelte';

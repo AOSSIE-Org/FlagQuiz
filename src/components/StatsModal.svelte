@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { CaseSensitive, CircleCheck, Flag as FlagIcon, Flame, Star, Trophy, X } from '@lucide/svelte';
+  import { CircleCheck, Flame, Star, Trophy, X } from '@lucide/svelte';
   import { untrack } from 'svelte';
   import { app } from '../lib/app.svelte';
   import { COUNTRIES, type Country } from '../data/countries';
   import { dayKey, lastDays } from '../lib/dates';
   import { isMastered } from '../lib/select';
-  import { GAMES, type GameId } from '../lib/types';
+  import { availableIn } from '../lib/app.svelte';
+  import { GAME_NAMES, GAMES, type GameId } from '../lib/types';
+  import GameIcon from './GameIcon.svelte';
   import Modal from './Modal.svelte';
 
   /** Largest and smallest height of a mastered flag, and the gap between flags (px). */
@@ -25,10 +27,11 @@
       c += counts.c;
       d += counts.d;
     }
-    const mastered = COUNTRIES.filter((country) => isMastered(stats.get(country.code))).sort((a, b) =>
+    const items = COUNTRIES.filter(availableIn(game));
+    const mastered = items.filter((country) => isMastered(stats.get(country.code))).sort((a, b) =>
       a.name.localeCompare(b.name),
     );
-    return { accuracy: c + d ? Math.round((100 * c) / (c + d)) : null, mastered };
+    return { accuracy: c + d ? Math.round((100 * c) / (c + d)) : null, mastered, total: items.length };
   }
 
   const games = GAMES.map((game) => ({ game, ...summary(game) }));
@@ -96,6 +99,10 @@
           <span class="big">{app.dayStreak.current}</span>
           <span class="best" title="Best"><Trophy size="1em" aria-label="Best" />{app.dayStreak.best}</span>
         </div>
+        <div class="card" title="Correct answers">
+          <CircleCheck class="check" size="1.6em" aria-hidden="true" />
+          <span class="big">{app.user.correctCount}</span>
+        </div>
         <div class="card" title="Rounds without mistakes">
           <Star class="star" size="1.6em" aria-hidden="true" />
           <span class="big">{app.user.perfectRun}</span>
@@ -110,10 +117,10 @@
       </div>
 
       {#each games as g (g.game)}
-        <section class="game" aria-label={g.game === 'flag' ? 'Guess the Flag' : 'Guess the Country'}>
+        <section class="game" aria-label={GAME_NAMES[g.game]}>
           <div class="summary">
-            <span class="game-icon" title={g.game === 'flag' ? 'Guess the Flag' : 'Guess the Country'}>
-              {#if g.game === 'flag'}<FlagIcon />{:else}<CaseSensitive />{/if}
+            <span class="game-icon" title={GAME_NAMES[g.game]}>
+              <GameIcon game={g.game} />
             </span>
             <svg class="ring" viewBox="0 0 36 36" aria-label="Correct: {g.accuracy ?? 0}%">
               <circle cx="18" cy="18" r={R} class="track" />
@@ -123,7 +130,7 @@
               <text x="18" y="21.5" text-anchor="middle">{g.accuracy === null ? '–' : `${g.accuracy}%`}</text>
             </svg>
             <span class="mastered" title="Mastered">
-              <CircleCheck size="1.2em" aria-hidden="true" />{g.mastered.length}<small>/{COUNTRIES.length}</small>
+              <CircleCheck size="1.2em" aria-hidden="true" />{g.mastered.length}<small>/{g.total}</small>
             </span>
           </div>
           {#if g.mastered.length}
@@ -156,7 +163,7 @@
   }
   .cards {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: clamp(8px, 2vmin, 16px);
   }
   .card {
@@ -172,6 +179,9 @@
   .card :global(.flame) {
     color: #ff8200;
     fill: var(--gold);
+  }
+  .card :global(.check) {
+    color: var(--green);
   }
   .card :global(.star) {
     color: var(--gold);

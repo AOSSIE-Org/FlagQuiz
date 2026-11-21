@@ -3,8 +3,15 @@
   import { onMount } from 'svelte';
   import { app } from './lib/app.svelte';
   import FlagEditor from './components/FlagEditor.svelte';
+  import FullscreenButton from './components/FullscreenButton.svelte';
+  import GameCapital from './components/GuessCapital.svelte';
+  import GameCapitalCountry from './components/GuessCapitalCountry.svelte';
   import GameCountry from './components/GuessCountry.svelte';
   import GameFlag from './components/GuessFlag.svelte';
+  import GameLocation from './components/GuessLocation.svelte';
+  import InstallHelp from './components/InstallHelp.svelte';
+  import Splash from './components/Splash.svelte';
+  import { install } from './lib/install.svelte';
   import GamePicker from './components/GamePicker.svelte';
   import ProfileMenu from './components/ProfileMenu.svelte';
   import FilterModal from './components/FilterModal.svelte';
@@ -13,8 +20,15 @@
   import TurnBanner from './components/TurnBanner.svelte';
   import UserPicker from './components/UserPicker.svelte';
 
+  /** The splash screen stays for at least this long, and until the app is ready. */
+  const SPLASH_MS = 2000;
+  let splash = $state(true);
+
   onMount(() => {
-    void app.init();
+    const started = Date.now();
+    void app.init().then(() => {
+      setTimeout(() => (splash = false), Math.max(0, SPLASH_MS - (Date.now() - started)));
+    });
   });
 </script>
 
@@ -28,8 +42,14 @@
     {#if app.phase === 'playing'}
       {#if app.game === 'flag'}
         <GameFlag />
-      {:else}
+      {:else if app.game === 'country'}
         <GameCountry />
+      {:else if app.game === 'location'}
+        <GameLocation />
+      {:else if app.game === 'capital'}
+        <GameCapital />
+      {:else}
+        <GameCapitalCountry />
       {/if}
     {/if}
   </main>
@@ -48,6 +68,16 @@
 
   {#if app.banner}
     <TurnBanner player={app.banner} />
+  {/if}
+
+  {#if install.helpOpen}
+    <InstallHelp />
+  {/if}
+
+  <FullscreenButton />
+
+  {#if splash}
+    <Splash onclose={() => (splash = false)} />
   {/if}
 
   <div class="rotate" aria-hidden="true">

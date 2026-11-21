@@ -1,5 +1,5 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
-import type { GameId, ItemStats, StatRecord, User } from './types';
+import { DEFAULT_SETTINGS, type GameId, type ItemStats, type Settings, type StatRecord, type User } from './types';
 
 interface FlagQuizDB extends DBSchema {
   users: { key: number; value: User };
@@ -13,12 +13,15 @@ interface FlagQuizDB extends DBSchema {
     value: { userId: number; date: string };
     indexes: { byUser: number };
   };
+  /** Device-wide preferences, under the key "settings". */
+  settings: { key: string; value: Settings };
 }
 
 export type DB = IDBPDatabase<FlagQuizDB>;
 
 export const DB_NAME = 'flag-quiz';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
+const SETTINGS_KEY = 'settings';
 
 export function openDatabase(name: string = DB_NAME): Promise<DB> {
   return openDB<FlagQuizDB>(name, DB_VERSION, {
@@ -39,6 +42,9 @@ export function openDatabase(name: string = DB_NAME): Promise<DB> {
           await cursor.update({ ...cursor.value, s: (d + 1) / (c + d + 2) });
           cursor = await cursor.continue();
         }
+      }
+      if (oldVersion < 3) {
+        db.createObjectStore('settings');
       }
     },
   });
@@ -97,4 +103,25 @@ export async function insertUserWithData(
   ]);
   await tx.done;
   return { ...copy, id };
+}
+
+/** Deletes a user with all their statistics and play days, atomically. */
+export async function deleteUserWithData(db: DB, userId: number): Promise<void> {
+  const tx = db.transaction(['users', 'stats', 'playDays'], 'readwrite');
+  const statKeys = await tx.objectStore('stats').index('byUser').getAllKeys(userId);
+  const dayKeys = await tx.objectStore('playDays').index('byUser').getAllKeys(userId);
+  await Promise.all([
+    tx.objectStore('users').delete(userId),
+    ...statKeys.map((k) => tx.objectStore('stats').delete(k)),
+    ...dayKeys.map((k) => tx.objectStore('playDays').delete(k)),
+  ]);
+  await tx.done;
+}
+
+export async function getSettings(db: DB): Promise<Settings> {
+  return { ...DEFAULT_SETTINGS, ...((await db.get('settings', SETTINGS_KEY)) ?? {}) };
+}
+
+export async function saveSettings(db: DB, settings: Settings): Promise<void> {
+  await db.put('settings', { ...settings }, SETTINGS_KEY);
 }

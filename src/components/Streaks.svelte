@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Flame, Star } from '@lucide/svelte';
+  import { CircleCheck, Flame, Star } from '@lucide/svelte';
   import { app } from '../lib/app.svelte';
 </script>
 
@@ -10,6 +10,9 @@
     </span>
     <span class="chip" title="Rounds without mistakes" aria-label="{app.user.perfectRun} rounds without mistakes">
       <Star class="star" aria-hidden="true" />{app.user.perfectRun}
+    </span>
+    <span class="chip" title="Correct answers" aria-label="{app.user.correctCount} correct answers">
+      <CircleCheck class="check" aria-hidden="true" />{app.user.correctCount}
     </span>
   </div>
 {/if}
@@ -36,6 +39,9 @@
   .chip :global(.flame) {
     color: #ff8200;
     fill: var(--gold);
+  }
+  .chip :global(.check) {
+    color: var(--green);
   }
   .chip :global(.star) {
     color: var(--gold);

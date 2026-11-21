@@ -60,15 +60,18 @@
 <h1>Flag Quiz</h1>
 </div>
 
-[Flag Quiz](https://flagquiz.aossie.org/) is a simple, purely local web game for children to learn the flags of all the countries and territories of the world. It uses big icons instead of text, reads country names aloud, adapts to what each child already knows, and keeps all data on the device.
+[Flag Quiz](https://flagquiz.aossie.org/) is a simple, purely local web game for children to learn the flags, locations and capitals of all the countries and territories of the world. It uses big icons instead of text, reads names aloud, adapts to what each child already knows, and keeps all data on the device.
 
 ---
 
 ## 🚀 Features
 
-- **Two games**:
+- **Five games**:
   - *Guess the Flag*: a country name is shown (and read aloud) and the child picks its flag.
   - *Guess the Country*: a flag is shown and the child picks the country's name.
+  - *Guess the Location*: a country's name and flag are shown and the child taps it on a world map. A wrong country shows its own name and flag on the map. Tiny countries have round markers that are easy to tap, and the map can be zoomed (wheel, pinch or ＋/－) and dragged.
+  - *Guess the Capital*: a country's name and flag are shown and the child picks its capital, each shown with its name and four photos of the city and its landmarks (e.g. the Eiffel Tower for Paris).
+  - *Guess the Capital's Country*: a capital and its four photos are shown and the child picks the country.
 - **Every flag in the world**: 234 ISO 3166-1 countries and territories, with their real proportions.
 - **Spoken names**: names are read aloud on hover or tap, using the device's own text-to-speech voices.
 - **Clear feedback**: correct answers get a green check and a chime, and the next round starts after 1 s. A wrong pick turns red and shows (and says) what was actually picked.
@@ -76,13 +79,16 @@
 - **Three difficulty levels**: 3, 6 or 9 options per round.
 - **Choose the countries**: practise only some continents, and only the N most populous countries (all continents and the top 100 by default).
 - **Multiple players**: each player has a name and a custom flag (3 colours, from a palette or any colour, and 12 patterns with stripes, crosses, circles, rhombuses, stars and moons). The current player's name and flag are shown top right.
-- **Multiplayer mode**: several children take turns on one device. A player keeps playing until they make a mistake; then the right answer is shown and it's the next player's turn. Each player keeps their own difficulty level (3, 6 or 9 options), so children of different ages can play together, and players with the lowest best run play first.
-- **Streaks and statistics**: 🔥 days played in a row and ⭐ rounds in a row without mistakes (top left), plus a statistics view with the all-time bests, a 4-week calendar, accuracy, and every mastered flag (difficulty score below 0.2).
+- **Multiplayer mode**: several children take turns on one device. A player keeps playing until they make a mistake, or until they have played the maximum number of rounds in a row (3 by default, set next to the player selection); then it's the next player's turn. Each player keeps their own difficulty level (3, 6 or 9 options), so children of different ages can play together, and players with the lowest best run play first.
+- **Streaks and statistics**: 🔥 days played in a row, ⭐ rounds in a row without mistakes and ✅ correct answers (top left), plus a statistics view with the all-time bests, a 4-week calendar, accuracy, and every mastered country per game (difficulty score below 0.2).
+- **Grown-ups only: deleting players**: a small, faded 🗑 button in the player picker; deleting a player requires solving an equation such as `7x − 23 = 2x + 52`.
+- **Sound controls**: menu switches for reading names aloud and for sound effects.
 - **Save and load players**: export a player's data as a JSON file and import it on another device or browser.
 - **Share**: share the app with the device's share sheet (or copy its link).
 - **Light and dark mode**, with AOSSIE's brand colours and font.
-- **Fits on one screen**: no scrolling on desktop or on phones in landscape.
-- **Works offline**: installable as a Progressive Web App, and also works as a plain static website.
+- **Fits on one screen**: no scrolling on desktop or on phones in landscape. A discreet button in the lower-right corner switches to full screen (where the browser supports it).
+- **Works offline and installs like an app**: a Progressive Web App that also works as a plain static website. On phones and tablets, an "Install app" menu button shows the browser's install dialog (Android) or how to use Share → Add to Home Screen (iOS).
+- **Splash screen** with the app's logo and "made by AOSSIE".
 - **Private by design**: no accounts, no servers, no analytics. Everything is stored in the browser's IndexedDB.
 
 ---
@@ -97,13 +103,17 @@
 
 ### Browser APIs
 - **IndexedDB** (through [`idb`](https://github.com/jakearchibald/idb)) for players, statistics and play dates
-- **Web Speech API** (`speechSynthesis`) to read country names aloud
+- **Web Speech API** (`speechSynthesis`) to read names aloud
 - **Web Audio API** for the feedback sounds (generated in code, no audio files)
+- **Fullscreen API** for the full-screen button, and `beforeinstallprompt` for installing on Android
 
 ### Data
 - Flags from [hampusborgos/country-flags](https://github.com/hampusborgos/country-flags) (public domain, taken from Wikimedia Commons), optimised with SVGO
 - Populations and continents from [GeoNames](https://www.geonames.org/) (CC BY 4.0). The populations agree within 10% with the World Bank's 2024 figures for all 216 countries in both datasets. Russia, Türkiye, Kazakhstan, Egypt, Azerbaijan and Georgia are listed under both of their continents.
 - Both are downloaded and generated by [`scripts/fetch-countries.mjs`](scripts/fetch-countries.mjs) into `public/flags/` and `src/data/countries.ts`
+- Capitals from [Wikidata](https://www.wikidata.org/) (CC0), using each country's best-rank capital, with a few curated choices where there are several (Pretoria, Sucre, Sri Jayawardenepura Kotte, Sanaa, Mbabane, Brades). Israel and Palestine, whose capitals are contested, are left out of the capital games.
+- Photos of capitals from [Wikimedia Commons](https://commons.wikimedia.org/), all freely licensed: the city's main Wikidata image plus its most famous landmarks (buildings, monuments, museums, parks, squares, attractions located in the city, ranked by the number of Wikipedia editions about them). Photos are filtered for young children (no war, violence, prisons, slavery, genocide or adult topics), duplicates are removed, and a few Wikidata errors are corrected in the script (e.g. Managua, Malabo, St. John's) after a manual review of every capital's photos. 215 capitals have four suitable photos; the others (mostly tiny territories, plus Diego Garcia, a military base) are left out of the capital games. Authors and licences are listed in the app's credits page (`credits.html`, ⓘ in the menu). Generated by [`scripts/fetch-capitals.mjs`](scripts/fetch-capitals.mjs).
+- World map from [Natural Earth](https://www.naturalearthdata.com/) 1:50m (public domain) via [world-atlas](https://github.com/topojson/world-atlas), simplified and projected with d3-geo by [`scripts/fetch-map.mjs`](scripts/fetch-map.mjs)
 
 ### Testing
 - [Vitest](https://vitest.dev/) with [`fake-indexeddb`](https://github.com/dumbmatter/fakeIndexedDB)
@@ -198,12 +208,19 @@ flowchart TD
   New --> Game[Choose a game]
   Game --> GF[Guess the Flag]
   Game --> GC[Guess the Country]
+  Game --> GL[Guess the Location]
+  Game --> GK[Guess the Capital]
+  Game --> GKC[Guess the Capital's Country]
   GF --> Round[Round: pick an option]
   GC --> Round
+  GL --> Round
+  GK --> Round
+  GKC --> Round
   Round -- wrong --> Feedback[Red feedback,<br/>name / flag revealed] --> Round
   Round -- correct --> Next[✓ + chime, 1 s] --> Round
-  Round -- "wrong (multiplayer)" --> Turn[Right answer shown,<br/>next player's turn] --> Round
-  Round -. profile button .-> Menu[Menu: 🌙 theme · ✏️ edit · difficulty · 🌍 countries ·<br/>📊 statistics · 🔗 share · ⬇️ save data · 🎮 change game · 👥 switch player]
+  Round -- "wrong, or N rounds in a row (multiplayer)" --> Turn[Next player's turn] --> Round
+  Round -. profile button .-> Menu[Menu: 🌙 theme · ✏️ edit · difficulty · 🌍 countries · 📊 statistics ·<br/>🗣 speech · 🔊 sounds · 🔗 share · 💾 save data · ⬇️ install · ⓘ credits · 🎮 game · 👥 players]
+  Pick -- 🗑 --> Delete[Delete a player:<br/>solve an equation]
   Pick -- ⬆️ --> Import[Load a player<br/>from a JSON file] --> Pick
 ```
 
@@ -228,13 +245,21 @@ flowchart TD
    - The 🔥 days-in-a-row streak and the ⭐ rounds-without-mistakes streak are always shown at the top left.
    - Tapping the profile flag (top right) opens the menu: theme, edit player, difficulty (tap to cycle 3 → 6 → 9 options), countries (continents and top N by population), statistics, share, save data, change game, switch player.
 
-5. **Playing together**:
-   - In the "Who is playing?" dialog, switch from 👤 to 👥 and tap the players who will play (each gets a ✓), then ▶.
+5. **Guess the Location / Capital / Capital's Country**:
+   - On the map, a wrong tap colours that country red and shows its name and flag where it is. Tiny countries are round markers; zoom in with the wheel, a pinch or ＋, and drag to move.
+   - In the capital games, each capital shows four photos of the city and its landmarks; a wrong pick shows whose capital it is (or the capital of the chosen country).
+
+6. **Playing together**:
+   - In the "Who is playing?" dialog, switch from 👤 to 👥, tap the players who will play (each gets a ✓), choose how many rounds in a row each player may play (🔁 − 3 +), then ▶.
    - The player with the lowest best run starts. Their name and flag are shown top right, with the next players' flags below.
    - After a mistake, the right answer is shown, then the next player's flag and name appear (and the name is said aloud).
 
-6. **Moving to another device**:
-   - In the menu, ⬇️ saves the player's data as a JSON file.
+7. **Grown-ups**:
+   - To delete a player, tap the small 🗑 in the "Who is playing?" dialog, tap the player, and solve the equation.
+   - To install the app on a phone or tablet, use ⬇️ in the menu.
+
+8. **Moving to another device**:
+   - In the menu, 💾 saves the player's data as a JSON file.
    - On the other device, the ⬆️ button in the "Who is playing?" dialog loads that file as a new player.
 
 ---
@@ -283,6 +308,8 @@ Navigate to [http://localhost:5173](http://localhost:5173) to see the applicatio
 | `npm run check` | Type-check Svelte and TypeScript |
 | `npm test` | Run the unit tests |
 | `npm run fetch-countries` | Download the flags, populations and continents again and regenerate `src/data/countries.ts` |
+| `npm run fetch-capitals` | Download the capitals and their photos again (`public/capitals/`, `src/data/capitals.ts`, `public/credits.html`); `-- --only=FR,GB` updates some countries only |
+| `npm run fetch-map` | Regenerate the world map (`src/data/map.json`) |
 
 ### Deployment
 
@@ -292,6 +319,7 @@ Every push to `main` is built, tested and deployed to [flagquiz.aossie.org](http
 
 - Over **HTTPS** (or on `localhost`), the service worker is registered: the app works offline and can be installed.
 - Over plain HTTP, the app still works as a normal website.
+- Everything the app needs (about 18 MB, mostly the photos of capitals) is downloaded in the background when the app is first opened or installed, so all games work offline.
 - The social media metadata in `index.html` points to `https://flagquiz.aossie.org/` and `https://flagquiz.aossie.org/og-image.png`. Update these if the app is deployed elsewhere.
 
 ---
@@ -306,6 +334,10 @@ Every push to `main` is built, tested and deployed to [flagquiz.aossie.org](http
 | Guess the Country (dark mode, hard) | Menu | Statistics |
 | ![Countries](docs/screenshots/countries.png) | ![Multiplayer: choose players](docs/screenshots/multiplayer-players.png) | ![Multiplayer: next player](docs/screenshots/multiplayer-turn.png) |
 | Choose continents and top N by population | Multiplayer: choose players | Multiplayer: next player's turn |
+| ![Guess the Location](docs/screenshots/guess-the-location.png) | ![Guess the Capital](docs/screenshots/guess-the-capital.png) | ![Guess the Capital's Country](docs/screenshots/guess-the-capital-country.png) |
+| Guess the Location | Guess the Capital | Guess the Capital's Country |
+| ![Splash screen](docs/screenshots/splash.png) | ![Delete a player](docs/screenshots/delete-player.png) | |
+| Splash screen | Deleting a player (grown-ups only) | |
 
 ---
 
@@ -328,7 +360,7 @@ See [MAINTAINERS.md](./MAINTAINERS.md) for maintainers, mentors, and ideators.
 This project is licensed under the GNU General Public License v3.0.
 See the [LICENSE](LICENSE) file for details.
 
-The flag images are in the public domain (see [hampusborgos/country-flags](https://github.com/hampusborgos/country-flags)). Population and continent data © [GeoNames](https://www.geonames.org/), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+The flag images are in the public domain (see [hampusborgos/country-flags](https://github.com/hampusborgos/country-flags)). Population and continent data © [GeoNames](https://www.geonames.org/), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Capitals from Wikidata (CC0); map from Natural Earth (public domain). The photos of capitals are from Wikimedia Commons under their own free licences (mostly CC BY and CC BY-SA); each photo's author, licence and source are listed in [`public/credits.html`](public/credits.html) and in `src/data/capitals.ts`. The AOSSIE logo is used according to the [AOSSIE brand guidelines](https://github.com/AOSSIE-Org/Info/blob/main/Brand.md).
 
 ---
 

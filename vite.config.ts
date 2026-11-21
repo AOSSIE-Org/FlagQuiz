@@ -13,16 +13,26 @@ export default defineConfig({
       injectRegister: 'script-defer',
       includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png'],
       manifest: {
+        id: './',
         name: 'Flag Quiz',
         short_name: 'Flag Quiz',
-        description: 'Learn the flags of the world.',
+        description: 'Learn the flags, maps and capitals of the world. A free game for children by AOSSIE.',
         lang: 'en',
+        dir: 'ltr',
+        categories: ['education', 'games', 'kids'],
         theme_color: '#00843D',
-        background_color: '#121212',
+        background_color: '#FFFFFF',
         display: 'fullscreen',
+        display_override: ['fullscreen', 'standalone'],
         orientation: 'landscape',
         start_url: './',
         scope: './',
+        prefer_related_applications: false,
+        // Shown by Android's richer install dialog.
+        screenshots: [
+          { src: 'screenshots/wide.png', sizes: '1280x720', type: 'image/png', form_factor: 'wide', label: 'Guess the Flag' },
+          { src: 'screenshots/narrow.png', sizes: '844x390', type: 'image/png', form_factor: 'narrow', label: 'Guess the Capital' },
+        ],
         icons: [
           { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
@@ -31,9 +41,11 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
-        // Only used by social media previews.
-        globIgnores: ['og-image.png'],
+        // Everything, including the photos of capitals, is downloaded at install,
+        // so that every game works offline.
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,webp}'],
+        // Only used by social media previews and install dialogs.
+        globIgnores: ['og-image.png', 'screenshots/**'],
         maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,
       },
     }),

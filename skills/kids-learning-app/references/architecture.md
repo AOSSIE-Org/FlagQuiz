@@ -122,9 +122,16 @@ answer(code):
   the right aspect ratio instead, or circles become ovals.
 - **Dark-mode swatches**: give colour swatches an outline based on
   `var(--text)`, or black disappears on dark surfaces.
-- **Speech**: call `speechSynthesis.cancel()` before `speak()`, prefer
-  `localService` voices, de-duplicate the same text within ~700 ms. The first
-  call must follow a user gesture (starting a game counts).
+- **Speech** (see `src/lib/speech.ts`): engines differ in how they survive
+  interruptions. Only `cancel()` when something is speaking, then wait ~80 ms
+  before `speak()` (Safari/iOS and Chrome/Android can drop an utterance queued
+  right after `cancel()`); keep a reference to the current utterance (Chrome
+  can garbage-collect it and its events never fire); reset the engine
+  (`cancel()` + `resume()`) when speech is switched on or off; and add a
+  watchdog that resets and retries once if an utterance never starts. Prefer
+  `localService` voices, de-duplicate the same text within ~700 ms, and speak
+  the first utterance synchronously inside a user gesture (iOS). Test with a
+  fake `speechSynthesis` (vitest `stubGlobal` + fake timers).
 - **Imports are untrusted**: limit file size, check `format`/`version`,
   validate every field (colour regex, enums, finite numbers in range,
   non-negative integers, date regex), skip unknown item codes, and create a
@@ -134,6 +141,31 @@ answer(code):
   them (World Bank API).
 - **Social previews** need absolute URLs for `og:image`; exclude the image
   from the service-worker precache (`globIgnores`).
+- **Wikidata Query Service**: geo `wikibase:around` queries over big cities
+  and `P279*` class checks over thousands of items time out; you're also
+  rate-limited (HTTP 429) after a few heavy queries. Walk `P131+` down from
+  the city instead, rank by `wikibase:sitelinks` in a sub-query with a LIMIT,
+  apply class whitelists only to that short list, run one query per area
+  (a `VALUES` list of areas made the planner time out), and use the geo query
+  only as a small-radius fallback.
+- **Wikidata data errors**: check that landmarks are within ~50 km of the
+  city; a "located in" chain once put Irish railway stations in Pitcairn.
+- **Commons**: get licences in batches of 50 titles with `prop=imageinfo&
+  iiprop=url|extmetadata&iiurlwidth=…`; strip HTML from `Artist`; skip
+  `NonFree`; retry thumbnail downloads on 429 honouring `Retry-After`; always
+  send an identifying User-Agent (project URL, no personal data).
+- **world-atlas ids** are ISO numeric strings; map them to alpha-2 (GeoNames
+  has the numeric codes). A few shapes have no id (Kosovo, Somaliland, N.
+  Cyprus…): assign or draw them as neutral land. Simplify with
+  topojson-simplify (quantile 0.5 halved the size to ~480 KB).
+- **SVG maps**: use `vector-effect="non-scaling-stroke"` and scale markers and
+  labels by `1/zoom` so they keep their screen size; distinguish taps from
+  drags with a movement threshold and find the tapped element with
+  `document.elementFromPoint` (pointer capture changes `event.target`);
+  `touch-action: none` on the map.
+- **Hover styles** must not override result colours (`:hover:not(.wrong)`).
+- **`beforeinstallprompt`** fires early: register the listener in a module
+  imported first in `main.ts`.
 - **Template workflows** reference actions by SHA; pin new workflows the same
   way (`gh api repos/<owner>/<action>/git/ref/tags/<tag>`).
 

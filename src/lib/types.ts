@@ -1,8 +1,39 @@
 import type { Continent } from '../data/countries';
 
-/** `flag` = "Guess the Flag", `country` = "Guess the Country". */
-export type GameId = 'flag' | 'country';
-export const GAMES: readonly GameId[] = ['flag', 'country'];
+/**
+ * `flag` = "Guess the Flag", `country` = "Guess the Country",
+ * `location` = "Guess the Location", `capital` = "Guess the Capital",
+ * `capitalCountry` = "Guess the Capital's Country".
+ */
+export type GameId = 'flag' | 'country' | 'location' | 'capital' | 'capitalCountry';
+export const GAMES: readonly GameId[] = ['flag', 'country', 'location', 'capital', 'capitalCountry'];
+
+/** A record with one value per game. */
+export function perGame<T>(value: (game: GameId) => T): Record<GameId, T> {
+  return Object.fromEntries(GAMES.map((g) => [g, value(g)])) as Record<GameId, T>;
+}
+
+export const GAME_NAMES: Record<GameId, string> = {
+  flag: 'Guess the Flag',
+  country: 'Guess the Country',
+  location: 'Guess the Location',
+  capital: 'Guess the Capital',
+  capitalCountry: "Guess the Capital's Country",
+};
+
+/** Device-wide preferences. */
+export interface Settings {
+  /** Read names aloud. */
+  speech: boolean;
+  /** Feedback sounds. */
+  sounds: boolean;
+  /** Multiplayer: maximum rounds in a row per player. */
+  turnRounds: number;
+}
+
+export const DEFAULT_SETTINGS: Settings = { speech: true, sounds: true, turnRounds: 3 };
+export const TURN_ROUNDS_MIN = 1;
+export const TURN_ROUNDS_MAX = 10;
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
 export const DIFFICULTIES: readonly Difficulty[] = ['easy', 'medium', 'hard'];
@@ -67,6 +98,8 @@ export interface User {
   perfectRun: number;
   /** Best ever number of consecutive rounds solved without mistakes. */
   bestPerfectRun: number;
+  /** Total number of correct answers, in all games. */
+  correctCount: number;
   filter: CountryFilter;
   createdAt: number;
   lastActiveAt: number;

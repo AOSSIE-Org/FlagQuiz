@@ -1,6 +1,12 @@
 /** Short feedback sounds synthesised with the Web Audio API (no audio files). */
 
 let ctx: AudioContext | null = null;
+let enabled = true;
+
+/** Turns the feedback sounds on or off. */
+export function setSoundsEnabled(on: boolean): void {
+  enabled = on;
+}
 
 function audio(): AudioContext | null {
   if (typeof AudioContext === 'undefined') return null;
@@ -10,6 +16,7 @@ function audio(): AudioContext | null {
 }
 
 function tone(freq: number, start: number, duration: number, type: OscillatorType, gain = 0.12) {
+  if (!enabled) return;
   const ac = audio();
   if (!ac) return;
   const t0 = ac.currentTime + start;

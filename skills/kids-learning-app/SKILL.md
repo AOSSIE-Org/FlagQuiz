@@ -89,6 +89,34 @@ Apply these unless the user explicitly says otherwise.
   all mastered items — the modal grows to fit them and never overflows.
 - Export a player as JSON (menu) and import it as a new player (player picker),
   validating every field of the untrusted file.
+- Deleting players is for grown-ups only: a small, faded 🗑 in the player
+  picker enters delete mode, and confirming requires solving a linear equation
+  (e.g. `7x − 23 = 2x + 52`), with a new equation after every wrong answer.
+- Multiplayer turns also end after a configurable number of rounds in a row
+  (default 3, set next to the player selection).
+- Menu switches for text-to-speech and for sound effects (device-wide settings
+  stored in IndexedDB), a ⓘ credits page, and a total "correct answers" counter
+  next to the streaks.
+
+**Shell**
+- Splash screen at start: app logo, name and "made by" + AOSSIE's secondary
+  logo (ink version on light, coloured on dark), ~2 s, tap to skip.
+- Discreet full-screen toggle in the lower-right corner (Fullscreen API;
+  hidden where unsupported, e.g. iPhone Safari).
+- Installable PWA: an "Install app" menu button shown only on phones/tablets
+  when not already installed. Android: keep `beforeinstallprompt` and call
+  `prompt()`. iOS: show Share → Add to Home Screen with icons. Manifest with
+  `id`, `display: fullscreen`, `orientation`, maskable icons, `screenshots`
+  (wide + narrow); `apple-mobile-web-app-*` meta tags.
+
+**Content-rich games (when the subject needs them)**
+- Maps: Natural Earth via world-atlas, projected at build time with d3-geo
+  into SVG paths; round tappable markers for tiny countries; wheel/pinch/±
+  zoom and drag; wrong taps label the tapped country on the map.
+- Photos: Wikimedia Commons, chosen via Wikidata (the place's main image plus
+  its most famous landmarks), resized with sharp to small WebP files, with
+  author/licence/source kept for a credits page. Precache them with the rest
+  of the app (~20 KB each as 360×240 WebP) so every game works offline.
 
 **Repository**
 - Initialize from [AOSSIE-Org/Template-Repo](https://github.com/AOSSIE-Org/Template-Repo)

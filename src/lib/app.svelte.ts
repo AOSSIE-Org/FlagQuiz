@@ -1,14 +1,21 @@
+import { CAPITALS } from '../data/capitals';
 import { COUNTRIES, type Country } from '../data/countries';
 import * as store from './db';
 import { dayKey, streaks } from './dates';
 import { applyFilter, K_START, nextK, pickRound, recordGuess } from './select';
-import { playCorrect, playWrong } from './sound';
-import { speak } from './speech';
+import { playCorrect, playWrong, setSoundsEnabled } from './sound';
+import { setSpeechEnabled, speak } from './speech';
 import { buildExport, exportFileName, parseImport, type ImportedPlayer } from './transfer';
 import { nextTurn, turnOrder } from './turns';
 import {
   DEFAULT_FILTER,
+  DEFAULT_SETTINGS,
   OPTION_COUNT,
+  TURN_ROUNDS_MAX,
+  TURN_ROUNDS_MIN,
+  GAMES,
+  perGame,
+  type Settings,
   type CountryFilter,
   type Difficulty,
   type GameId,
@@ -42,9 +49,17 @@ export const TURN_BANNER_MS = 1600;
 /** Maximum number of recent targets that are not repeated. */
 const RECENT_SIZE = 15;
 const KNOWN_CODES = new Set(COUNTRIES.map((c) => c.code));
+const CAPITAL_CODES = new Set(CAPITALS.map((c) => c.code));
+
+/** Countries that can appear in a game. */
+export function availableIn(game: GameId): (c: Country) => boolean {
+  if (game === 'capital' || game === 'capitalCountry') return (c) => CAPITAL_CODES.has(c.code);
+  if (game === 'location') return (c) => c.code !== 'AQ';
+  return () => true;
+}
 
 type PlayerStats = Record<GameId, Map<string, ItemStats>>;
-const emptyStats = (): PlayerStats => ({ flag: new Map(), country: new Map() });
+const emptyStats = (): PlayerStats => perGame(() => new Map());
 
 export function systemTheme(): Theme {
   return typeof matchMedia !== 'undefined' && matchMedia('(prefers-color-scheme: dark)').matches
@@ -54,7 +69,12 @@ export function systemTheme(): Theme {
 
 /** Fills in fields added in later versions of the app. */
 function withDefaults(user: User): User {
-  return { ...user, filter: user.filter ?? structuredClone(DEFAULT_FILTER) };
+  return {
+    ...user,
+    filter: user.filter ?? structuredClone(DEFAULT_FILTER),
+    correctCount: user.correctCount ?? 0,
+    adapt: { ...perGame(() => K_START), ...user.adapt },
+  };
 }
 
 class AppState {
@@ -66,6 +86,7 @@ class AppState {
   menuOpen = $state(false);
   statsOpen = $state(false);
   filterOpen = $state(false);
+  settings = $state<Settings>({ ...DEFAULT_SETTINGS });
 
   /** Player picker: one player, or several players taking turns. */
   pickerMode = $state<PickerMode>('single');
@@ -84,14 +105,16 @@ class AppState {
   multiplayer = $derived(this.players.length > 1);
   playDays = $derived(this.user?.id !== undefined ? (this.playDaysById[this.user.id] ?? []) : []);
   dayStreak = $derived(streaks(this.playDays));
-  /** Countries that can be asked, according to the current player's filter. */
-  pool = $derived(applyFilter(COUNTRIES, this.user?.filter ?? DEFAULT_FILTER));
+  /** Countries of the current game that can be asked, according to the current player's filter. */
+  pool = $derived(applyFilter(COUNTRIES.filter(availableIn(this.game)), this.user?.filter ?? DEFAULT_FILTER));
 
   #db: store.DB | null = null;
   #stats = new Map<number, PlayerStats>();
   #recent: string[] = [];
   #mistakes = 0;
   #roundSeq = 0;
+  /** Multiplayer: rounds the current player has played in this turn. */
+  #turnRounds = 0;
   /** Incremented whenever pending timers must be ignored. */
   #session = 0;
 
@@ -99,13 +122,27 @@ class AppState {
     try {
       this.#db = await store.openDatabase();
       this.users = (await store.listUsers(this.#db)).map(withDefaults);
+      this.settings = await store.getSettings(this.#db);
     } catch (err) {
       // e.g. storage disabled: the app still works, but nothing is saved.
       console.warn('IndexedDB unavailable; progress will not be saved.', err);
       this.#db = null;
     }
+    setSpeechEnabled(this.settings.speech);
+    setSoundsEnabled(this.settings.sounds);
     this.phase = 'pickUser';
     if (this.users.length === 0) this.editor = 'new';
+  }
+
+  // --------------------------------------------------------------- settings
+
+  setSettings(patch: Partial<Settings>): void {
+    const next = { ...this.settings, ...patch };
+    next.turnRounds = Math.min(TURN_ROUNDS_MAX, Math.max(TURN_ROUNDS_MIN, Math.round(next.turnRounds)));
+    this.settings = next;
+    setSpeechEnabled(next.speech);
+    setSoundsEnabled(next.sounds);
+    if (this.#db) void store.saveSettings(this.#db, $state.snapshot(next) as Settings);
   }
 
   // ---------------------------------------------------------------- players
@@ -151,12 +188,12 @@ class AppState {
       return;
     }
     const id = player.id;
-    const [days, flag, country] = await Promise.all([
-      store.getPlayDays(this.#db, id),
-      store.getStats(this.#db, id, 'flag'),
-      store.getStats(this.#db, id, 'country'),
+    const db = this.#db;
+    const [days, ...maps] = await Promise.all([
+      store.getPlayDays(db, id),
+      ...GAMES.map((g) => store.getStats(db, id, g)),
     ]);
-    this.#stats.set(id, { flag, country });
+    this.#stats.set(id, Object.fromEntries(GAMES.map((g, i) => [g, maps[i]])) as PlayerStats);
     this.playDaysById = { ...this.playDaysById, [id]: days };
   }
 
@@ -167,9 +204,10 @@ class AppState {
       flag,
       difficulty: 'easy',
       theme: currentTheme(),
-      adapt: { flag: K_START, country: K_START },
+      adapt: perGame(() => K_START),
       perfectRun: 0,
       bestPerfectRun: 0,
+      correctCount: 0,
       filter: structuredClone(DEFAULT_FILTER),
       createdAt: now,
       lastActiveAt: now,
@@ -191,6 +229,15 @@ class AppState {
     this.user.flag = flag;
     this.editor = null;
     await this.#saveUser(this.user);
+  }
+
+  /** Deletes a player and all their data. Not allowed for players in the current session. */
+  async deleteUser(id: number): Promise<void> {
+    if (this.players.some((p) => p.id === id)) return;
+    if (this.#db) await store.deleteUserWithData(this.#db, id);
+    this.users = this.users.filter((u) => u.id !== id);
+    this.selectedIds = this.selectedIds.filter((x) => x !== id);
+    this.#stats.delete(id);
   }
 
   switchUser(): void {
@@ -242,7 +289,7 @@ class AppState {
     if (!this.user) return;
     const data = buildExport(
       $state.snapshot(this.user) as User,
-      { flag: this.statsFor('flag'), country: this.statsFor('country') },
+      perGame((g) => this.statsFor(g)),
       this.playDays,
     );
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -274,6 +321,7 @@ class AppState {
     this.menuOpen = false;
     this.banner = null;
     this.#recent = [];
+    this.#turnRounds = 0;
     this.phase = 'playing';
     this.newRound();
   }
@@ -294,7 +342,7 @@ class AppState {
       OPTION_COUNT[this.user.difficulty],
       this.#recent,
       Math.random,
-      COUNTRIES,
+      COUNTRIES.filter(availableIn(this.game)),
     );
     // With few countries in the pool, fewer recent targets are excluded.
     const recentSize = Math.min(RECENT_SIZE, Math.floor(pool.length / 2));
@@ -323,6 +371,7 @@ class AppState {
     if (code === round.target.code) {
       round.solved = true;
       playCorrect();
+      user.correctCount++;
       if (this.#mistakes === 0) {
         this.#record(user, game, code, false);
         user.perfectRun++;
@@ -330,7 +379,10 @@ class AppState {
       }
       user.adapt[game] = nextK(user.adapt[game], this.#mistakes);
       void this.#saveUser(user);
-      this.#later(NEXT_ROUND_DELAY_MS, () => this.newRound());
+      // Multiplayer: after the maximum number of rounds in a row, the next player plays.
+      this.#turnRounds++;
+      const turnOver = this.multiplayer && this.#turnRounds >= this.settings.turnRounds;
+      this.#later(NEXT_ROUND_DELAY_MS, () => (turnOver ? this.#passTurn() : this.newRound()));
       return 'correct';
     }
 
@@ -356,6 +408,7 @@ class AppState {
   }
 
   #passTurn(): void {
+    this.#turnRounds = 0;
     this.turn = nextTurn(this.turn, this.players.length);
     const player = this.user;
     if (!player) return;

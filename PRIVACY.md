@@ -23,7 +23,9 @@ Depending on the features you use and the permissions you grant, the App may acc
   * how many times each flag/country was guessed correctly or incorrectly in each game, used to choose which flags to show next;
   * the dates on which the player played, used to show the streak of days played;
   * the current and best number of rounds solved in a row without mistakes;
-  * which continents and how many of the most populous countries the player chose to practise.
+  * which continents and how many of the most populous countries the player chose to practise;
+  * the total number of correct answers;
+  * device-wide settings: whether names are read aloud, whether sound effects play, and the maximum number of rounds in a row per player in multiplayer games.
 * The App does not request any device permissions (no location, camera, microphone, contacts or files).
 
 The information accessed by the App is used only for the purposes described in this Privacy Policy and to provide the functionality of the App.
@@ -46,7 +48,7 @@ The App does not sell your personal information.
 
 The App does not use personal information for targeted advertising.
 
-No information is shared with any third parties.
+No information is shared with any third parties. All flags, photos and map data are part of the App and are loaded from the same place as the App itself; the credits page only links to the original photos on Wikimedia Commons.
 
 The share button only shares the link to the App, using your device's share sheet (or copies the link to your clipboard). What happens next depends on the app you choose to share it with. No player information is included.
 
@@ -66,7 +68,7 @@ However, no method of electronic storage or transmission can be guaranteed to be
 Where information is stored locally, you can generally remove it by using the App's available data-clearing features, 
 clearing the data through your device settings, or uninstalling the App.
 
-No information is stored on servers, so there is nothing to request deletion of. To delete all players and their progress, clear the site data of the App in your browser settings (or uninstall the installed App).
+No information is stored on servers, so there is nothing to request deletion of. A player and all their progress can be deleted in the App (the 🗑 button in the player selection, protected by a question only grown-ups can answer). To delete everything, clear the site data of the App in your browser settings (or uninstall the installed App).
 
 
 ## Data Export

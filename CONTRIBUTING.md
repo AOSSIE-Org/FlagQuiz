@@ -247,7 +247,8 @@ Steps to test the changes
 - Use Svelte 5 runes (`$state`, `$derived`, `$props`, `$effect`). Shared state lives in `src/lib/app.svelte.ts`.
 - Keep game logic in plain, testable TypeScript modules under `src/lib/` and add tests next to them (`*.test.ts`).
 - The app must stay **purely local**: no network requests at runtime, no analytics, no external fonts or CDNs.
-- Do not edit `src/data/countries.ts` or `public/flags/` by hand: change and re-run `scripts/fetch-countries.mjs` (`npm run fetch-countries`).
+- Do not edit generated data by hand: change and re-run the scripts instead — `npm run fetch-countries` (`src/data/countries.ts`, `public/flags/`), `npm run fetch-capitals` (`src/data/capitals.ts`, `public/capitals/`, `public/credits.html`) and `npm run fetch-map` (`src/data/map.json`).
+- Every photo must be freely licensed and credited: keep the author, licence and source of each one (the capitals script does this for Wikimedia Commons).
 
 ### General Guidelines
 

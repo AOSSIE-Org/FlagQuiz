@@ -4,15 +4,21 @@
     Check,
     Download,
     Earth,
+    FileDown,
     Gamepad2,
+    Info,
     Moon,
     Pencil,
     Share2,
+    Speech,
     Sun,
     Users,
+    Volume2,
+    VolumeX,
     X,
   } from '@lucide/svelte';
   import { app, shareApp } from '../lib/app.svelte';
+  import { install } from '../lib/install.svelte';
   import { upcoming } from '../lib/turns';
   import { DIFFICULTIES } from '../lib/types';
   import CustomFlag from './CustomFlag.svelte';
@@ -105,6 +111,28 @@
           <ChartColumn />
         </button>
         <button
+          role="menuitemcheckbox"
+          aria-checked={app.settings.speech}
+          class="item"
+          class:off={!app.settings.speech}
+          onclick={() => app.setSettings({ speech: !app.settings.speech })}
+          aria-label="Read names aloud"
+          title={app.settings.speech ? 'Reading names aloud: on' : 'Reading names aloud: off'}
+        >
+          <Speech />
+        </button>
+        <button
+          role="menuitemcheckbox"
+          aria-checked={app.settings.sounds}
+          class="item"
+          class:off={!app.settings.sounds}
+          onclick={() => app.setSettings({ sounds: !app.settings.sounds })}
+          aria-label="Sound effects"
+          title={app.settings.sounds ? 'Sound effects: on' : 'Sound effects: off'}
+        >
+          {#if app.settings.sounds}<Volume2 />{:else}<VolumeX />{/if}
+        </button>
+        <button
           role="menuitem"
           class="item"
           class:ok={shareResult === 'copied'}
@@ -116,8 +144,16 @@
           {#if shareResult === 'copied'}<Check />{:else if shareResult === 'failed'}<X />{:else}<Share2 />{/if}
         </button>
         <button role="menuitem" class="item" onclick={() => app.exportUser()} aria-label="Save my data" title="Save my data">
-          <Download />
+          <FileDown />
         </button>
+        {#if install.available}
+          <button role="menuitem" class="item" onclick={() => open(() => install.install())} aria-label="Install app" title="Install app">
+            <Download />
+          </button>
+        {/if}
+        <a role="menuitem" class="item" href="./credits.html" target="_blank" rel="noopener" aria-label="Credits" title="Credits">
+          <Info />
+        </a>
         <button role="menuitem" class="item" onclick={() => app.changeGame()} aria-label="Change game" title="Change game">
           <Gamepad2 />
         </button>
@@ -189,6 +225,7 @@
     right: 0;
     z-index: 15;
     display: grid;
+    grid-template-columns: repeat(2, auto);
     gap: clamp(4px, 1vmin, 8px);
     padding: clamp(6px, 1.4vmin, 10px);
     border-radius: var(--radius);
@@ -208,6 +245,23 @@
   }
   .item:hover {
     background: var(--surface-2);
+  }
+  a.item {
+    color: inherit;
+  }
+  /* A switched-off setting: dimmed and crossed out. */
+  .item.off {
+    position: relative;
+    color: var(--muted);
+  }
+  .item.off::after {
+    content: '';
+    position: absolute;
+    width: 60%;
+    height: 2.5px;
+    border-radius: 2px;
+    background: var(--bad);
+    transform: rotate(-45deg);
   }
   .item.difficulty {
     font-size: clamp(20px, 4.4vmin, 26px);

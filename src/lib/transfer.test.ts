@@ -10,9 +10,10 @@ const user: User = {
   flag: { colors: ['#00843D', '#FFCD00', '#0032A0'], pattern: 'hoist' },
   difficulty: 'medium',
   theme: 'dark',
-  adapt: { flag: 2, country: -1 },
+  adapt: { flag: 2, country: -1, location: 1, capital: 1, capitalCountry: 1 },
   perfectRun: 3,
   bestPerfectRun: 12,
+  correctCount: 40,
   filter: { continents: ['EU', 'SA'], topN: 2 },
   createdAt: 1000,
   lastActiveAt: 2000,
@@ -24,6 +25,9 @@ function exported(): ExportFile {
     {
       flag: new Map<string, ItemStats>([['FR', { s: 0.1, c: 9, d: 0 }]]),
       country: new Map<string, ItemStats>([['DE', { s: 0.55, c: 0, d: 1 }]]),
+      location: new Map(),
+      capital: new Map(),
+      capitalCountry: new Map(),
     },
     ['2026-11-19', '2026-11-20'],
     new Date('2026-11-21T10:00:00Z'),
@@ -92,7 +96,7 @@ describe('export / import', () => {
     });
     expect(u.name).toBe('A very very long');
     expect(u.difficulty).toBe('easy');
-    expect(u.adapt).toEqual({ flag: 4, country: 1 });
+    expect(u.adapt).toEqual({ flag: 4, country: 1, location: 1, capital: 1, capitalCountry: 1 });
     expect(u.filter).toEqual({ continents: DEFAULT_FILTER.continents, topN: known.size });
     expect(u.bestPerfectRun).toBe(20);
     expect(stats.map((s) => s.code)).toEqual(['FR', 'DE']);
