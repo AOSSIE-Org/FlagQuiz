@@ -53,6 +53,12 @@ jobs:
   dependency-review:
     name: Dependency & License Review
     runs-on: ubuntu-latest
+    # Disabled until the repository's dependency graph is enabled
+    # (Settings → Advanced Security → Dependency graph); without it the
+    # dependency review API returns "403 Forbidden". After enabling it, create
+    # the repository variable DEPENDENCY_REVIEW_ENABLED with the value "true"
+    # (Settings → Secrets and variables → Actions → Variables).
+    if: vars.DEPENDENCY_REVIEW_ENABLED == 'true'
 
     steps:
       - name: Run Dependency Review

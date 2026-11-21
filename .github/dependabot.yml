@@ -33,6 +33,10 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+    ignore:
+      # svelte-check (used by `npm run check`) does not support TypeScript 7 yet.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "chore(deps)"  # Follows conventional commits
       include: "scope"
