@@ -4,6 +4,7 @@
   import { app } from './lib/app.svelte';
   import FlagEditor from './components/FlagEditor.svelte';
   import FullscreenButton from './components/FullscreenButton.svelte';
+  import SoundButton from './components/SoundButton.svelte';
   import GameCapital from './components/GuessCapital.svelte';
   import GameCapitalCountry from './components/GuessCapitalCountry.svelte';
   import GameCountry from './components/GuessCountry.svelte';
@@ -80,6 +81,7 @@
   {/if}
 
   <FullscreenButton />
+  <SoundButton />
   <UpdateButton />
 
   {#if splash}
