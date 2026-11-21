@@ -43,11 +43,11 @@
 
 
 <p align="center">
-  <a href="https://scorecard.dev/viewer/?uri=github.com/AOSSIE-Org/LearnGeography">
-    <img src="https://api.scorecard.dev/projects/github.com/AOSSIE-Org/LearnGeography/badge" alt="OpenSSF Scorecard"/></a>
+  <a href="https://scorecard.dev/viewer/?uri=github.com/AOSSIE-Org/FlagQuiz">
+    <img src="https://api.scorecard.dev/projects/github.com/AOSSIE-Org/FlagQuiz/badge" alt="OpenSSF Scorecard"/></a>
   &nbsp;&nbsp;
   <a href="./BestPracticesChecklist.md">
-    <img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FAOSSIE-Org%2FLearnGeography%2Fmain%2Fchecklist-status.json&query=%24.percent&suffix=%25&label=Best%20Practices&logo=openssf" alt="Best Practices"/></a>
+    <img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FAOSSIE-Org%2FFlagQuiz%2Fmain%2Fchecklist-status.json&query=%24.percent&suffix=%25&label=Best%20Practices&logo=openssf" alt="Best Practices"/></a>
   &nbsp;&nbsp;
   <a href="https://github.com/gitleaks/gitleaks">
     <img src="https://img.shields.io/badge/protected%20by-gitleaks-blue" alt="Protected by Gitleaks"/></a>
@@ -126,7 +126,7 @@ The template's checklist categories (protocol, smart contracts, mobile app store
 
 ## 🔗 Repository Links
 
-1. [Main Repository](https://github.com/AOSSIE-Org/LearnGeography) (the frontend is the whole app; there is no backend)
+1. [Main Repository](https://github.com/AOSSIE-Org/FlagQuiz) (the frontend is the whole app; there is no backend)
 
 ---
 
@@ -243,8 +243,8 @@ No accounts, API keys or environment variables are needed.
 #### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/AOSSIE-Org/LearnGeography.git
-cd LearnGeography
+git clone https://github.com/AOSSIE-Org/FlagQuiz.git
+cd FlagQuiz
 ```
 
 #### 2. Install Dependencies
@@ -274,6 +274,8 @@ Navigate to [http://localhost:5173](http://localhost:5173) to see the applicatio
 | `npm run fetch-countries` | Download the flags, populations and continents again and regenerate `src/data/countries.ts` |
 
 ### Deployment
+
+Every push to `main` is built, tested and deployed to [flagquiz.aossie.org](https://flagquiz.aossie.org/) by the [Deploy to GitHub Pages](.github/workflows/deploy.yml) workflow (the repository's Pages source must be set to "GitHub Actions").
 
 `npm run build` produces a fully static site in `dist/` with relative paths, so it can be served from any static host and any sub-folder (GitHub Pages, Netlify, nginx, …).
 
@@ -323,6 +325,6 @@ The flag images are in the public domain (see [hampusborgos/country-flags](https
 
 Thanks a lot for spending your time helping Flag Quiz grow. Keep rocking 🥂
 
-[![Contributors](https://contrib.rocks/image?repo=AOSSIE-Org/LearnGeography)](https://github.com/AOSSIE-Org/LearnGeography/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=AOSSIE-Org/FlagQuiz)](https://github.com/AOSSIE-Org/FlagQuiz/graphs/contributors)
 
 © 2026 AOSSIE

@@ -91,13 +91,13 @@ What we expect:
 
 2. **Clone Your Fork**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/LearnGeography.git
-   cd LearnGeography
+   git clone https://github.com/YOUR_USERNAME/FlagQuiz.git
+   cd FlagQuiz
    ```
 
 3. **Add Upstream Remote**
    ```bash
-   git remote add upstream https://github.com/AOSSIE-Org/LearnGeography.git
+   git remote add upstream https://github.com/AOSSIE-Org/FlagQuiz.git
    ```
 
 4. **Install Dependencies**

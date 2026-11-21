@@ -8,7 +8,7 @@
   "homepage": "https://flagquiz.aossie.org/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AOSSIE-Org/LearnGeography.git"
+    "url": "https://github.com/AOSSIE-Org/FlagQuiz.git"
   },
   "engines": {
     "node": ">=20"
