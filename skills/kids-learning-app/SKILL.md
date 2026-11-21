@@ -1,9 +1,9 @@
 ---
 name: kids-learning-app
-description: Plan, build, verify and ship a small, purely local educational web game for young children (e.g. learning flags, capitals, maps, animals, letters, numbers, shapes, colours) with AOSSIE's stack and conventions — Svelte 5 + TypeScript + Vite, IndexedDB storage, offline PWA that also works as a plain static site and installs on phones, AOSSIE branding, icon-first minimal UI that fits one screen without scrolling, multilingual (the most spoken languages that browsers can speak, i18n with right-to-left support), spoken prompts in the chosen language, safe updates that never lose players' progress, multiple players and multiplayer turns, adaptive difficulty, streaks and statistics, JSON export/import, grown-ups-only deletion, credits and donation pages, social sharing metadata, the AOSSIE Template-Repo with every TODO and checklist filled, CI and GitHub Pages deployment. Use when asked to create a new learning app, quiz or game for kids, or to extend one built this way.
+description: Plan, build, verify and ship a small, purely local educational web game for young children (e.g. learning flags, capitals, maps, animals, letters, numbers, shapes, colours) with AOSSIE's stack and conventions — Svelte 5 + TypeScript + Vite, IndexedDB storage, offline PWA that also works as a plain static site and installs on phones, AOSSIE branding, icon-first minimal UI that fits one screen without scrolling, multilingual (every language browsers can speak and the CLDR names countries in — 77 in Flag Quiz — i18n with right-to-left support), spoken prompts in the chosen language, safe updates that never lose players' progress, multiple players and multiplayer turns, adaptive difficulty, streaks and statistics, JSON export/import, grown-ups-only deletion, credits and donation pages, social sharing metadata, the AOSSIE Template-Repo with every TODO and checklist filled, CI and GitHub Pages deployment. Use when asked to create a new learning app, quiz or game for kids, or to extend one built this way.
 compatibility: Needs Node.js 20+, npm, git, the GitHub CLI (gh) and network access (template repo, brand assets, open data). playwright-core with the system Chrome and Playwright's WebKit build (`npx playwright install webkit`) is required for verification in both browser engines.
 metadata:
-  version: "1.4"
+  version: "1.5"
   category: app-generation
   origin: Distilled from building Flag Quiz (https://github.com/AOSSIE-Org/FlagQuiz); the full conversation is in prompts/1.md of that repo.
 user-invocable: true
@@ -115,36 +115,45 @@ Speech bugs came back twice while building Flag Quiz; avoid them from the start:
   truth and the fallback; `{placeholder}` interpolation; no string
   concatenation for sentences; languages other than English loaded on demand
   (and precached for offline use).
-- Support **every language in Wikipedia's [list of languages by total number
-  of speakers](https://en.wikipedia.org/wiki/List_of_languages_by_total_number_of_speakers)
-  (Ethnologue) that browsers can speak** (a Web Speech voice on Android,
-  iOS/macOS or Windows/Edge) and that the CLDR names countries in. Flag Quiz
-  has 29: English, Mandarin, Hindi, Spanish, Arabic, French, Bengali,
-  Portuguese, Indonesian, Urdu, Russian, German, Japanese, Marathi,
-  Vietnamese, Telugu, Swahili, Turkish, Filipino, Tamil, Cantonese, Persian,
-  Korean, Amharic, Thai, Javanese, Italian, Gujarati, Kannada. Arabic dialects
-  are served by Modern Standard Arabic; languages without a voice (e.g.
-  Nigerian Pidgin, Hausa, Yoruba, Western Punjabi, Wu, Bhojpuri) are left out
-  and named in the README/report. **English is the default**, not the
+- Support **every language that browsers can speak** (a Web Speech voice on
+  Android, iOS/macOS or Windows/Edge — Edge's online voices cover the most),
+  **that the CLDR names countries in, and that can be translated**: first the
+  languages of Wikipedia's [list of languages by total number of
+  speakers](https://en.wikipedia.org/wiki/List_of_languages_by_total_number_of_speakers)
+  (Ethnologue), then all further ones. Flag Quiz has 77 (see
+  `src/lib/languages.ts`). Arabic dialects are served by Modern Standard
+  Arabic; languages without a voice (e.g. Nigerian Pidgin, Hausa, Yoruba,
+  Western Punjabi, Wu, Bhojpuri) are left out and named in the README/report.
+  A language whose CLDR data has no country names (Sundanese) falls back to
+  the language its speakers read (Indonesian), also for missing capitals. **English is the default**, not the
   browser's language.
 - A language button (文A) in the menu and in the player picker (so it can be
   changed before any player exists) opens a picker showing each language's
   name in itself (English name as tooltip; no flags for languages), **English
   first, then alphabetical by own name** (Latin script first, then the other
-  scripts). It must **never scroll**: a grid with `auto-fill` columns, names
-  that wrap instead of being cut, and a viewport-based width (a dialog that
-  shrinks to its content makes `width: 100%` collapse) — check from 667×375
-  to 1440×900.
+  scripts). It must **never scroll**, even with ~80 languages: a grid with
+  `auto-fill` columns whose width is a multiple of the text size (wide enough
+  for the longest word), names that break only between words, a
+  viewport-based width (a dialog that shrinks to its content makes
+  `width: 100%` collapse), and a `fit()` that picks the largest text size
+  (18 → 9 px) at which neither the dialog nor any name overflows — measure
+  the name element, not the button (the ✓ badge sticks out). Check from
+  667×375 to 1440×900.
 - **Everything is translated, including the credits page**: generate it in
   English with `data-i18n`, `data-country` and `data-capital` attributes, plus
   one small JSON per language (texts with links filled in, names); the app
   links to `credits.html#<lang>` and an inline script applies the JSON (hash,
   not query, so the precached page still matches offline); precache the JSON.
-- Many translations at once can be split across parallel agents, one batch of
-  languages each, with the English file as the source of truth and a
+- Many translations at once can be split across parallel agents (e.g. six
+  agents × eight languages), one batch each, with the English file as the source of truth and a
   key/placeholder check they must pass; review their notes on uncertain
   wording, fix false friends (e.g. German "Impressum" is a legal notice, not
-  "credits") and report the least certain languages.
+  "credits") and report the least certain languages. Ask them to avoid case
+  endings on `{name}`-style placeholders (rephrase instead), to use
+  typographic apostrophes, and to say where iOS has no UI in the language.
+- Wikidata: request labels for many languages with a separate query per
+  purpose sent by POST (a single GET with ~80 label columns fails with
+  HTTP 414).
 - Set `<html lang>` and `dir`; Arabic and Urdu are right to left, so use
   logical CSS properties (`inset-inline-end`, `margin-inline-start`,
   `padding-inline-end`, `border-start-start-radius`…) instead of left/right.

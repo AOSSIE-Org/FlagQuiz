@@ -116,6 +116,66 @@ for (const [lang, names] of Object.entries(HONG_KONG_MACAO)) {
   COUNTRY_OVERRIDES[lang] = { ...COUNTRY_OVERRIDES[lang], ...names };
 }
 
+/** Simpler names for the languages added later (same reasons as above). */
+const MORE_OVERRIDES = {
+  sq: {"HK": "Hong-Kongu", "MO": "Makao", "CD": "Republika Demokratike e Kongos", "CG": "Republika e Kongos", "PS": "Palestina", "GS": "Xhorxha Jugore"},
+  eu: {"HK": "Hong Kong", "MO": "Macau", "CG": "Kongoko Errepublika", "PS": "Palestina", "GS": "Hegoaldeko Georgia"},
+  bs: {"HK": "Hong Kong", "MO": "Makao", "CG": "Republika Kongo", "PS": "Palestina", "GS": "Južna Džordžija"},
+  bg: {"HK": "Хонконг", "MO": "Макао", "CD": "Демократична република Конго", "CG": "Република Конго", "PS": "Палестина", "GS": "Южна Джорджия"},
+  ca: {"HK": "Hong Kong", "MO": "Macau", "CD": "República Democràtica del Congo", "CG": "República del Congo", "PS": "Palestina", "GS": "Geòrgia del Sud"},
+  hr: {"HK": "Hong Kong", "MO": "Makao", "CD": "Demokratska Republika Kongo", "CG": "Republika Kongo", "PS": "Palestina", "GS": "Južna Georgia"},
+  cs: {"HK": "Hongkong", "MO": "Macao", "CD": "Demokratická republika Kongo", "CG": "Konžská republika", "PS": "Palestina", "GS": "Jižní Georgie"},
+  da: {"HK": "Hongkong", "MO": "Macao", "CD": "Den Demokratiske Republik Congo", "CG": "Republikken Congo", "PS": "Palæstina", "GS": "South Georgia"},
+  nl: {"HK": "Hongkong", "MO": "Macau", "CD": "Democratische Republiek Congo", "CG": "Republiek Congo", "PS": "Palestina", "GS": "Zuid-Georgia"},
+  et: {"HK": "Hongkong", "MO": "Macau", "CD": "Kongo Demokraatlik Vabariik", "PS": "Palestiina", "GS": "Lõuna-Georgia"},
+  fi: {"HK": "Hongkong", "MO": "Macao", "PS": "Palestiina", "GS": "Etelä-Georgia"},
+  gl: {"HK": "Hong Kong", "MO": "Macau", "PS": "Palestina", "GS": "Xeorxia do Sur"},
+  el: {"HK": "Χονγκ Κονγκ", "MO": "Μακάο", "CD": "Λαϊκή Δημοκρατία του Κονγκό", "CG": "Δημοκρατία του Κονγκό", "PS": "Παλαιστίνη", "GS": "Νότια Γεωργία"},
+  hu: {"HK": "Hongkong", "MO": "Makaó", "CD": "Kongói Demokratikus Köztársaság", "CG": "Kongói Köztársaság", "PS": "Palesztina", "GS": "Déli-Georgia"},
+  is: {"HK": "Hong Kong", "MO": "Makaó", "CD": "Austur-Kongó", "CG": "Vestur-Kongó", "PS": "Palestína", "GS": "Suður-Georgía"},
+  ga: {"HK": "Hong Cong", "MO": "Macao", "CG": "Poblacht an Chongó", "PS": "an Phalaistín", "GS": "an tSeoirsia Theas"},
+  lv: {"HK": "Honkonga", "MO": "Makao", "CD": "Kongo Demokrātiskā Republika", "CG": "Kongo Republika", "PS": "Palestīna", "GS": "Dienviddžordžija"},
+  lt: {"HK": "Honkongas", "MO": "Makao", "CD": "Kongo Demokratinė Respublika", "CG": "Kongo Respublika", "PS": "Palestina", "GS": "Pietų Džordžija"},
+  mk: {"HK": "Хонгконг", "MO": "Макао", "CD": "Демократска Република Конго", "CG": "Република Конго", "PS": "Палестина", "GS": "Јужна Џорџија"},
+  mt: {"HK": "Hong Kong", "MO": "il-Macao", "CG": "ir-Repubblika tal-Kongo", "PS": "il-Palestina", "GS": "il-Georgia tan-Nofsinhar"},
+  nb: {"HK": "Hongkong", "MO": "Macao", "CD": "Den demokratiske republikken Kongo", "CG": "Republikken Kongo", "PS": "Palestina", "GS": "Sør-Georgia", "LC": "Saint Lucia", "VC": "Saint Vincent og Grenadinene"},
+  pl: {"HK": "Hongkong", "MO": "Makau", "CG": "Republika Konga", "PS": "Palestyna", "GS": "Georgia Południowa"},
+  ro: {"HK": "Hong Kong", "MO": "Macao", "CD": "Republica Democrată Congo", "CG": "Republica Congo", "PS": "Palestina", "GS": "Georgia de Sud"},
+  sr: {"HK": "Хонгконг", "MO": "Макао", "CD": "Демократска Република Конго", "CG": "Република Конго", "PS": "Палестина", "GS": "Јужна Џорџија"},
+  sk: {"HK": "Hongkong", "MO": "Macao", "PS": "Palestína", "GS": "Južná Georgia"},
+  sl: {"HK": "Hongkong", "MO": "Makav", "CG": "Republika Kongo", "PS": "Palestina", "GS": "Južna Georgia"},
+  sv: {"HK": "Hongkong", "MO": "Macao", "CD": "Demokratiska republiken Kongo", "CG": "Republiken Kongo", "PS": "Palestina", "GS": "Sydgeorgien"},
+  uk: {"HK": "Гонконг", "MO": "Макао", "CD": "Демократична Республіка Конго", "CG": "Республіка Конго", "PS": "Палестина", "GS": "Південна Джорджія"},
+  cy: {"HK": "Hong Kong", "MO": "Macau", "CD": "Gweriniaeth Ddemocrataidd y Congo", "CG": "Gweriniaeth y Congo", "PS": "Palesteina", "GS": "De Georgia"},
+  hy: {"HK": "Հոնկոնգ", "MO": "Մակաո", "CD": "Կոնգոյի Դեմոկրատական Հանրապետություն", "CG": "Կոնգոյի Հանրապետություն", "PS": "Պաղեստին", "GS": "Հարավային Ջորջիա"},
+  az: {"HK": "Honq Konq", "MO": "Makao", "CD": "Konqo Demokratik Respublikası", "CG": "Konqo Respublikası", "PS": "Fələstin", "GS": "Cənubi Corciya"},
+  my: {"HK": "ဟောင်ကောင်", "MO": "မကာအို", "CD": "ကွန်ဂို ဒီမိုကရက်တစ် သမ္မတနိုင်ငံ", "CG": "ကွန်ဂို သမ္မတနိုင်ငံ", "PS": "ပါလက်စတိုင်း", "GS": "တောင် ဂျော်ဂျီယာ"},
+  ka: {"HK": "ჰონკონგი", "MO": "მაკაო", "CD": "კონგოს დემოკრატიული რესპუბლიკა", "CG": "კონგოს რესპუბლიკა", "PS": "პალესტინა", "GS": "სამხრეთ ჯორჯია"},
+  he: {"HK": "הונג קונג", "MO": "מקאו", "CD": "הרפובליקה הדמוקרטית של קונגו", "CG": "הרפובליקה של קונגו", "PS": "פלסטין", "GS": "ג׳ורג׳יה הדרומית"},
+  kk: {"HK": "Гонконг", "MO": "Макао", "CD": "Конго Демократиялық Республикасы", "CG": "Конго Республикасы", "PS": "Палестина", "GS": "Оңтүстік Георгия"},
+  km: {"HK": "ហុងកុង", "MO": "ម៉ាកាវ", "CD": "សាធារណរដ្ឋប្រជាធិបតេយ្យកុងហ្គោ", "CG": "សាធារណរដ្ឋកុងហ្គោ", "PS": "ប៉ាឡេស្ទីន", "GS": "ហ្សកហ្ស៊ីខាងត្បូង"},
+  lo: {"HK": "ຮົງກົງ", "MO": "ມາກາວ", "CD": "ສາທາລະນະລັດປະຊາທິປະໄຕຄອງໂກ", "CG": "ສາທາລະນະລັດຄອງໂກ", "PS": "ປາເລັດສະໄຕນ໌", "GS": "ຈໍເຈຍຕອນໃຕ້"},
+  ms: {"HK": "Hong Kong", "MO": "Macau", "CD": "Republik Demokratik Congo", "CG": "Republik Congo", "PS": "Palestin", "GS": "Georgia Selatan"},
+  ml: {"HK": "ഹോങ്കോങ്", "MO": "മക്കാവു", "CD": "കോംഗോ ജനാധിപത്യ റിപ്പബ്ലിക്", "CG": "കോംഗോ റിപ്പബ്ലിക്", "PS": "പലസ്തീൻ", "GS": "ദക്ഷിണ ജോർജ്ജിയ"},
+  mn: {"HK": "Хонконг", "MO": "Макао", "CD": "Бүгд Найрамдах Ардчилсан Конго", "CG": "Бүгд Найрамдах Конго", "PS": "Палестин", "GS": "Өмнөд Жоржиа"},
+  ne: {"HK": "हङकङ", "MO": "मकाउ", "CD": "प्रजातान्त्रिक गणतन्त्र कङ्गो", "CG": "गणतन्त्र कङ्गो", "PS": "प्यालेस्टाइन", "GS": "दक्षिण जर्जिया"},
+  ps: {"HK": "هانګ کانګ", "MO": "مکاو", "CD": "د کانګو ډیموکراټیک جمهوریت", "CG": "د کانګو جمهوریت", "PS": "فلسطین", "GS": "سويلي جارجيا"},
+  si: {"HK": "හොංකොං", "MO": "මැකාවු", "CD": "කොංගෝ ප්‍රජාතන්ත්‍රවාදී ජනරජය", "CG": "කොංගෝ ජනරජය", "PS": "පලස්තීනය", "GS": "දකුණු ජෝර්ජියාව"},
+  uz: {"HK": "Gonkong", "MO": "Makao", "CD": "Kongo Demokratik Respublikasi", "CG": "Kongo Respublikasi", "PS": "Falastin", "GS": "Janubiy Georgiya"},
+  af: {"HK": "Hongkong", "MO": "Macau", "CG": "Republiek van die Kongo", "PS": "Palestina", "GS": "Suid-Georgië"},
+  so: {"CG": "Jamhuuriyadda Kongo", "PS": "Falastiin", "GS": "Joorjiyada Koonfureed", "KN": "Saint Kitts iyo Nevis", "LC": "Saint Lusia", "VC": "Saint Finsent iyo Girenadiins"},
+  zu: {"HK": "i-Hong Kong", "MO": "i-Macau", "CD": "i-Democratic Republic of the Congo", "CG": "i-Republic of the Congo", "PS": "i-Palestine", "GS": "i-South Georgia"},
+};
+for (const [lang, names] of Object.entries(MORE_OVERRIDES)) {
+  COUNTRY_OVERRIDES[lang] = { ...COUNTRY_OVERRIDES[lang], ...names };
+}
+
+/**
+ * Languages whose CLDR data has (almost) no country names fall back to a
+ * language their speakers read; so do their missing capital names.
+ */
+const FALLBACK_LANG = { su: 'id', jv: 'id' };
+
 /** CLDR abbreviations that children wouldn't understand. */
 function expand(lang, name) {
   if (lang === 'ru') return name.replace(/\bо-ва\b/g, 'острова').replace(/\bо-в\b/g, 'остров');
@@ -127,6 +187,9 @@ const LABEL_LANGS = {
   zh: ['zh-hans', 'zh-cn', 'zh'],
   yue: ['yue', 'zh-hk', 'zh-hant'],
   fil: ['fil', 'tl'],
+  su: ['su', 'id'],
+  jv: ['jv', 'id'],
+  ms: ['ms', 'id'],
 };
 const labelLangs = (lang) => LABEL_LANGS[lang] ?? [lang];
 
@@ -149,6 +212,8 @@ function tidyCapital(lang, label) {
   if (!/D\.\s?C\./.test(name)) name = name.replace(/,\s*[^,]+$/, '');
   // Chinese labels often end in 市 ("city"), which children don't say.
   if ((lang === 'zh' || lang === 'yue') && name.length > 2) name = name.replace(/市$/, '');
+  // Some Khmer labels start with ទីក្រុង ("city of"), most don't.
+  if (lang === 'km') name = name.replace(/^ទីក្រុង/, '');
   return name;
 }
 
@@ -161,9 +226,17 @@ async function readData(file) {
 }
 
 async function sparql(query) {
-  const url = `https://query.wikidata.org/sparql?query=${encodeURIComponent(query)}`;
+  // POST: the queries are too long for a URL.
   for (let attempt = 1; ; attempt++) {
-    const res = await fetch(url, { headers: { 'User-Agent': UA, Accept: 'application/sparql-results+json' } });
+    const res = await fetch('https://query.wikidata.org/sparql', {
+      method: 'POST',
+      headers: {
+        'User-Agent': UA,
+        Accept: 'application/sparql-results+json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({ query }),
+    });
     if (res.ok) return (await res.json()).results.bindings;
     if (attempt >= 4) throw new Error(`Wikidata: HTTP ${res.status}`);
     await new Promise((r) => setTimeout(r, 3000 * attempt));
@@ -175,17 +248,12 @@ const capitals = await readData('capitals.ts');
 
 // ------------------------------------------------------------------ capitals
 
-// Candidate capital items of every country (any rank), with coordinates and labels.
-const variants = [...new Set(LANGS.flatMap(labelLangs))];
-const v = (code) => `?l_${code.replace('-', '_')}`;
-const labelVars = variants.map(v).join(' ');
-const labelOptionals = variants.map((l) => `OPTIONAL { ?cap rdfs:label ${v(l)} FILTER(LANG(${v(l)}) = "${l}") }`).join('\n  ');
-console.log('Querying capital labels…');
-const rows = await sparql(`SELECT ?iso ?cap ?coord ${labelVars} WHERE {
+// Candidate capital items of every country (any rank), with coordinates.
+console.log('Querying capitals…');
+const rows = await sparql(`SELECT ?iso ?cap ?coord WHERE {
   { ?country wdt:P297 ?iso ; p:P36/ps:P36 ?cap . }
   UNION { VALUES (?iso ?cap) { ${Object.entries(CAPITAL_ITEM).map(([iso, q]) => `("${iso}" wd:${q})`).join(' ')} } }
   ?cap wdt:P625 ?coord .
-  ${labelOptionals}
 }`);
 
 /** Distance in km between two points. */
@@ -198,7 +266,7 @@ function km(lat1, lon1, lat2, lon2) {
 }
 
 // The capital item of each country is the candidate closest to the capital's coordinates.
-const capitalLabels = new Map();
+const capitalItem = new Map();
 for (const capital of capitals) {
   let best = null;
   for (const r of rows) {
@@ -206,28 +274,55 @@ for (const capital of capitals) {
     const m = r.coord.value.match(/Point\(([-\d.e]+) ([-\d.e]+)\)/);
     if (!m) continue;
     const d = km(capital.lat, capital.lon, Number(m[2]), Number(m[1]));
-    if (!best || d < best.d) best = { d, r };
+    if (!best || d < best.d) best = { d, item: r.cap.value.split('/').pop() };
   }
   if (!best || best.d > 5) {
     console.warn(`  ${capital.code} ${capital.name}: no matching Wikidata item; English name used`);
     continue;
   }
-  capitalLabels.set(
-    capital.code,
-    Object.fromEntries(LANGS.map((l) => [l, labelLangs(l).map((x) => best.r[v(x).slice(1)]?.value).find(Boolean)])),
-  );
+  capitalItem.set(capital.code, best.item);
 }
+
+// Their labels in every language (one row per label).
+console.log('Querying capital labels…');
+const variants = [...new Set(LANGS.flatMap(labelLangs))];
+const labelRows = await sparql(`SELECT ?cap ?label WHERE {
+  VALUES ?cap { ${[...new Set(capitalItem.values())].map((q) => `wd:${q}`).join(' ')} }
+  ?cap rdfs:label ?label .
+  FILTER(LANG(?label) IN (${variants.map((l) => `"${l}"`).join(', ')}))
+}`);
+const labelsOf = new Map();
+for (const r of labelRows) {
+  const item = r.cap.value.split('/').pop();
+  const labels = labelsOf.get(item) ?? {};
+  labels[r.label['xml:lang']] = r.label.value;
+  labelsOf.set(item, labels);
+}
+const capitalLabels = new Map(
+  [...capitalItem].map(([code, item]) => {
+    const labels = labelsOf.get(item) ?? {};
+    return [code, Object.fromEntries(LANGS.map((l) => [l, labelLangs(l).map((x) => labels[x]).find(Boolean)]))];
+  }),
+);
 
 // ------------------------------------------------------------------- output
 
 await mkdir(OUT_DIR, { recursive: true });
+/** The CLDR name of a region in `lang`, or in its fallback language, or undefined. */
+function regionName(lang, code) {
+  for (const l of [lang, FALLBACK_LANG[lang]].filter(Boolean)) {
+    const name = COUNTRY_OVERRIDES[l]?.[code] ?? new Intl.DisplayNames([l], { type: 'region', fallback: 'none' }).of(code);
+    if (name) return expand(l, name);
+  }
+  return undefined;
+}
+
 for (const lang of LANGS) {
-  const regions = new Intl.DisplayNames([lang], { type: 'region' });
   const countryNames = {};
   for (const c of countries) {
     let name = c.name;
     if (lang !== 'en') {
-      name = COUNTRY_OVERRIDES[lang]?.[c.code] ?? expand(lang, regions.of(c.code));
+      name = regionName(lang, c.code) ?? c.name;
       if (STRIP_PARENS.has(c.code)) name = name.replace(/\s*[(（].*?[)）]\s*/g, ' ').trim();
     }
     countryNames[c.code] = name;
@@ -241,7 +336,7 @@ for (const lang of LANGS) {
       CAPITAL_OVERRIDES[lang]?.[c.code] ?? (label && lang !== 'en' ? tidyCapital(lang, label) : c.name);
   }
   const continents = Object.fromEntries(
-    Object.entries(CONTINENT_REGIONS).map(([k, region]) => [k, regions.of(region)]),
+    Object.entries(CONTINENT_REGIONS).map(([k, region]) => [k, regionName(lang, region) ?? region]),
   );
   const data = { countries: countryNames, capitals: capitalNames, continents };
   await writeFile(join(OUT_DIR, `${lang}.json`), `${JSON.stringify(data, null, 1)}\n`);
