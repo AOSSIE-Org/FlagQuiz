@@ -1,0 +1,75 @@
+{
+ "description": "Exported by the first releases (commits 1960eb9 to bb9a7f5): player file version 1 with two games and no correct-answer count.",
+ "file": {
+  "format": "flag-quiz-player",
+  "version": 1,
+  "exportedAt": "2026-11-20T10:00:00.000Z",
+  "player": {
+   "name": "Ben",
+   "flag": {
+    "colors": [
+     "#E4002B",
+     "#FFFFFF",
+     "#000000"
+    ],
+    "pattern": "stars"
+   },
+   "difficulty": "easy",
+   "theme": "dark",
+   "adapt": {
+    "flag": 1,
+    "country": -2
+   },
+   "perfectRun": 1,
+   "bestPerfectRun": 4,
+   "filter": {
+    "continents": [
+     "AF",
+     "AS",
+     "EU",
+     "NA",
+     "SA",
+     "OC",
+     "AN"
+    ],
+    "topN": 100
+   },
+   "createdAt": 1763600100000
+  },
+  "stats": [
+   {
+    "game": "country",
+    "code": "KE",
+    "s": 0.3,
+    "c": 4,
+    "d": 1
+   }
+  ],
+  "playDays": [
+   "2026-11-20"
+  ]
+ },
+ "expected": [
+  {
+   "name": "Ben",
+   "correctCount": 0,
+   "adapt": {
+    "flag": 1,
+    "country": -2,
+    "location": 1,
+    "capital": 1,
+    "capitalCountry": 1
+   },
+   "scores": {
+    "country": {
+     "correct": 4,
+     "gold": 1,
+     "bestGold": 4,
+     "silver": 1,
+     "bestSilver": 4
+    }
+   }
+  }
+ ],
+ "statCount": 1
+}

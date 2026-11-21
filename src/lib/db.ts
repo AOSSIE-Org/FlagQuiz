@@ -29,11 +29,29 @@ export const DB_NAME = 'flag-quiz';
  * 3. settings
  * 4. users: per-game scores instead of one run of rounds without mistakes
  */
-const DB_VERSION = 4;
+export const DB_VERSION = 4;
 const SETTINGS_KEY = 'settings';
 
-export function openDatabase(name: string = DB_NAME): Promise<DB> {
-  return openDB<FlagQuizDB>(name, DB_VERSION, {
+/** What to do when other open copies of the app get in the way of each other. */
+export interface OpenEvents {
+  /** An older copy, open in another tab or window, prevents the upgrade; it continues once that copy closes. */
+  blocked?: () => void;
+  /** A newer copy wants to upgrade the data: this connection has been closed and must not be used. */
+  blocking?: () => void;
+}
+
+/**
+ * Opens (and if needed upgrades) the database. Rejects with a `VersionError`
+ * DOMException when the data was saved by a newer version of the app.
+ */
+export function openDatabase(name: string = DB_NAME, events: OpenEvents = {}): Promise<DB> {
+  let db: DB | undefined;
+  const opening = openDB<FlagQuizDB>(name, DB_VERSION, {
+    blocked: () => events.blocked?.(),
+    blocking: () => {
+      db?.close();
+      events.blocking?.();
+    },
     async upgrade(db, oldVersion, _newVersion, tx) {
       if (oldVersion < 1) {
         db.createObjectStore('users', { keyPath: 'id', autoIncrement: true });
@@ -70,6 +88,7 @@ export function openDatabase(name: string = DB_NAME): Promise<DB> {
       }
     },
   });
+  return opening.then((opened) => (db = opened));
 }
 
 /** Users, most recently active first. */

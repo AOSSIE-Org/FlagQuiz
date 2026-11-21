@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { buildExport, exportFileName, ImportError, parseImport, type ExportFile } from './transfer';
+import {
+  backupFileName,
+  buildBackup,
+  buildExport,
+  exportFileName,
+  ImportError,
+  MAX_IMPORT_BYTES,
+  parseImport,
+  parseImportFile,
+  type ExportFile,
+} from './transfer';
 import { DEFAULT_FILTER, type ItemStats, type User } from './types';
 
 const known = new Set(['FR', 'DE', 'BR']);
@@ -80,7 +90,7 @@ describe('export / import', () => {
     expect(() => reparse({ ...f, stats: [{ game: 'x', code: 'FR', s: 0.5, c: 0, d: 0 }] })).toThrow(ImportError);
     expect(() => reparse({ ...f, stats: [{ game: 'flag', code: 'FR', s: 0.5, c: -1, d: 0 }] })).toThrow(ImportError);
     expect(() => reparse({ ...f, playDays: ['yesterday'] })).toThrow(ImportError);
-    expect(() => parseImport('x'.repeat(6 * 1024 * 1024), known)).toThrow('File too large');
+    expect(() => parseImport('x'.repeat(MAX_IMPORT_BYTES + 1), known)).toThrow('File too large');
   });
 
   it('sanitises settings and skips unknown countries', () => {
@@ -132,5 +142,28 @@ describe('export / import', () => {
       expect(err).toBeInstanceOf(ImportError);
       expect((err as ImportError).reason).toBe('unsupportedVersion');
     }
+  });
+
+  it('round-trips a backup of several players, and rejects it whole if one player is bad', () => {
+    const stats = {
+      flag: new Map<string, ItemStats>([['FR', { s: 0.1, c: 9, d: 0 }]]),
+      country: new Map<string, ItemStats>(),
+      location: new Map<string, ItemStats>(),
+      capital: new Map<string, ItemStats>(),
+      capitalCountry: new Map<string, ItemStats>(),
+    };
+    const backup = buildBackup([
+      { user, stats, playDays: ['2026-11-20'] },
+      { user: { ...user, name: 'Ben' }, stats, playDays: [] },
+    ]);
+    const players = parseImportFile(JSON.stringify(backup), known, 5000);
+    expect(players.map((p) => p.user.name)).toEqual(['Ana', 'Ben']);
+    expect(players[0].user.scores).toEqual(user.scores);
+    expect(players[0].stats).toHaveLength(1);
+    // A single player file gives one player.
+    expect(parseImportFile(JSON.stringify(exported()), known)).toHaveLength(1);
+    backup.players[1].player.name = '';
+    expect(() => parseImportFile(JSON.stringify(backup), known)).toThrow(ImportError);
+    expect(backupFileName(new Date(2026, 10, 21))).toBe('flag-quiz-players-2026-11-21.json');
   });
 });

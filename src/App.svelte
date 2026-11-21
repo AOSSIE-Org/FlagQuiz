@@ -11,6 +11,7 @@
   import GameLocation from './components/GuessLocation.svelte';
   import InstallHelp from './components/InstallHelp.svelte';
   import LanguageModal from './components/LanguageModal.svelte';
+  import UpdateButton from './components/UpdateButton.svelte';
   import Splash from './components/Splash.svelte';
   import { install } from './lib/install.svelte';
   import GamePicker from './components/GamePicker.svelte';
@@ -79,6 +80,7 @@
   {/if}
 
   <FullscreenButton />
+  <UpdateButton />
 
   {#if splash}
     <Splash onclose={() => (splash = false)} />

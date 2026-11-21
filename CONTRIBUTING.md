@@ -146,7 +146,11 @@ Then try your change in the browser with `npm run dev` (or `npm run build && npm
 - Check the page **never scrolls** at desktop sizes (e.g. 1280×720) and on a phone in landscape (e.g. 844×390). Use your browser's device toolbar.
 - Check both **light and dark** mode.
 - Check all three difficulty levels (3, 6 and 9 options).
-- If you touched the database schema, bump the version in `src/lib/db.ts` and add a migration in `upgrade()`.
+- If you change what is saved (the IndexedDB data in `src/lib/db.ts`, the player files or backups in `src/lib/transfer.ts`), players must never lose their progress:
+  1. First record a fixture of the **current** version in `src/lib/fixtures/` (`db-v<N>.json`, `export-v<N>.json`, `backup-v<N>.json`), ideally from the deployed app: play a little, then copy what DevTools → Application → IndexedDB shows, or a downloaded file.
+  2. Bump the version, add a migration (`upgrade()` in `db.ts`, or the import in `transfer.ts`) and document the new version in the comment above it.
+  3. Older files and databases must keep loading: `npm test` (`src/lib/compat.test.ts`) opens every fixture with the new code, and fails if a version has no fixture.
+  4. Never remove or rename a saved field without migrating it; prefer adding fields with defaults (`src/lib/users.ts`).
 
 ### 4. Commit Your Changes
 

@@ -110,6 +110,11 @@ const ar: Messages = {
   mastered: 'تم إتقانها',
   masteredCount: 'تم إتقانها: {n} من {total}',
 
+  updateAvailable: 'إصدار جديد: اضغط للتحديث',
+  updateRequired: 'استُخدم إصدار أحدث من Flag Quiz على هذا الجهاز. اضغط للتحديث.',
+  closeOtherCopies: 'Flag Quiz مفتوح في علامة تبويب أو نافذة أخرى. أغلقها للمتابعة.',
+  saveAllPlayers: 'حفظ كل اللاعبين في ملف واحد',
+
   installTheApp: 'تثبيت التطبيق',
   iosShare: 'مشاركة',
   addToHomeScreen: 'إضافة إلى الشاشة الرئيسية',

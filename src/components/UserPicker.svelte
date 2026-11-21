@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Check, Minus, Play, Plus, Repeat, Trash2, Upload, User as UserIcon, Users, X } from '@lucide/svelte';
+  import { Check, FolderDown, Minus, Play, Plus, Repeat, Trash2, Upload, User as UserIcon, Users, X } from '@lucide/svelte';
   import { app } from '../lib/app.svelte';
   import { ImportError, MAX_IMPORT_BYTES } from '../lib/transfer';
   import type { User } from '../lib/types';
@@ -12,7 +12,8 @@
 
   let fileInput: HTMLInputElement;
   let importError = $state<string | null>(null);
-  let imported = $state<number | null>(null);
+  /** Players just loaded from a file, highlighted. */
+  let imported = $state<number[]>([]);
   let errorTimer: ReturnType<typeof setTimeout> | undefined;
 
   let multi = $derived(app.pickerMode === 'multi');
@@ -49,8 +50,8 @@
     if (!file) return;
     try {
       if (file.size > MAX_IMPORT_BYTES) throw new ImportError('tooLarge');
-      const user = await app.importUser(await file.text());
-      imported = user.id ?? null;
+      const users = await app.importFile(await file.text());
+      imported = users.flatMap((u) => (u.id !== undefined ? [u.id] : []));
       importError = null;
     } catch (err) {
       importError = err instanceof ImportError ? t(`import.${err.reason}`) : t('import.failed');
@@ -90,7 +91,7 @@
       <li>
         <button
           class="tile"
-          class:new={user.id === imported}
+          class:new={user.id !== undefined && imported.includes(user.id)}
           class:selected
           class:dimmed={multi && !selected && !deleting}
           class:deleting
@@ -147,6 +148,12 @@
     >
       <Trash2 size="100%" />
     </button>
+    {#if app.users.length > 0}
+      <!-- Grown-ups: a backup of every player in one file (load it with ⬆️). -->
+      <button class="bin" onclick={() => app.exportAll()} aria-label={t('saveAllPlayers')} title={t('saveAllPlayers')}>
+        <FolderDown size="100%" />
+      </button>
+    {/if}
     <LanguageButton />
     {#if multi}
       <!-- Maximum rounds in a row per player. -->

@@ -1,0 +1,82 @@
+{
+ "description": "Exported by commits ee4418b to e6f6886 (player file version 1, five games).",
+ "file": {
+  "format": "flag-quiz-player",
+  "version": 1,
+  "exportedAt": "2026-11-21T10:00:00.000Z",
+  "player": {
+   "name": "Ana",
+   "flag": {
+    "colors": [
+     "#00843D",
+     "#FFCD00",
+     "#0032A0"
+    ],
+    "pattern": "hoist"
+   },
+   "difficulty": "medium",
+   "theme": "light",
+   "adapt": {
+    "flag": 1,
+    "country": 1,
+    "location": 2,
+    "capital": 0,
+    "capitalCountry": 1
+   },
+   "perfectRun": 3,
+   "bestPerfectRun": 9,
+   "correctCount": 40,
+   "filter": {
+    "continents": [
+     "EU",
+     "AS"
+    ],
+    "topN": 60
+   },
+   "createdAt": 1763600000000
+  },
+  "stats": [
+   {
+    "game": "flag",
+    "code": "FR",
+    "s": 0.1,
+    "c": 9,
+    "d": 0
+   },
+   {
+    "game": "capitalCountry",
+    "code": "JP",
+    "s": 0.5,
+    "c": 10,
+    "d": 3
+   }
+  ],
+  "playDays": [
+   "2026-11-20",
+   "2026-11-21"
+  ]
+ },
+ "expected": [
+  {
+   "name": "Ana",
+   "correctCount": 40,
+   "scores": {
+    "flag": {
+     "correct": 9,
+     "gold": 0,
+     "bestGold": 0,
+     "silver": 0,
+     "bestSilver": 0
+    },
+    "capitalCountry": {
+     "correct": 10,
+     "gold": 3,
+     "bestGold": 9,
+     "silver": 3,
+     "bestSilver": 9
+    }
+   }
+  }
+ ],
+ "statCount": 2
+}

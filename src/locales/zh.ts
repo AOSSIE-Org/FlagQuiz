@@ -110,6 +110,11 @@ const zh: Messages = {
   mastered: '已掌握',
   masteredCount: '已掌握：{total} 个中的 {n} 个',
 
+  updateAvailable: '新版本：点击更新',
+  updateRequired: '这台设备上已使用过更新版本的 Flag Quiz。点击更新。',
+  closeOtherCopies: 'Flag Quiz 已在另一个标签页或窗口中打开。请关闭它以继续。',
+  saveAllPlayers: '把所有玩家保存到一个文件',
+
   installTheApp: '安装应用',
   iosShare: '分享',
   addToHomeScreen: '添加到主屏幕',

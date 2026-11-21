@@ -9,8 +9,9 @@ export default defineConfig({
   plugins: [
     svelte(),
     VitePWA({
-      registerType: 'autoUpdate',
-      injectRegister: 'script-defer',
+      // A new version waits until the player taps the ↻ button (src/lib/update.svelte.ts).
+      registerType: 'prompt',
+      injectRegister: false,
       includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png'],
       manifest: {
         id: './',
@@ -47,6 +48,8 @@ export default defineConfig({
         // Only used by social media previews and install dialogs.
         globIgnores: ['og-image.png', 'screenshots/**'],
         maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,
+        // One-time switch from the earlier auto-updating service worker (see the file).
+        importScripts: ['sw-transition.js'],
       },
     }),
   ],

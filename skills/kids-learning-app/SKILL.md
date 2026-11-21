@@ -1,9 +1,9 @@
 ---
 name: kids-learning-app
-description: Plan, build, verify and ship a small, purely local educational web game for young children (e.g. learning flags, capitals, maps, animals, letters, numbers, shapes, colours) with AOSSIE's stack and conventions — Svelte 5 + TypeScript + Vite, IndexedDB storage, offline PWA that also works as a plain static site and installs on phones, AOSSIE branding, icon-first minimal UI that fits one screen without scrolling, multilingual (the 10 most spoken languages, i18n with right-to-left support), spoken prompts in the chosen language, multiple players and multiplayer turns, adaptive difficulty, streaks and statistics, JSON export/import, grown-ups-only deletion, credits and donation pages, social sharing metadata, the AOSSIE Template-Repo with every TODO and checklist filled, CI and GitHub Pages deployment. Use when asked to create a new learning app, quiz or game for kids, or to extend one built this way.
+description: Plan, build, verify and ship a small, purely local educational web game for young children (e.g. learning flags, capitals, maps, animals, letters, numbers, shapes, colours) with AOSSIE's stack and conventions — Svelte 5 + TypeScript + Vite, IndexedDB storage, offline PWA that also works as a plain static site and installs on phones, AOSSIE branding, icon-first minimal UI that fits one screen without scrolling, multilingual (the 10 most spoken languages, i18n with right-to-left support), spoken prompts in the chosen language, safe updates that never lose players' progress, multiple players and multiplayer turns, adaptive difficulty, streaks and statistics, JSON export/import, grown-ups-only deletion, credits and donation pages, social sharing metadata, the AOSSIE Template-Repo with every TODO and checklist filled, CI and GitHub Pages deployment. Use when asked to create a new learning app, quiz or game for kids, or to extend one built this way.
 compatibility: Needs Node.js 20+, npm, git, the GitHub CLI (gh) and network access (template repo, brand assets, open data). playwright-core with the system Chrome and Playwright's WebKit build (`npx playwright install webkit`) is required for verification in both browser engines.
 metadata:
-  version: "1.2"
+  version: "1.3"
   category: app-generation
   origin: Distilled from building Flag Quiz (https://github.com/AOSSIE-Org/FlagQuiz); the full conversation is in prompts/1.md of that repo.
 user-invocable: true
@@ -39,6 +39,40 @@ user asked for, or corrected, while building Flag Quiz.
 - PWA (`vite-plugin-pwa`): **everything is precached at install, photos
   included**, so every game works offline. The service worker registers only
   where supported, so the same build also works as a plain static site.
+- Ask for persistent storage (`navigator.storage.persist()`) when a player
+  starts playing, so the browser doesn't evict the data (Safari deletes data
+  of sites not on the home screen after 7 days without use).
+
+### Updates and saved data (the user's choices)
+Nobody should ever need to clear site data to get a new version, and an
+update must never lose or break players' progress:
+- **Update button, no automatic reload** (`registerType: 'prompt'`): check for
+  a new version at start, every hour and when the app returns to the
+  foreground; when one is downloaded, show a small gold ↻ button in the
+  lower-right corner; the new version starts only when it is tapped. (Chosen
+  over silent auto-update and network-first loading: the user decides when,
+  and nothing reloads mid-game.)
+- **Several copies**: open IndexedDB with `blocking` (a newer copy needs to
+  upgrade: close the connection and show "update required" with the ↻
+  button) and `blocked` (an older copy elsewhere holds the data: say "close
+  the other tab or window" and continue when it does). A copy that gets
+  `VersionError` (data saved by a newer version) shows only the update notice,
+  never an empty player list.
+- **Compatibility tests against recorded data**: keep fixtures of the data
+  saved by every version (database and export files, recorded from the
+  deployed app where possible) and a test that opens each one with the
+  current code and fails if a version has no fixture. Every change to saved
+  data: record a fixture of the current version first, bump the version,
+  migrate, never drop or rename fields without migrating. Write the rule in
+  CONTRIBUTING.
+- **Backup of all players**: a small, faded grown-ups' button in the player
+  picker saves every player in one file (`flag-quiz-backup` format); the
+  normal ⬆️ import accepts both single-player files and backups,
+  all-or-nothing.
+- When switching an existing app from auto-update to the update button, the
+  old pages have no button: let the first new service worker activate by
+  itself once (see the reference) and verify the switch in a browser with the
+  previously deployed build.
 
 ### Audience: young children
 - As little text as possible; intuitive icons (Lucide). Every icon-only button
@@ -265,6 +299,10 @@ show in Chrome):
   module with a fake engine, and run the hover-after-new-round check in every
   game (see **Speech without bugs**).
 - Offline: wait until the precache is complete, go offline, reload, play.
+- Updates, with the previously deployed build and a newer one served in turn
+  on the same port: the switch to the new version keeps the players; a newer
+  deployment shows ↻ and changes nothing until it is tapped; data opened by a
+  newer version shows the update notice; the all-players backup downloads.
 - Export/import (download event, `setInputFiles`, a bad file), stress cases
   (e.g. every item mastered), multiplayer turn order and limits, deletion.
 

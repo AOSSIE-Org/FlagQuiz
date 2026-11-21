@@ -85,7 +85,8 @@
 - **Statistics**: the days-in-a-row streak and its best, a 4-week calendar, and a table with, for each game, the most silver stars, the most gold stars and the flags of every mastered country (difficulty score below 0.2).
 - **Grown-ups only: deleting players**: a small, faded 🗑 button in the player picker; deleting a player requires solving an equation such as `7x − 23 = 2x + 52`.
 - **Sound controls**: menu switches for reading names aloud and for sound effects.
-- **Save and load players**: export a player's data as a JSON file and import it on another device or browser.
+- **Save and load players**: export a player's data as a JSON file and import it on another device or browser. Grown-ups can also save **all players in one file** (a small, faded button in the player picker) and load it back with the same ⬆️ button.
+- **Safe updates**: when a new version has been downloaded, a gold ↻ button appears in the lower-right corner; the new version starts when it is tapped, never in the middle of a game, and players' progress is kept. Saved data from every earlier version is migrated automatically and tested against recorded examples (`src/lib/fixtures/`). If an outdated copy of the app finds data saved by a newer one, it asks to be updated instead of showing no players; if an older copy is open in another tab, the app asks to close it. The app asks the browser to keep its storage persistent.
 - **Share**: share the app with the device's share sheet (or copy its link).
 - **Light and dark mode**, with AOSSIE's brand colours and font.
 - **Fits on one screen**: no scrolling on desktop or on phones in landscape. A discreet button in the lower-right corner switches to full screen (where the browser supports it).

@@ -4,10 +4,13 @@ import * as store from './db';
 import { dayKey, streaks } from './dates';
 import { applyFilter, K_START, nextK, pickRound, recordGuess } from './select';
 import { setLanguage, t } from './i18n.svelte';
-import { bestGoldOverall, emptyScores, migrateLegacyScores, normalizeScores, scoreCorrect, scoreMistake } from './scores';
+import { bestGoldOverall, emptyScores, scoreCorrect, scoreMistake } from './scores';
+import { withDefaults } from './users';
 import { playCorrect, playWrong, setSoundsEnabled } from './sound';
 import { setSpeechEnabled, speak } from './speech';
-import { buildExport, exportFileName, parseImport, type ImportedPlayer } from './transfer';
+import { persistStorage } from './storage';
+import { backupFileName, buildBackup, buildExport, exportFileName, parseImportFile } from './transfer';
+import { markOutdated, update } from './update.svelte';
 import { nextTurn, turnOrder } from './turns';
 import {
   DEFAULT_FILTER,
@@ -69,19 +72,6 @@ export function systemTheme(): Theme {
     : 'light';
 }
 
-/** Fills in fields added in later versions of the app (the database migrates saved players too). */
-function withDefaults(user: User): User {
-  const legacy = user as User & { perfectRun?: number; bestPerfectRun?: number };
-  const { perfectRun: _run, bestPerfectRun: _best, ...rest } = legacy;
-  return {
-    ...rest,
-    filter: user.filter ?? structuredClone(DEFAULT_FILTER),
-    correctCount: user.correctCount ?? 0,
-    scores: user.scores ? normalizeScores(user.scores) : migrateLegacyScores(legacy, perGame(() => [])),
-    adapt: { ...perGame(() => K_START), ...user.adapt },
-  };
-}
-
 class AppState {
   phase = $state<Phase>('loading');
   users = $state<User[]>([]);
@@ -126,13 +116,27 @@ class AppState {
 
   async init(): Promise<void> {
     try {
-      this.#db = await store.openDatabase();
+      this.#db = await store.openDatabase(store.DB_NAME, {
+        // An older copy is open elsewhere: wait (and say so) until it closes.
+        blocked: () => (update.blocked = true),
+        // A newer copy needs the data: stop using it and ask for the update.
+        blocking: () => {
+          this.#db = null;
+          markOutdated();
+        },
+      });
+      update.blocked = false;
       this.users = (await store.listUsers(this.#db)).map(withDefaults);
       this.settings = await store.getSettings(this.#db);
     } catch (err) {
-      // e.g. storage disabled: the app still works, but nothing is saved.
-      console.warn('IndexedDB unavailable; progress will not be saved.', err);
       this.#db = null;
+      if (err instanceof DOMException && err.name === 'VersionError') {
+        // The data was saved by a newer version: this copy is outdated.
+        markOutdated();
+      } else {
+        // e.g. storage disabled: the app still works, but nothing is saved.
+        console.warn('IndexedDB unavailable; progress will not be saved.', err);
+      }
     }
     setSpeechEnabled(this.settings.speech);
     setSoundsEnabled(this.settings.sounds);
@@ -188,6 +192,7 @@ class AppState {
     await Promise.all(this.players.map((p) => this.#saveUser(p)));
     this.editor = null;
     this.phase = 'pickGame';
+    void persistStorage();
   }
 
   async #load(player: User): Promise<void> {
@@ -300,25 +305,46 @@ class AppState {
       perGame((g) => this.statsFor(g)),
       this.playDays,
     );
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = exportFileName(this.user.name);
-    document.body.append(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    download(JSON.stringify(data, null, 2), exportFileName(this.user.name));
   }
 
-  /** Creates a new player from an exported JSON file. Throws ImportError on invalid files. */
-  async importUser(text: string): Promise<User> {
-    const imported: ImportedPlayer = parseImport(text, KNOWN_CODES);
-    const user = this.#db
-      ? await store.insertUserWithData(this.#db, imported.user, imported.stats, imported.playDays)
-      : { ...imported.user, id: -Date.now() };
-    this.users = [user, ...this.users];
-    return user;
+  /** Downloads a backup of every player on this device as one JSON file. */
+  async exportAll(): Promise<void> {
+    const db = this.#db;
+    const players = await Promise.all(
+      this.users.map(async (u) => {
+        const id = u.id!;
+        let stats: Record<GameId, ReadonlyMap<string, ItemStats>> = this.#stats.get(id) ?? emptyStats();
+        let playDays = this.playDaysById[id] ?? [];
+        if (db) {
+          const rows = await store.getAllStats(db, id);
+          const byGame = emptyStats();
+          for (const r of rows) byGame[r.game]?.set(r.code, { s: r.s, c: r.c, d: r.d });
+          stats = byGame;
+          playDays = await store.getPlayDays(db, id);
+        }
+        return { user: $state.snapshot(u) as User, stats, playDays };
+      }),
+    );
+    download(JSON.stringify(buildBackup(players), null, 2), backupFileName());
+  }
+
+  /**
+   * Creates new players from a player file or a backup of several players.
+   * Throws ImportError on invalid files (then nothing is imported).
+   */
+  async importFile(text: string): Promise<User[]> {
+    const imported = parseImportFile(text, KNOWN_CODES);
+    const users: User[] = [];
+    for (const p of imported) {
+      users.push(
+        this.#db
+          ? await store.insertUserWithData(this.#db, p.user, p.stats, p.playDays)
+          : { ...p.user, id: -Date.now() - users.length },
+      );
+    }
+    this.users = [...users, ...this.users];
+    return users;
   }
 
   // ---------------------------------------------------------------- games
@@ -447,6 +473,18 @@ class AppState {
     const id = this.user?.id;
     return (id !== undefined ? this.#stats.get(id)?.[game] : undefined) ?? new Map();
   }
+}
+
+/** Saves `text` as a file through the browser's download. */
+function download(text: string, fileName: string): void {
+  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function currentTheme(): Theme {

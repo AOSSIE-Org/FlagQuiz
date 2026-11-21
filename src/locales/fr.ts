@@ -110,6 +110,11 @@ const fr: Messages = {
   mastered: 'Maîtrisés',
   masteredCount: 'Maîtrisés : {n} sur {total}',
 
+  updateAvailable: 'Nouvelle version : touche pour mettre à jour',
+  updateRequired: 'Une version plus récente de Flag Quiz a été utilisée sur cet appareil. Touche pour mettre à jour.',
+  closeOtherCopies: 'Flag Quiz est ouvert dans un autre onglet ou une autre fenêtre. Ferme-le pour continuer.',
+  saveAllPlayers: 'Sauvegarder tous les joueurs dans un fichier',
+
   installTheApp: 'Installer l’appli',
   iosShare: 'Partager',
   addToHomeScreen: 'Sur l’écran d’accueil',

@@ -1,0 +1,373 @@
+{
+ "description": "Recorded from the deployed build of commit 023cbb4 (DB version 4) after playing two games and switching to French.",
+ "dbVersion": 4,
+ "stores": {
+  "users": [
+   {
+    "name": "Ana",
+    "flag": {
+     "colors": [
+      "#8B5A2B",
+      "#E4002B",
+      "#FFFFFF"
+     ],
+     "pattern": "crescent"
+    },
+    "difficulty": "easy",
+    "theme": "light",
+    "adapt": {
+     "flag": 1,
+     "country": -3,
+     "location": 1,
+     "capital": 1,
+     "capitalCountry": 1
+    },
+    "scores": {
+     "flag": {
+      "correct": 0,
+      "gold": 0,
+      "bestGold": 0,
+      "silver": 0,
+      "bestSilver": 0
+     },
+     "country": {
+      "correct": 6,
+      "gold": 0,
+      "bestGold": 0,
+      "silver": 0,
+      "bestSilver": 0
+     },
+     "location": {
+      "correct": 0,
+      "gold": 0,
+      "bestGold": 0,
+      "silver": 0,
+      "bestSilver": 0
+     },
+     "capital": {
+      "correct": 4,
+      "gold": 0,
+      "bestGold": 2,
+      "silver": 1,
+      "bestSilver": 2
+     },
+     "capitalCountry": {
+      "correct": 0,
+      "gold": 0,
+      "bestGold": 0,
+      "silver": 0,
+      "bestSilver": 0
+     }
+    },
+    "correctCount": 10,
+    "filter": {
+     "continents": [
+      "AF",
+      "AS",
+      "EU",
+      "NA",
+      "SA",
+      "OC",
+      "AN"
+     ],
+     "topN": 100
+    },
+    "createdAt": 1795267455329,
+    "lastActiveAt": 1795267455364,
+    "id": 1
+   }
+  ],
+  "stats": [
+   {
+    "userId": 1,
+    "game": "capital",
+    "code": "AR",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "capital",
+    "code": "BI",
+    "s": 0.45,
+    "c": 1,
+    "d": 0
+   },
+   {
+    "userId": 1,
+    "game": "capital",
+    "code": "GN",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "capital",
+    "code": "SD",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "capital",
+    "code": "SN",
+    "s": 0.45,
+    "c": 1,
+    "d": 0
+   },
+   {
+    "userId": 1,
+    "game": "capital",
+    "code": "ZW",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "AF",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "AR",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "AZ",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "BO",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "CN",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "DE",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "EC",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "GH",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "GN",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "MG",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "NG",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "NP",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "SE",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "SS",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "TJ",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "TW",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   }
+  ],
+  "playDays": [
+   {
+    "userId": 1,
+    "date": "2026-11-21"
+   }
+  ],
+  "settings": {
+   "speech": true,
+   "sounds": true,
+   "turnRounds": 3,
+   "language": "fr"
+  }
+ },
+ "expected": {
+  "users": [
+   {
+    "name": "Ana",
+    "scores": {
+     "flag": {
+      "correct": 0,
+      "gold": 0,
+      "bestGold": 0,
+      "silver": 0,
+      "bestSilver": 0
+     },
+     "country": {
+      "correct": 6,
+      "gold": 0,
+      "bestGold": 0,
+      "silver": 0,
+      "bestSilver": 0
+     },
+     "location": {
+      "correct": 0,
+      "gold": 0,
+      "bestGold": 0,
+      "silver": 0,
+      "bestSilver": 0
+     },
+     "capital": {
+      "correct": 4,
+      "gold": 0,
+      "bestGold": 2,
+      "silver": 1,
+      "bestSilver": 2
+     },
+     "capitalCountry": {
+      "correct": 0,
+      "gold": 0,
+      "bestGold": 0,
+      "silver": 0,
+      "bestSilver": 0
+     }
+    },
+    "correctCount": 10,
+    "adapt": {
+     "flag": 1,
+     "country": -3,
+     "location": 1,
+     "capital": 1,
+     "capitalCountry": 1
+    },
+    "filter": {
+     "continents": [
+      "AF",
+      "AS",
+      "EU",
+      "NA",
+      "SA",
+      "OC",
+      "AN"
+     ],
+     "topN": 100
+    },
+    "difficulty": "easy"
+   }
+  ],
+  "stats": [
+   {
+    "userId": 1,
+    "game": "capital",
+    "code": "AR",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "capital",
+    "code": "BI",
+    "s": 0.45,
+    "c": 1,
+    "d": 0
+   },
+   {
+    "userId": 1,
+    "game": "capital",
+    "code": "GN",
+    "s": 0.55,
+    "c": 0,
+    "d": 1
+   }
+  ],
+  "playDays": {
+   "1": [
+    "2026-11-21"
+   ]
+  },
+  "settings": {
+   "speech": true,
+   "sounds": true,
+   "turnRounds": 3,
+   "language": "fr"
+  }
+ }
+}

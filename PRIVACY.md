@@ -38,7 +38,7 @@ Some features may not work if the permissions required for those features are no
 
 The App is designed to minimize the storage and transmission of personal information.
 
-All information is stored locally on your device, in your browser's IndexedDB storage, and is not uploaded to or maintained on any remote server.
+All information is stored locally on your device, in your browser's IndexedDB storage, and is not uploaded to or maintained on any remote server. When a player starts playing, the App asks the browser to keep this storage persistent, so that the browser doesn't delete it on its own (for example when the device runs low on space). Your browser decides whether to grant this; Firefox may ask you.
 The App has no accounts, no backend and no analytics. After the App is loaded (or installed as a Progressive Web App), it works fully offline.
 
 

@@ -1,4 +1,7 @@
-/** Export and import of one player's data as JSON. */
+/**
+ * Export and import of players' data as JSON: one player per file, or a
+ * backup of every player on the device in one file.
+ */
 import { migrateLegacyScores, normalizeScores } from './scores';
 import { K_MAX, K_MIN, K_START } from './select';
 import {
@@ -23,8 +26,11 @@ export const EXPORT_FORMAT = 'flag-quiz-player';
  */
 export const EXPORT_VERSION = 2;
 const SUPPORTED_VERSIONS = [1, 2];
+/** A backup of every player: `players` holds one player file each. */
+export const BACKUP_FORMAT = 'flag-quiz-backup';
+export const BACKUP_VERSION = 1;
 /** Imported files larger than this are rejected. */
-export const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
+export const MAX_IMPORT_BYTES = 20 * 1024 * 1024;
 export const MAX_NAME_LENGTH = 16;
 
 export interface ExportedStat extends ItemStats {
@@ -39,6 +45,13 @@ export interface ExportFile {
   player: Omit<User, 'id' | 'lastActiveAt'>;
   stats: ExportedStat[];
   playDays: string[];
+}
+
+export interface BackupFile {
+  format: typeof BACKUP_FORMAT;
+  version: typeof BACKUP_VERSION;
+  exportedAt: string;
+  players: ExportFile[];
 }
 
 export interface ImportedPlayer {
@@ -76,6 +89,29 @@ export function buildExport(
     ),
     playDays: [...playDays],
   };
+}
+
+/** A backup of several players. */
+export function buildBackup(
+  players: readonly {
+    user: User;
+    stats: Record<GameId, ReadonlyMap<string, ItemStats>>;
+    playDays: readonly string[];
+  }[],
+  now: Date = new Date(),
+): BackupFile {
+  return {
+    format: BACKUP_FORMAT,
+    version: BACKUP_VERSION,
+    exportedAt: now.toISOString(),
+    players: players.map((p) => buildExport(p.user, p.stats, p.playDays, now)),
+  };
+}
+
+/** File name of a backup of all players, with the date. */
+export function backupFileName(now: Date = new Date()): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `flag-quiz-players-${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}.json`;
 }
 
 /** A safe file name for the export of a player. */
@@ -128,13 +164,37 @@ function parseK(v: unknown): number {
  * settings fall back to defaults; malformed data is rejected with an ImportError.
  */
 export function parseImport(text: string, knownCodes: ReadonlySet<string>, now: number = Date.now()): ImportedPlayer {
+  return parsePlayer(parseJson(text), knownCodes, now);
+}
+
+/**
+ * Parses a player file or a backup of several players; all-or-nothing: one
+ * malformed player rejects the whole file.
+ */
+export function parseImportFile(
+  text: string,
+  knownCodes: ReadonlySet<string>,
+  now: number = Date.now(),
+): ImportedPlayer[] {
+  const data = parseJson(text);
+  if (isObject(data) && data.format === BACKUP_FORMAT) {
+    if (data.version !== BACKUP_VERSION) fail('Unsupported file version', 'unsupportedVersion');
+    if (!Array.isArray(data.players) || data.players.length === 0) fail('Missing players');
+    return data.players.map((p: unknown) => parsePlayer(p, knownCodes, now));
+  }
+  return [parsePlayer(data, knownCodes, now)];
+}
+
+function parseJson(text: string): unknown {
   if (text.length > MAX_IMPORT_BYTES) fail('File too large', 'tooLarge');
-  let data: unknown;
   try {
-    data = JSON.parse(text);
+    return JSON.parse(text);
   } catch {
     fail('Not a JSON file', 'notJson');
   }
+}
+
+function parsePlayer(data: unknown, knownCodes: ReadonlySet<string>, now: number): ImportedPlayer {
   if (!isObject(data) || data.format !== EXPORT_FORMAT) fail('Not a Flag Quiz player file', 'notPlayerFile');
   if (!SUPPORTED_VERSIONS.includes(data.version as number)) fail('Unsupported file version', 'unsupportedVersion');
 

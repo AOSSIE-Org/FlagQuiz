@@ -31,6 +31,10 @@ src/
                            (lazy import.meta.glob, sets <html lang dir>, speech language)  (tested)
     scores.ts              per-game gold/silver stars + correct answers, legacy migration  (pure, tested)
     hoverSpeech.svelte.ts  speak on a real hover only (mutes the option under a resting mouse)
+    update.svelte.ts       service worker in prompt mode: periodic checks, ↻ state, outdated/blocked state
+    storage.ts             navigator.storage.persist()
+    users.ts               withDefaults(): players saved by any version, brought up to date
+    compat.test.ts + fixtures/  every saved-data version (db-v<N>, export-v<N>, backup-v<N>) opened by current code
     select.ts              scores, weights, adaptive k, pickRound, filters   (pure, tested)
     dates.ts               dayKey, addDays, lastDays, streaks                 (pure, tested)
     db.ts                  idb schema + versioned migrations                  (tested with fake-indexeddb)
@@ -57,6 +61,8 @@ src/
     StatsModal.svelte      streak + calendar, table: game × best silver, best gold, mastered flags (fitted)
     FilterModal.svelte     restrict the content pool
     TurnBanner.svelte      multiplayer: next player's flag and name
+    UpdateButton.svelte    gold ↻ (lower right) when a new version is ready; full-screen notices when
+                           outdated (VersionError / blocking) or blocked by an older copy
     Guess*.svelte          one component per game, presentational (map game loads its data lazily)
     CapitalPhotos.svelte   four photos: 2×2, or one row in wide short spaces (container query)
     GameIcon.svelte        one icon per game (statistics)
@@ -160,6 +166,22 @@ answer(code):
   at build time. Wikidata `zh` labels mix Traditional and Simplified Chinese —
   query `zh-hans` first; strip disambiguation (`"Stanley, Falkland Islands"`,
   `"(ville)"`) and Chinese `市`.
+- **Update flow**: `registerType: 'prompt'`, `injectRegister: false`, and
+  `registerSW({ onNeedRefresh, onRegisteredSW })` from `virtual:pwa-register`;
+  call `registration.update()` hourly and on `visibilitychange`; the ↻ button
+  calls `updateSW(true)` (skip waiting + reload). Moving from `autoUpdate`:
+  a waiting worker would wait for ever behind pages that have no button, so
+  `public/sw-transition.js` (added with `workbox.importScripts`) calls
+  `skipWaiting()` once when it is installed over a worker that never set its
+  marker cache, and sets the marker on activate. With auto-update, an old page
+  can also break when its lazy chunks are removed by the new worker — another
+  reason for prompt mode.
+- **Testing updates**: copy the previous `dist/` before building, then serve
+  old, new and a "newer" copy (edit `index.html` and its revision in
+  `sw.js`) one after the other with `vite preview --outDir <dir> --port <p>`
+  in one browser context (Python's `http.server` stalls Chrome). Open the data
+  at a higher version from the page (`indexedDB.open(name, 99)`) to simulate a
+  newer copy. The ↻ button pulses, so click it with `force: true`.
 - **RTL**: `dir="rtl"` flips flex/grid order automatically; absolutely
   positioned badges and menus need logical properties, or they end up
   off-screen.

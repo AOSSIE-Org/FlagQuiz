@@ -1,0 +1,135 @@
+{
+ "description": "Saved by commits ee4418b to e6f6886 (DB version 3): five games, settings, correct-answer count, one run of rounds without mistakes for all games.",
+ "dbVersion": 3,
+ "stores": {
+  "users": [
+   {
+    "id": 1,
+    "name": "Ana",
+    "flag": {
+     "colors": [
+      "#00843D",
+      "#FFCD00",
+      "#0032A0"
+     ],
+     "pattern": "hoist"
+    },
+    "difficulty": "hard",
+    "theme": "light",
+    "adapt": {
+     "flag": 1,
+     "country": 1,
+     "location": 2,
+     "capital": 0,
+     "capitalCountry": 1
+    },
+    "perfectRun": 6,
+    "bestPerfectRun": 11,
+    "correctCount": 57,
+    "filter": {
+     "continents": [
+      "AF",
+      "AS",
+      "EU",
+      "NA",
+      "SA",
+      "OC",
+      "AN"
+     ],
+     "topN": 100
+    },
+    "createdAt": 1763600000000,
+    "lastActiveAt": 1763700000000
+   }
+  ],
+  "stats": [
+   {
+    "userId": 1,
+    "game": "location",
+    "code": "IT",
+    "s": 0.15,
+    "c": 12,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "location",
+    "code": "PE",
+    "s": 0.4,
+    "c": 8,
+    "d": 4
+   },
+   {
+    "userId": 1,
+    "game": "capital",
+    "code": "FR",
+    "s": 0.3,
+    "c": 30,
+    "d": 2
+   }
+  ],
+  "playDays": [
+   {
+    "userId": 1,
+    "date": "2026-11-21"
+   }
+  ],
+  "settings": {
+   "speech": false,
+   "sounds": true,
+   "turnRounds": 5
+  }
+ },
+ "expected": {
+  "users": [
+   {
+    "name": "Ana",
+    "correctCount": 57,
+    "scores": {
+     "location": {
+      "correct": 20,
+      "gold": 0,
+      "bestGold": 0,
+      "silver": 0,
+      "bestSilver": 0
+     },
+     "capital": {
+      "correct": 30,
+      "gold": 6,
+      "bestGold": 11,
+      "silver": 6,
+      "bestSilver": 11
+     },
+     "flag": {
+      "correct": 0,
+      "gold": 0,
+      "bestGold": 0,
+      "silver": 0,
+      "bestSilver": 0
+     }
+    }
+   }
+  ],
+  "stats": [
+   {
+    "userId": 1,
+    "game": "location",
+    "code": "IT",
+    "s": 0.15,
+    "c": 12,
+    "d": 1
+   }
+  ],
+  "playDays": {
+   "1": [
+    "2026-11-21"
+   ]
+  },
+  "settings": {
+   "speech": false,
+   "sounds": true,
+   "turnRounds": 5,
+   "language": "en"
+  }
+ }
+}

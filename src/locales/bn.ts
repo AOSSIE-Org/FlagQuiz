@@ -110,6 +110,11 @@ const bn: Messages = {
   mastered: 'শেখা হয়ে গেছে',
   masteredCount: 'শেখা হয়ে গেছে: {total}টির মধ্যে {n}টি',
 
+  updateAvailable: 'নতুন সংস্করণ: আপডেট করতে ট্যাপ করো',
+  updateRequired: 'এই ডিভাইসে Flag Quiz-এর নতুন সংস্করণ ব্যবহার করা হয়েছে। আপডেট করতে ট্যাপ করো।',
+  closeOtherCopies: 'Flag Quiz অন্য একটি ট্যাব বা উইন্ডোতে খোলা আছে। চালিয়ে যেতে সেটি বন্ধ করো।',
+  saveAllPlayers: 'সব খেলোয়াড়কে একটি ফাইলে সংরক্ষণ করো',
+
   installTheApp: 'অ্যাপ ইনস্টল করো',
   iosShare: 'শেয়ার',
   addToHomeScreen: 'হোম স্ক্রিনে যোগ করো',

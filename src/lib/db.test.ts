@@ -133,3 +133,45 @@ describe('play days', () => {
     expect(await getPlayDays(db, 1)).toEqual(['2026-11-19', '2026-11-20']);
   });
 });
+
+describe('several copies of the app', () => {
+  it('steps aside when a newer version needs to upgrade', async () => {
+    const name = freshName();
+    let blocking = 0;
+    await openDatabase(name, { blocking: () => blocking++ });
+    // A newer version of the app opens the same data.
+    const newer = await openDB(name, 99);
+    expect(blocking).toBe(1);
+    expect(newer.version).toBe(99);
+    newer.close();
+  });
+
+  it('reports that the data was saved by a newer version', async () => {
+    const name = freshName();
+    (await openDB(name, 99)).close();
+    await expect(openDatabase(name)).rejects.toMatchObject({ name: 'VersionError' });
+  });
+
+  it('waits for an older copy to close before upgrading', async () => {
+    const name = freshName();
+    const older = await openDB(name, 3, {
+      upgrade(db) {
+        db.createObjectStore('users', { keyPath: 'id', autoIncrement: true });
+        const stats = db.createObjectStore('stats', { keyPath: ['userId', 'game', 'code'] });
+        stats.createIndex('byUserGame', ['userId', 'game']);
+        stats.createIndex('byUser', 'userId');
+        const days = db.createObjectStore('playDays', { keyPath: ['userId', 'date'] });
+        days.createIndex('byUser', 'userId');
+        db.createObjectStore('settings');
+      },
+    });
+    let blocked = 0;
+    const opening = openDatabase(name, { blocked: () => blocked++ });
+    await new Promise((r) => setTimeout(r, 20));
+    expect(blocked).toBe(1);
+    older.close();
+    const db = await opening;
+    expect(db.version).toBeGreaterThan(3);
+    db.close();
+  });
+});

@@ -122,6 +122,12 @@ const en = {
   mastered: 'Mastered',
   masteredCount: 'Mastered: {n} of {total}',
 
+  // Updates and backups
+  updateAvailable: 'New version: tap to update',
+  updateRequired: 'A newer version of Flag Quiz has been used on this device. Tap to update.',
+  closeOtherCopies: 'Flag Quiz is open in another tab or window. Close it to continue.',
+  saveAllPlayers: 'Save all players in one file',
+
   // Installing
   installTheApp: 'Install the app',
   iosShare: 'Share',

@@ -1,0 +1,103 @@
+{
+ "description": "Saved by development builds before the first release (DB version 1): stats have counts only.",
+ "dbVersion": 1,
+ "stores": {
+  "users": [
+   {
+    "id": 1,
+    "name": "Ana",
+    "flag": {
+     "colors": [
+      "#00843D",
+      "#FFCD00",
+      "#0032A0"
+     ],
+     "pattern": "hoist"
+    },
+    "difficulty": "easy",
+    "theme": "light",
+    "adapt": {
+     "flag": 1,
+     "country": 0.5
+    },
+    "perfectRun": 2,
+    "bestPerfectRun": 5,
+    "createdAt": 1763600000000,
+    "lastActiveAt": 1763600500000
+   }
+  ],
+  "stats": [
+   {
+    "userId": 1,
+    "game": "flag",
+    "code": "FR",
+    "c": 3,
+    "d": 1
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "DE",
+    "c": 0,
+    "d": 2
+   }
+  ],
+  "playDays": [
+   {
+    "userId": 1,
+    "date": "2026-11-19"
+   }
+  ]
+ },
+ "expected": {
+  "users": [
+   {
+    "name": "Ana",
+    "correctCount": 0,
+    "filter": {
+     "continents": [
+      "AF",
+      "AS",
+      "EU",
+      "NA",
+      "SA",
+      "OC",
+      "AN"
+     ],
+     "topN": 100
+    },
+    "scores": {
+     "flag": {
+      "correct": 3,
+      "gold": 2,
+      "bestGold": 5,
+      "silver": 2,
+      "bestSilver": 5
+     },
+     "country": {
+      "correct": 0,
+      "gold": 0,
+      "bestGold": 0,
+      "silver": 0,
+      "bestSilver": 0
+     }
+    }
+   }
+  ],
+  "stats": [
+   {
+    "userId": 1,
+    "game": "flag",
+    "code": "FR",
+    "s": 0.3333333333333333,
+    "c": 3,
+    "d": 1
+   }
+  ],
+  "playDays": {
+   "1": [
+    "2026-11-19"
+   ]
+  }
+ }
+}

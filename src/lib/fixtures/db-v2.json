@@ -1,0 +1,187 @@
+{
+ "description": "Saved by the first releases (DB version 2, commits 1960eb9 to bb9a7f5): two games, no settings, no correct-answer count.",
+ "dbVersion": 2,
+ "stores": {
+  "users": [
+   {
+    "id": 1,
+    "name": "Ana",
+    "flag": {
+     "colors": [
+      "#00843D",
+      "#FFCD00",
+      "#0032A0"
+     ],
+     "pattern": "hoist"
+    },
+    "difficulty": "medium",
+    "theme": "dark",
+    "adapt": {
+     "flag": 2,
+     "country": -1
+    },
+    "perfectRun": 4,
+    "bestPerfectRun": 7,
+    "filter": {
+     "continents": [
+      "EU",
+      "SA"
+     ],
+     "topN": 50
+    },
+    "createdAt": 1763600000000,
+    "lastActiveAt": 1763650000000
+   },
+   {
+    "id": 2,
+    "name": "Ben",
+    "flag": {
+     "colors": [
+      "#E4002B",
+      "#FFFFFF",
+      "#000000"
+     ],
+     "pattern": "stars"
+    },
+    "difficulty": "easy",
+    "theme": "light",
+    "adapt": {
+     "flag": 1,
+     "country": 1
+    },
+    "perfectRun": 0,
+    "bestPerfectRun": 3,
+    "filter": {
+     "continents": [
+      "AF",
+      "AS",
+      "EU",
+      "NA",
+      "SA",
+      "OC",
+      "AN"
+     ],
+     "topN": 100
+    },
+    "createdAt": 1763600100000,
+    "lastActiveAt": 1763640000000
+   }
+  ],
+  "stats": [
+   {
+    "userId": 1,
+    "game": "flag",
+    "code": "FR",
+    "s": 0.1,
+    "c": 9,
+    "d": 0
+   },
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "BR",
+    "s": 0.6,
+    "c": 5,
+    "d": 7
+   },
+   {
+    "userId": 2,
+    "game": "flag",
+    "code": "JP",
+    "s": 0.45,
+    "c": 1,
+    "d": 0
+   }
+  ],
+  "playDays": [
+   {
+    "userId": 1,
+    "date": "2026-11-19"
+   },
+   {
+    "userId": 1,
+    "date": "2026-11-20"
+   },
+   {
+    "userId": 2,
+    "date": "2026-11-20"
+   }
+  ]
+ },
+ "expected": {
+  "users": [
+   {
+    "name": "Ana",
+    "difficulty": "medium",
+    "correctCount": 0,
+    "filter": {
+     "continents": [
+      "EU",
+      "SA"
+     ],
+     "topN": 50
+    },
+    "adapt": {
+     "flag": 2,
+     "country": -1,
+     "location": 1,
+     "capital": 1,
+     "capitalCountry": 1
+    },
+    "scores": {
+     "flag": {
+      "correct": 9,
+      "gold": 0,
+      "bestGold": 0,
+      "silver": 0,
+      "bestSilver": 0
+     },
+     "country": {
+      "correct": 5,
+      "gold": 4,
+      "bestGold": 7,
+      "silver": 4,
+      "bestSilver": 7
+     }
+    }
+   },
+   {
+    "name": "Ben",
+    "scores": {
+     "flag": {
+      "correct": 1,
+      "gold": 0,
+      "bestGold": 3,
+      "silver": 0,
+      "bestSilver": 3
+     }
+    }
+   }
+  ],
+  "stats": [
+   {
+    "userId": 1,
+    "game": "country",
+    "code": "BR",
+    "s": 0.6,
+    "c": 5,
+    "d": 7
+   }
+  ],
+  "playDays": {
+   "1": [
+    "2026-11-19",
+    "2026-11-20"
+   ],
+   "2": [
+    "2026-11-20"
+   ]
+  },
+  "settings": {
+   "speech": true,
+   "sounds": true,
+   "turnRounds": 3,
+   "language": "en"
+  }
+ }
+}

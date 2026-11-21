@@ -110,6 +110,11 @@ const es: Messages = {
   mastered: 'Dominados',
   masteredCount: 'Dominados: {n} de {total}',
 
+  updateAvailable: 'Nueva versión: toca para actualizar',
+  updateRequired: 'En este dispositivo se ha usado una versión más nueva de Flag Quiz. Toca para actualizar.',
+  closeOtherCopies: 'Flag Quiz está abierto en otra pestaña o ventana. Ciérrala para continuar.',
+  saveAllPlayers: 'Guardar todos los jugadores en un archivo',
+
   installTheApp: 'Instalar la app',
   iosShare: 'Compartir',
   addToHomeScreen: 'Añadir a pantalla de inicio',

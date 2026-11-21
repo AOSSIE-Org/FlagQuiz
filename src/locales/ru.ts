@@ -110,6 +110,11 @@ const ru: Messages = {
   mastered: 'Выучено',
   masteredCount: 'Выучено: {n} из {total}',
 
+  updateAvailable: 'Новая версия: нажми, чтобы обновить',
+  updateRequired: 'На этом устройстве уже использовалась более новая версия Flag Quiz. Нажмите, чтобы обновить.',
+  closeOtherCopies: 'Flag Quiz открыт в другой вкладке или окне. Закройте его, чтобы продолжить.',
+  saveAllPlayers: 'Сохранить всех игроков в один файл',
+
   installTheApp: 'Установить приложение',
   iosShare: 'Поделиться',
   addToHomeScreen: 'На экран «Домой»',

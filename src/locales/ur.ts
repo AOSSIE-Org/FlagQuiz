@@ -110,6 +110,11 @@ const ur: Messages = {
   mastered: 'سیکھ لیے',
   masteredCount: 'سیکھ لیے: {total} میں سے {n}',
 
+  updateAvailable: 'نیا ورژن: اپ ڈیٹ کرنے کے لیے ٹیپ کریں',
+  updateRequired: 'اس ڈیوائس پر Flag Quiz کا نیا ورژن استعمال ہو چکا ہے۔ اپ ڈیٹ کرنے کے لیے ٹیپ کریں۔',
+  closeOtherCopies: 'Flag Quiz کسی اور ٹیب یا ونڈو میں کھلا ہے۔ جاری رکھنے کے لیے اسے بند کریں۔',
+  saveAllPlayers: 'تمام کھلاڑیوں کو ایک فائل میں محفوظ کریں',
+
   installTheApp: 'ایپ انسٹال کریں',
   iosShare: 'شیئر',
   addToHomeScreen: 'ہوم اسکرین میں شامل کریں',
