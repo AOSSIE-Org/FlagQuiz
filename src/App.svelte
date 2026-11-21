@@ -21,7 +21,7 @@
   import UserPicker from './components/UserPicker.svelte';
 
   /** The splash screen stays for at least this long, and until the app is ready. */
-  const SPLASH_MS = 2000;
+  const SPLASH_MS = 4000;
   let splash = $state(true);
 
   onMount(() => {

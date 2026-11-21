@@ -2,6 +2,7 @@
   import {
     ChartColumn,
     Check,
+    Coffee,
     Download,
     Earth,
     FileDown,
@@ -154,6 +155,17 @@
         <a role="menuitem" class="item" href="./credits.html" target="_blank" rel="noopener" aria-label="Credits" title="Credits">
           <Info />
         </a>
+        <a
+          role="menuitem"
+          class="item donate"
+          href="https://buymeacoffee.com/aossie"
+          target="_blank"
+          rel="noopener"
+          aria-label="Support AOSSIE with a donation"
+          title="Support AOSSIE with a donation"
+        >
+          <Coffee />
+        </a>
         <button role="menuitem" class="item" onclick={() => app.changeGame()} aria-label="Change game" title="Change game">
           <Gamepad2 />
         </button>
@@ -248,6 +260,10 @@
   }
   a.item {
     color: inherit;
+  }
+  a.item.donate {
+    background: var(--gold);
+    color: var(--ink);
   }
   /* A switched-off setting: dimmed and crossed out. */
   .item.off {

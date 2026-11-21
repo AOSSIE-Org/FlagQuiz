@@ -88,7 +88,8 @@
 - **Light and dark mode**, with AOSSIE's brand colours and font.
 - **Fits on one screen**: no scrolling on desktop or on phones in landscape. A discreet button in the lower-right corner switches to full screen (where the browser supports it).
 - **Works offline and installs like an app**: a Progressive Web App that also works as a plain static website. On phones and tablets, an "Install app" menu button shows the browser's install dialog (Android) or how to use Share → Add to Home Screen (iOS).
-- **Splash screen** with the app's logo and "made by AOSSIE".
+- **Splash screen** with the app's logo and name and "made by" AOSSIE's logo.
+- **Credits and donations**: a credits page (ⓘ in the menu) with every data source and photo licence, and a ☕ menu item to support AOSSIE, a not-for-profit, at [buymeacoffee.com/aossie](https://buymeacoffee.com/aossie).
 - **Private by design**: no accounts, no servers, no analytics. Everything is stored in the browser's IndexedDB.
 
 ---
@@ -310,6 +311,7 @@ Navigate to [http://localhost:5173](http://localhost:5173) to see the applicatio
 | `npm run fetch-countries` | Download the flags, populations and continents again and regenerate `src/data/countries.ts` |
 | `npm run fetch-capitals` | Download the capitals and their photos again (`public/capitals/`, `src/data/capitals.ts`, `public/credits.html`); `-- --only=FR,GB` updates some countries only |
 | `npm run fetch-map` | Regenerate the world map (`src/data/map.json`) |
+| `npm run build-credits` | Regenerate the credits page (`public/credits.html`) from the data files |
 
 ### Deployment
 

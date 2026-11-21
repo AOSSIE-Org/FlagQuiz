@@ -146,6 +146,16 @@
     gap: clamp(10px, 3vmin, 24px);
     width: min(820px, 88vw);
   }
+  /*
+   * Explicit single-column tracks and min-width: 0, so that percentage widths
+   * inside resolve against the column (Safari otherwise sizes the column from
+   * its content and the preview spills over the patterns).
+   */
+  .left,
+  .right {
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
   .left {
     grid-area: left;
     display: grid;
@@ -153,11 +163,14 @@
     gap: clamp(8px, 2.5vmin, 18px);
   }
   .left :global(.preview) {
-    width: min(100%, 38dvh * 1.5);
+    width: 100%;
+    max-width: calc(38dvh * 1.5);
+    height: auto;
     justify-self: center;
     border-radius: 8px;
   }
   .name {
+    min-width: 0;
     display: flex;
     align-items: center;
     gap: 8px;

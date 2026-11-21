@@ -9,8 +9,7 @@
   <h1>Flag Quiz</h1>
   <p class="made-by">
     <span>made by</span>
-    <img class="aossie on-light" src="./brand/aossie-secondary-ink.svg" alt="AOSSIE" />
-    <img class="aossie on-dark" src="./brand/aossie-secondary.svg" alt="AOSSIE" />
+    <img class="aossie" src="./brand/aossie-secondary.svg" alt="AOSSIE" />
   </p>
 </div>
 
@@ -25,7 +24,7 @@
     gap: clamp(8px, 2.5vmin, 20px);
     background: var(--bg);
     color: var(--text);
-    animation: fade-out 0.4s ease 1.6s forwards;
+    animation: fade-out 0.4s ease 3.6s forwards;
   }
   .logo {
     width: clamp(90px, 28vmin, 200px);
@@ -37,12 +36,14 @@
     font-size: clamp(32px, 10vmin, 72px);
     font-weight: 900;
     letter-spacing: -0.02em;
+    color: var(--gold);
     animation: rise 0.5s ease 0.15s both;
   }
   .made-by {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.5em;
+    gap: 0.35em;
     margin: clamp(4px, 2vmin, 16px) 0 0;
     font-size: clamp(14px, 3vmin, 20px);
     font-weight: 600;
@@ -52,23 +53,6 @@
   .aossie {
     height: clamp(24px, 5.5vmin, 40px);
     width: auto;
-  }
-  .on-dark {
-    display: none;
-  }
-  :global(:root[data-theme='dark']) .on-dark {
-    display: block;
-  }
-  :global(:root[data-theme='dark']) .on-light {
-    display: none;
-  }
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme='light'])) .on-dark {
-      display: block;
-    }
-    :global(:root:not([data-theme='light'])) .on-light {
-      display: none;
-    }
   }
   @keyframes pop {
     from {

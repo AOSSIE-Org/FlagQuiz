@@ -12,7 +12,7 @@
  * Writes:
  *   - public/capitals/<code>-<n>.webp       (360×240 photos)
  *   - src/data/capitals.ts
- *   - public/credits.html                    (photo and data credits)
+ *   - public/credits.html                    (photo and data credits, via build-credits.mjs)
  *
  * Usage: npm run fetch-capitals [-- --only=FR,AU]
  * Wikimedia APIs are queried politely (identifying User-Agent, low concurrency).
@@ -21,6 +21,7 @@ import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
+import { buildCredits } from './build-credits.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PHOTO_DIR = join(ROOT, 'public', 'capitals');
@@ -401,53 +402,5 @@ export const CAPITALS: readonly Capital[] = ${JSON.stringify(result, null, 2)};
 `,
 );
 
-const esc = (s = '') => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-const nameOf = new Map(countries.map((c) => [c.code, c.name]));
-await writeFile(
-  CREDITS_FILE,
-  `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="robots" content="noindex" />
-<title>Flag Quiz – Credits</title>
-<style>
-  body { font-family: system-ui, sans-serif; margin: 0 auto; max-width: 960px; padding: 16px; line-height: 1.45; color: #121212; background: #fff; }
-  @media (prefers-color-scheme: dark) { body { color: #fff; background: #121212; } a { color: #ffcd00; } }
-  h1 { color: #00843d; } table { border-collapse: collapse; width: 100%; font-size: 14px; }
-  td, th { text-align: left; padding: 6px; border-bottom: 1px solid #8884; vertical-align: top; }
-  img { width: 90px; height: 60px; object-fit: cover; border-radius: 4px; }
-</style>
-</head>
-<body>
-<h1>Flag Quiz – Credits</h1>
-<p>Flag Quiz is free and open source software by <a href="https://aossie.org/">AOSSIE</a>, licensed under the GNU GPL v3.
-Source code: <a href="https://github.com/AOSSIE-Org/FlagQuiz">github.com/AOSSIE-Org/FlagQuiz</a>.</p>
-<h2>Data</h2>
-<ul>
-<li>Flags: <a href="https://github.com/hampusborgos/country-flags">hampusborgos/country-flags</a> (public domain, from Wikimedia Commons).</li>
-<li>Populations and continents: <a href="https://www.geonames.org/">GeoNames</a> (CC BY 4.0).</li>
-<li>Capitals: <a href="https://www.wikidata.org/">Wikidata</a> (CC0).</li>
-<li>World map: <a href="https://www.naturalearthdata.com/">Natural Earth</a> (public domain), via <a href="https://github.com/topojson/world-atlas">world-atlas</a>.</li>
-</ul>
-<h2>Photos of capitals</h2>
-<p>All photos are from <a href="https://commons.wikimedia.org/">Wikimedia Commons</a>, resized and cropped. Follow the links for the originals and the full licence terms.</p>
-<table>
-<tr><th></th><th>Capital</th><th>Shows</th><th>Author</th><th>Licence</th></tr>
-${result
-  .flatMap((c) =>
-    c.photos.map(
-      (p) =>
-        `<tr><td><img src="${esc(p.src)}" alt="" loading="lazy" /></td><td>${esc(c.name)} (${esc(nameOf.get(c.code))})</td>` +
-        `<td><a href="${esc(p.source)}">${esc(p.title)}</a></td><td>${esc(p.author)}</td>` +
-        `<td>${p.licenseUrl ? `<a href="${esc(p.licenseUrl)}">${esc(p.license)}</a>` : esc(p.license)}</td></tr>`,
-    ),
-  )
-  .join('\n')}
-</table>
-</body>
-</html>
-`,
-);
+await buildCredits();
 console.log(`Wrote ${result.length} capitals (${result.length * PHOTOS} photos), ${DATA_FILE} and ${CREDITS_FILE}`);
