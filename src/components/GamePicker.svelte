@@ -2,7 +2,8 @@
   import { ArrowDown, Earth, MapPin, Volume2 } from '@lucide/svelte';
   import { CAPITALS } from '../data/capitals';
   import { app } from '../lib/app.svelte';
-  import { GAME_NAMES, type GameId } from '../lib/types';
+  import { t } from '../lib/i18n.svelte';
+  import type { GameId } from '../lib/types';
   import Modal from './Modal.svelte';
 
   const paris = CAPITALS.find((c) => c.code === 'FR') ?? CAPITALS[0];
@@ -11,29 +12,29 @@
   const start = (game: GameId) => app.startGame(game);
 </script>
 
-<Modal label="Choose a game" onclose={app.round ? () => (app.phase = 'playing') : undefined} wide>
+<Modal label={t('chooseGame')} onclose={app.round ? () => (app.phase = 'playing') : undefined} wide>
   <div class="games">
-    <button class="game" onclick={() => start('flag')} aria-label={GAME_NAMES.flag} title={GAME_NAMES.flag}>
+    <button class="game" onclick={() => start('flag')} aria-label={t('game.flag')} title={t('game.flag')}>
       <span class="art">
         <span class="word"><Volume2 size="1em" aria-hidden="true" /> Aa</span>
         <span class="row">
           {#each ['br', 'it', 'ru'] as code (code)}<img class="mini-flag" src="./flags/{code}.svg" alt="" />{/each}
         </span>
       </span>
-      <span class="caption">{GAME_NAMES.flag}</span>
+      <span class="caption">{t('game.flag')}</span>
     </button>
 
-    <button class="game" onclick={() => start('country')} aria-label={GAME_NAMES.country} title={GAME_NAMES.country}>
+    <button class="game" onclick={() => start('country')} aria-label={t('game.country')} title={t('game.country')}>
       <span class="art">
         <img class="big-flag" src="./flags/au.svg" alt="" />
         <span class="row">
           {#each ['Aa', 'Ee', 'Oo'] as w (w)}<span class="chip">{w}</span>{/each}
         </span>
       </span>
-      <span class="caption">{GAME_NAMES.country}</span>
+      <span class="caption">{t('game.country')}</span>
     </button>
 
-    <button class="game" onclick={() => start('location')} aria-label={GAME_NAMES.location} title={GAME_NAMES.location}>
+    <button class="game" onclick={() => start('location')} aria-label={t('game.location')} title={t('game.location')}>
       <span class="art">
         <img class="big-flag" src="./flags/jp.svg" alt="" />
         <span class="globe">
@@ -41,18 +42,18 @@
           <span class="pin"><MapPin size="100%" fill="currentColor" stroke="var(--bg)" aria-hidden="true" /></span>
         </span>
       </span>
-      <span class="caption">{GAME_NAMES.location}</span>
+      <span class="caption">{t('game.location')}</span>
     </button>
 
     {#if paris}
-      <button class="game" onclick={() => start('capital')} aria-label={GAME_NAMES.capital} title={GAME_NAMES.capital}>
+      <button class="game" onclick={() => start('capital')} aria-label={t('game.capital')} title={t('game.capital')}>
         <span class="art">
           <img class="big-flag" src="./flags/fr.svg" alt="" />
           <span class="photos">
             {#each paris.photos as p (p.src)}<img src="./{p.src}" alt="" />{/each}
           </span>
         </span>
-        <span class="caption">{GAME_NAMES.capital}</span>
+        <span class="caption">{t('game.capital')}</span>
       </button>
     {/if}
 
@@ -60,8 +61,8 @@
       <button
         class="game"
         onclick={() => start('capitalCountry')}
-        aria-label={GAME_NAMES.capitalCountry}
-        title={GAME_NAMES.capitalCountry}
+        aria-label={t('game.capitalCountry')}
+        title={t('game.capitalCountry')}
       >
         <span class="art">
           <span class="photos">
@@ -72,7 +73,7 @@
             {#each ['gb', 'ie', 'ca'] as code (code)}<img class="mini-flag" src="./flags/{code}.svg" alt="" />{/each}
           </span>
         </span>
-        <span class="caption">{GAME_NAMES.capitalCountry}</span>
+        <span class="caption">{t('game.capitalCountry')}</span>
       </button>
     {/if}
   </div>

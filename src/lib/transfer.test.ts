@@ -11,8 +11,13 @@ const user: User = {
   difficulty: 'medium',
   theme: 'dark',
   adapt: { flag: 2, country: -1, location: 1, capital: 1, capitalCountry: 1 },
-  perfectRun: 3,
-  bestPerfectRun: 12,
+  scores: {
+    flag: { correct: 30, gold: 3, bestGold: 12, silver: 5, bestSilver: 14 },
+    country: { correct: 10, gold: 0, bestGold: 4, silver: 1, bestSilver: 6 },
+    location: { correct: 0, gold: 0, bestGold: 0, silver: 0, bestSilver: 0 },
+    capital: { correct: 0, gold: 0, bestGold: 0, silver: 0, bestSilver: 0 },
+    capitalCountry: { correct: 0, gold: 0, bestGold: 0, silver: 0, bestSilver: 0 },
+  },
   correctCount: 40,
   filter: { continents: ['EU', 'SA'], topN: 2 },
   createdAt: 1000,
@@ -88,8 +93,7 @@ describe('export / import', () => {
         difficulty: 'impossible',
         adapt: { flag: 100, country: 'x' },
         filter: { continents: ['XX'], topN: 1e9 },
-        perfectRun: 20,
-        bestPerfectRun: 5,
+        scores: { flag: { correct: 2, gold: 20, bestGold: 5, silver: -3, bestSilver: 'x' }, country: null },
       },
       stats: [...f.stats, { game: 'flag', code: 'ZZ', s: 0.5, c: 1, d: 1 }, f.stats[0]],
       playDays: ['2026-11-20', '2026-11-19', '2026-11-20'],
@@ -98,8 +102,35 @@ describe('export / import', () => {
     expect(u.difficulty).toBe('easy');
     expect(u.adapt).toEqual({ flag: 4, country: 1, location: 1, capital: 1, capitalCountry: 1 });
     expect(u.filter).toEqual({ continents: DEFAULT_FILTER.continents, topN: known.size });
-    expect(u.bestPerfectRun).toBe(20);
+    expect(u.scores.flag).toEqual({ correct: 2, gold: 20, bestGold: 20, silver: 0, bestSilver: 0 });
+    expect(u.scores.country).toEqual({ correct: 0, gold: 0, bestGold: 0, silver: 0, bestSilver: 0 });
     expect(stats.map((s) => s.code)).toEqual(['FR', 'DE']);
     expect(playDays).toEqual(['2026-11-19', '2026-11-20']);
+  });
+
+  it('imports version 1 files, moving the old run to the most played game', () => {
+    const f = exported();
+    const { scores: _scores, ...player } = f.player;
+    const { user: u } = reparse({
+      ...f,
+      version: 1,
+      player: { ...player, perfectRun: 3, bestPerfectRun: 12 },
+      stats: [
+        { game: 'flag', code: 'FR', s: 0.1, c: 9, d: 0 },
+        { game: 'country', code: 'DE', s: 0.5, c: 2, d: 30 },
+      ],
+    });
+    expect(u.scores.flag).toEqual({ correct: 9, gold: 0, bestGold: 0, silver: 0, bestSilver: 0 });
+    expect(u.scores.country).toEqual({ correct: 2, gold: 3, bestGold: 12, silver: 3, bestSilver: 12 });
+  });
+
+  it('rejects files from newer versions with a reason', () => {
+    try {
+      reparse({ ...exported(), version: 99 });
+      expect.unreachable();
+    } catch (err) {
+      expect(err).toBeInstanceOf(ImportError);
+      expect((err as ImportError).reason).toBe('unsupportedVersion');
+    }
   });
 });

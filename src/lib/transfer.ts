@@ -1,4 +1,5 @@
 /** Export and import of one player's data as JSON. */
+import { migrateLegacyScores, normalizeScores } from './scores';
 import { K_MAX, K_MIN, K_START } from './select';
 import {
   CONTINENTS,
@@ -15,7 +16,13 @@ import {
 } from './types';
 
 export const EXPORT_FORMAT = 'flag-quiz-player';
-export const EXPORT_VERSION = 1;
+/**
+ * Version history (files of every version can still be imported):
+ * 1. one run of rounds without mistakes for all games (`perfectRun`, `bestPerfectRun`)
+ * 2. per-game scores (`scores`)
+ */
+export const EXPORT_VERSION = 2;
+const SUPPORTED_VERSIONS = [1, 2];
 /** Imported files larger than this are rejected. */
 export const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
 export const MAX_NAME_LENGTH = 16;
@@ -40,7 +47,17 @@ export interface ImportedPlayer {
   playDays: string[];
 }
 
-export class ImportError extends Error {}
+/** Why a file can't be imported; also the key of the message shown (`import.<reason>`). */
+export type ImportFailure = 'tooLarge' | 'notJson' | 'notPlayerFile' | 'unsupportedVersion' | 'invalid';
+
+export class ImportError extends Error {
+  constructor(
+    readonly reason: ImportFailure,
+    message: string = reason,
+  ) {
+    super(message);
+  }
+}
 
 export function buildExport(
   user: User,
@@ -79,8 +96,8 @@ const isCount = (v: unknown): v is number => Number.isInteger(v) && (v as number
 const COLOR = /^#[0-9a-f]{6}$/i;
 const DATE = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 
-function fail(message: string): never {
-  throw new ImportError(message);
+function fail(message: string, reason: ImportFailure = 'invalid'): never {
+  throw new ImportError(reason, message);
 }
 
 function parseFlag(v: unknown): UserFlag {
@@ -111,22 +128,21 @@ function parseK(v: unknown): number {
  * settings fall back to defaults; malformed data is rejected with an ImportError.
  */
 export function parseImport(text: string, knownCodes: ReadonlySet<string>, now: number = Date.now()): ImportedPlayer {
-  if (text.length > MAX_IMPORT_BYTES) fail('File too large');
+  if (text.length > MAX_IMPORT_BYTES) fail('File too large', 'tooLarge');
   let data: unknown;
   try {
     data = JSON.parse(text);
   } catch {
-    fail('Not a JSON file');
+    fail('Not a JSON file', 'notJson');
   }
-  if (!isObject(data) || data.format !== EXPORT_FORMAT) fail('Not a Flag Quiz player file');
-  if (data.version !== EXPORT_VERSION) fail('Unsupported file version');
+  if (!isObject(data) || data.format !== EXPORT_FORMAT) fail('Not a Flag Quiz player file', 'notPlayerFile');
+  if (!SUPPORTED_VERSIONS.includes(data.version as number)) fail('Unsupported file version', 'unsupportedVersion');
 
   const p = data.player;
   if (!isObject(p)) fail('Missing player');
   const name = typeof p.name === 'string' ? p.name.trim().slice(0, MAX_NAME_LENGTH) : '';
   if (!name) fail('Missing player name');
   const adapt = isObject(p.adapt) ? p.adapt : {};
-  const perfectRun = isCount(p.perfectRun) ? p.perfectRun : 0;
 
   const user: User = {
     name,
@@ -134,8 +150,7 @@ export function parseImport(text: string, knownCodes: ReadonlySet<string>, now: 
     difficulty: DIFFICULTIES.includes(p.difficulty as never) ? (p.difficulty as User['difficulty']) : 'easy',
     theme: p.theme === 'dark' ? 'dark' : 'light',
     adapt: perGame((g) => parseK(adapt[g])),
-    perfectRun,
-    bestPerfectRun: Math.max(perfectRun, isCount(p.bestPerfectRun) ? p.bestPerfectRun : 0),
+    scores: normalizeScores(p.scores),
     correctCount: isCount(p.correctCount) ? p.correctCount : 0,
     filter: parseFilter(p.filter, knownCodes.size),
     createdAt: typeof p.createdAt === 'number' && Number.isFinite(p.createdAt) ? p.createdAt : now,
@@ -164,5 +179,8 @@ export function parseImport(text: string, knownCodes: ReadonlySet<string>, now: 
   });
   playDays.sort();
 
+  if (data.version === 1) {
+    user.scores = migrateLegacyScores(p, perGame((g) => stats.filter((r) => r.game === g)));
+  }
   return { user, stats, playDays };
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Maximize, Minimize } from '@lucide/svelte';
   import { onMount } from 'svelte';
+  import { t } from '../lib/i18n.svelte';
 
   /** Discreet full-screen toggle (hidden where the Fullscreen API isn't available, e.g. iPhone Safari). */
   type Doc = Document & { webkitFullscreenEnabled?: boolean; webkitFullscreenElement?: Element; webkitExitFullscreen?: () => void };
@@ -41,8 +42,8 @@
   <button
     class="fullscreen"
     onclick={toggle}
-    aria-label={active ? 'Exit full screen' : 'Full screen'}
-    title={active ? 'Exit full screen' : 'Full screen'}
+    aria-label={active ? t('exitFullScreen') : t('fullScreen')}
+    title={active ? t('exitFullScreen') : t('fullScreen')}
   >
     {#if active}<Minimize size="100%" />{:else}<Maximize size="100%" />{/if}
   </button>

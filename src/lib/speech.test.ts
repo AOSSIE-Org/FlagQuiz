@@ -150,3 +150,20 @@ describe('watchdog', () => {
     expect(synth.calls).toEqual(['speak:France']);
   });
 });
+
+describe('language', () => {
+  const voice = (lang: string, localService = true) => ({ lang, localService, name: lang }) as SpeechSynthesisVoice;
+
+  it('chooses a voice for the language: same region first, offline first', () => {
+    const voices = [voice('en-US'), voice('fr-CA'), voice('fr-FR', false), voice('fr_FR'), voice('hi-IN')];
+    expect(speech.chooseVoice(voices, 'fr-FR')).toBe(voices[3]);
+    expect(speech.chooseVoice(voices, 'fr-BE')).toBe(voices[1]);
+    expect(speech.chooseVoice(voices, 'ur-PK')).toBeNull();
+  });
+
+  it('speaks in the chosen language even without a matching voice', () => {
+    speech.setSpeechLanguage('ur-PK');
+    speech.speak('پاکستان');
+    expect((synth.queue[0] as FakeUtterance).lang).toBe('ur-PK');
+  });
+});

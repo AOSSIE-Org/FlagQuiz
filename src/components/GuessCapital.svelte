@@ -5,38 +5,41 @@
   import type { Country } from '../data/countries';
   import { app } from '../lib/app.svelte';
   import { speak } from '../lib/speech';
+  import { hoverSpeech } from '../lib/hoverSpeech.svelte';
+  import { capitalName, countryName, t } from '../lib/i18n.svelte';
   import CapitalPhotos from './CapitalPhotos.svelte';
   import Flag from './Flag.svelte';
 
   const capitalOf = new Map(CAPITALS.map((c) => [c.code, c]));
+  const hover = hoverSpeech(() => app.round?.id);
 
-  // Say the country's name whenever a new round starts.
+  // Say the country's name whenever a new round starts (or the language changes).
   $effect(() => {
     app.round?.id;
-    untrack(() => app.round && speak(app.round.target.name));
+    const name = app.round && countryName(app.round.target.code);
+    untrack(() => name && speak(name));
   });
 
   function choose(country: Country) {
-    if (app.answer(country.code) === 'wrong') speak(`${capitalOf.get(country.code)?.name}, ${country.name}`);
-  }
-
-  function hover(e: PointerEvent, text: string) {
-    if (e.pointerType === 'mouse') speak(text);
+    if (app.answer(country.code) === 'wrong') speak(`${capitalName(country.code)}, ${countryName(country.code)}`);
   }
 </script>
 
 {#if app.round}
   {@const round = app.round}
-  <section class="game" aria-label="Guess the Capital">
+  {@const target = countryName(round.target.code)}
+  <section class="game" aria-label={t('game.capital')}>
     <div class="prompt-row">
       <button
         class="prompt"
-        onclick={() => speak(round.target.name)}
-        onpointerenter={(e) => hover(e, round.target.name)}
-        aria-label="{round.target.name}: listen"
+        data-hover-speech
+        onclick={() => speak(target)}
+        onpointerenter={(e) => hover.enter(e, target)}
+        onpointerleave={hover.leave}
+        aria-label={t('listen', { name: target })}
       >
         <span class="prompt-flag"><Flag country={round.target} decorative /></span>
-        <span class="name">{round.target.name}</span>
+        <span class="name">{target}</span>
         <Volume2 class="speaker" aria-hidden="true" />
       </button>
     </div>
@@ -45,6 +48,7 @@
       <ul class="grid" style:--rows={Math.ceil(round.options.length / 3)}>
         {#each round.options as country (country.code)}
           {@const capital = capitalOf.get(country.code)!}
+          {@const name = capitalName(country.code)}
           {@const wrong = round.wrong.includes(country.code)}
           {@const correct = round.solved && country.code === round.target.code}
           <li>
@@ -52,17 +56,19 @@
               class="cell"
               class:wrong
               class:correct
+              data-hover-speech
               aria-disabled={wrong || round.solved}
               onclick={() => choose(country)}
-              onpointerenter={(e) => hover(e, capital.name)}
+              onpointerenter={(e) => hover.enter(e, name)}
+              onpointerleave={hover.leave}
             >
-              <span class="capital-name">{capital.name}</span>
+              <span class="capital-name">{name}</span>
               <CapitalPhotos {capital} class="cell-photos" />
               {#if wrong || correct}
                 <!-- Whose capital it is. -->
                 <span class="owner">
                   <span class="owner-flag"><Flag {country} decorative /></span>
-                  {country.name}
+                  {countryName(country.code)}
                 </span>
               {/if}
               {#if correct}
@@ -70,7 +76,7 @@
               {/if}
             </button>
             <!-- Touch screens have no hover: offer an explicit "listen" button. -->
-            <button class="listen" onclick={() => speak(capital.name)} aria-label="{capital.name}: listen">
+            <button class="listen" onclick={() => speak(name)} aria-label={t('listen', { name })}>
               <Volume2 size="100%" aria-hidden="true" />
             </button>
           </li>
@@ -145,7 +151,7 @@
     display: none;
     position: absolute;
     top: 4px;
-    right: 4px;
+    inset-inline-end: 4px;
     width: clamp(26px, 6vmin, 36px);
     height: clamp(26px, 6vmin, 36px);
     padding: 5px;
@@ -159,7 +165,7 @@
       display: block;
     }
     .capital-name {
-      padding-right: clamp(28px, 6.5vmin, 40px);
+      padding-inline-end: clamp(28px, 6.5vmin, 40px);
     }
     .badge {
       top: auto;
@@ -250,7 +256,7 @@
   .badge {
     position: absolute;
     top: 6px;
-    right: 6px;
+    inset-inline-end: 6px;
     display: grid;
     place-items: center;
     width: clamp(24px, 6vmin, 40px);

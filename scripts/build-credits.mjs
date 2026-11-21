@@ -191,6 +191,7 @@ export async function buildCredits() {
     <li>Flags: <a href="https://github.com/hampusborgos/country-flags">hampusborgos/country-flags</a> (public domain, from Wikimedia Commons).</li>
     <li>Populations and continents: <a href="https://www.geonames.org/">GeoNames</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>).</li>
     <li>Capitals: <a href="https://www.wikidata.org/">Wikidata</a> (CC0).</li>
+    <li>Names of countries and continents in other languages: <a href="https://cldr.unicode.org/">Unicode CLDR</a> (<a href="https://www.unicode.org/license.txt">Unicode License v3</a>); names of capitals: <a href="https://www.wikidata.org/">Wikidata</a> (CC0).</li>
     <li>World map: <a href="https://www.naturalearthdata.com/">Natural Earth</a> (public domain), via <a href="https://github.com/topojson/world-atlas">world-atlas</a>.</li>
   </ul>
 

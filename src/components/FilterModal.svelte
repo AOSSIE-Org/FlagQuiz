@@ -5,17 +5,8 @@
   import { COUNTRIES, type Continent } from '../data/countries';
   import { applyFilter } from '../lib/select';
   import { CONTINENTS, DEFAULT_FILTER, type CountryFilter } from '../lib/types';
+  import { continentName, num, t } from '../lib/i18n.svelte';
   import Modal from './Modal.svelte';
-
-  const NAMES: Record<Continent, string> = {
-    AF: 'Africa',
-    AS: 'Asia',
-    EU: 'Europe',
-    NA: 'North America',
-    SA: 'South America',
-    OC: 'Oceania',
-    AN: 'Antarctica',
-  };
 
   /** The three most populous countries of each continent, as a visual hint. */
   const SAMPLES = Object.fromEntries(
@@ -54,36 +45,36 @@
   }
 </script>
 
-<Modal label="Countries" onclose={close} wide>
+<Modal label={t('countries')} onclose={close} wide>
   <div class="filter">
-    <div class="continents" role="group" aria-label="Continents">
+    <div class="continents" role="group" aria-label={t('continents')}>
       {#each CONTINENTS as k (k)}
         {@const on = filter.continents.includes(k)}
-        <button class="continent" class:on aria-pressed={on} onclick={() => toggle(k)} title={NAMES[k]}>
+        <button class="continent" class:on aria-pressed={on} onclick={() => toggle(k)} title={continentName(k)}>
           <span class="flags" aria-hidden="true">
             {#each SAMPLES[k] as c (c.code)}
               <img src="./flags/{c.code.toLowerCase()}.svg" alt="" />
             {/each}
           </span>
-          <span class="name">{NAMES[k]}</span>
+          <span class="name">{continentName(k)}</span>
           <span class="tick" aria-hidden="true">{#if on}<Check size="100%" strokeWidth={4} />{/if}</span>
         </button>
       {/each}
     </div>
 
-    <label class="top-n" title="Most populous countries">
+    <label class="top-n" title={t('mostPopulous')}>
       <Users aria-hidden="true" />
-      <span class="visually-hidden">Most populous countries</span>
+      <span class="visually-hidden">{t('mostPopulous')}</span>
       <input type="range" min={MIN_N} max={MAX_N} step="1" bind:value={filter.topN} />
-      <output>{filter.topN >= MAX_N ? '∞' : filter.topN}</output>
+      <output>{filter.topN >= MAX_N ? '∞' : num(filter.topN)}</output>
     </label>
 
     <div class="actions">
-      <button class="icon-btn" onclick={close} aria-label="Cancel" title="Cancel"><X size={28} /></button>
-      <span class="count" title="Countries in the game" aria-label="{count} countries in the game">
-        <FlagIcon aria-hidden="true" />{count}
+      <button class="icon-btn" onclick={close} aria-label={t('cancel')} title={t('cancel')}><X size={28} /></button>
+      <span class="count" title={t('countriesInGame')} aria-label={t('scoreValue', { label: t('countriesInGame'), value: count })}>
+        <FlagIcon aria-hidden="true" />{num(count)}
       </span>
-      <button class="icon-btn primary" onclick={save} aria-label="Save" title="Save">
+      <button class="icon-btn primary" onclick={save} aria-label={t('save')} title={t('save')}>
         <Check size={32} strokeWidth={3} />
       </button>
     </div>
@@ -139,7 +130,7 @@
   .tick {
     position: absolute;
     top: -8px;
-    right: -8px;
+    inset-inline-end: -8px;
     width: 22px;
     height: 22px;
     padding: 3px;

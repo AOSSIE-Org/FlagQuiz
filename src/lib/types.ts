@@ -1,4 +1,5 @@
 import type { Continent } from '../data/countries';
+import { DEFAULT_LANGUAGE, type LanguageCode } from './languages';
 
 /**
  * `flag` = "Guess the Flag", `country` = "Guess the Country",
@@ -13,14 +14,6 @@ export function perGame<T>(value: (game: GameId) => T): Record<GameId, T> {
   return Object.fromEntries(GAMES.map((g) => [g, value(g)])) as Record<GameId, T>;
 }
 
-export const GAME_NAMES: Record<GameId, string> = {
-  flag: 'Guess the Flag',
-  country: 'Guess the Country',
-  location: 'Guess the Location',
-  capital: 'Guess the Capital',
-  capitalCountry: "Guess the Capital's Country",
-};
-
 /** Device-wide preferences. */
 export interface Settings {
   /** Read names aloud. */
@@ -29,9 +22,11 @@ export interface Settings {
   sounds: boolean;
   /** Multiplayer: maximum rounds in a row per player. */
   turnRounds: number;
+  /** Language of the app. */
+  language: LanguageCode;
 }
 
-export const DEFAULT_SETTINGS: Settings = { speech: true, sounds: true, turnRounds: 3 };
+export const DEFAULT_SETTINGS: Settings = { speech: true, sounds: true, turnRounds: 3, language: DEFAULT_LANGUAGE };
 export const TURN_ROUNDS_MIN = 1;
 export const TURN_ROUNDS_MAX = 10;
 
@@ -94,15 +89,25 @@ export interface User {
   theme: Theme;
   /** Adaptive exponent per game: > 0 favours harder items, < 0 easier ones. */
   adapt: Record<GameId, number>;
-  /** Current number of consecutive rounds solved without mistakes. */
-  perfectRun: number;
-  /** Best ever number of consecutive rounds solved without mistakes. */
-  bestPerfectRun: number;
+  /** Scores per game. */
+  scores: Record<GameId, GameScore>;
   /** Total number of correct answers, in all games. */
   correctCount: number;
   filter: CountryFilter;
   createdAt: number;
   lastActiveAt: number;
+}
+
+/** A player's scores in one game. */
+export interface GameScore {
+  /** Correct answers (green-gold check mark). */
+  correct: number;
+  /** Gold stars: rounds in a row solved without mistakes; a mistake resets them to 0. */
+  gold: number;
+  bestGold: number;
+  /** Silver stars: +1 per round solved without mistakes, −1 per mistake, never below 0. */
+  silver: number;
+  bestSilver: number;
 }
 
 /** What a player knows about one country in one game. */

@@ -1,9 +1,9 @@
 ---
 name: kids-learning-app
-description: Plan, build, verify and ship a small, purely local educational web game for young children (e.g. learning flags, capitals, maps, animals, letters, numbers, shapes, colours) with AOSSIE's stack and conventions — Svelte 5 + TypeScript + Vite, IndexedDB storage, offline PWA that also works as a plain static site and installs on phones, AOSSIE branding, icon-first minimal UI that fits one screen without scrolling, spoken prompts, multiple players and multiplayer turns, adaptive difficulty, streaks and statistics, JSON export/import, grown-ups-only deletion, credits and donation pages, social sharing metadata, the AOSSIE Template-Repo with every TODO and checklist filled, CI and GitHub Pages deployment. Use when asked to create a new learning app, quiz or game for kids, or to extend one built this way.
+description: Plan, build, verify and ship a small, purely local educational web game for young children (e.g. learning flags, capitals, maps, animals, letters, numbers, shapes, colours) with AOSSIE's stack and conventions — Svelte 5 + TypeScript + Vite, IndexedDB storage, offline PWA that also works as a plain static site and installs on phones, AOSSIE branding, icon-first minimal UI that fits one screen without scrolling, multilingual (the 10 most spoken languages, i18n with right-to-left support), spoken prompts in the chosen language, multiple players and multiplayer turns, adaptive difficulty, streaks and statistics, JSON export/import, grown-ups-only deletion, credits and donation pages, social sharing metadata, the AOSSIE Template-Repo with every TODO and checklist filled, CI and GitHub Pages deployment. Use when asked to create a new learning app, quiz or game for kids, or to extend one built this way.
 compatibility: Needs Node.js 20+, npm, git, the GitHub CLI (gh) and network access (template repo, brand assets, open data). playwright-core with the system Chrome and Playwright's WebKit build (`npx playwright install webkit`) is required for verification in both browser engines.
 metadata:
-  version: "1.1"
+  version: "1.2"
   category: app-generation
   origin: Distilled from building Flag Quiz (https://github.com/AOSSIE-Org/FlagQuiz); the full conversation is in prompts/1.md of that repo.
 user-invocable: true
@@ -43,29 +43,80 @@ user asked for, or corrected, while building Flag Quiz.
 ### Audience: young children
 - As little text as possible; intuitive icons (Lucide). Every icon-only button
   has an `aria-label` and a `title`.
-- Prompts and answers are read aloud (Web Speech API, local voices preferred):
-  on round start, on click, and on hover with a mouse. On touch screens add an
-  explicit 🔊 button wherever hover would be the only way to hear something.
-  Don't speak an option that merely appears under a stationary mouse when a new
-  round is rendered; only a deliberate hover (leave and re-enter) speaks.
+- Prompts and answers are read aloud (Web Speech API, local voices preferred),
+  in the app's language: on round start, on click, and on hover with a mouse.
+  On touch screens add an explicit 🔊 button wherever hover would be the only
+  way to hear something. Follow **Speech without bugs** below.
 - Feedback: correct → green ✓, chime (Web Audio, no files), next round after
   **1 s**; wrong → red border/text, shake, and a reveal of what was picked
   (its name, flag, capital or position), also read aloud.
 - Big touch targets; calm animations; `prefers-reduced-motion` respected.
+
+### Speech without bugs
+Speech bugs came back twice while building Flag Quiz; avoid them from the start:
+- **Hover after a new round**: when a new round renders options under a mouse
+  that hasn't moved, browsers fire `pointerenter` on the option now under it.
+  Only a real transition from not hovering to hovering may speak. Use **one
+  shared helper** (`src/lib/hoverSpeech.svelte.ts`) for **every** hoverable
+  option and prompt in **every** game: it mutes the element under the
+  stationary mouse after each round until `pointerleave`. Fixing this per
+  component let the bug survive in the games that were added later.
+- **Toggling speech off and on** must not leave the engine silent: reset it
+  (`cancel()` + `resume()`) on every toggle, cancel only when something is
+  speaking and wait ~80 ms before speaking again, keep a reference to the
+  current utterance, and retry once from a watchdog (`src/lib/speech.ts`).
+- **Language**: set `utterance.lang` to the app's language and choose a voice
+  for it (same region first, offline first); with no matching voice, still set
+  `lang`. Re-speak the prompt when the language changes mid-round.
+- **Test it**, don't assume: unit-test the speech module with a fake engine,
+  and in Playwright replace `speechSynthesis.speak` with a recorder, solve a
+  round with the mouse on the right answer, wait for the next round without
+  moving, and assert nothing under the mouse was spoken; then leave and
+  re-enter and assert it is.
+
+### Languages (i18n)
+- Multilingual from the start, with standard i18n practice: no user-visible
+  string in components; message catalogues per language
+  (`src/locales/<lang>.ts`) keyed like the English one, which is the source of
+  truth and the fallback; `{placeholder}` interpolation; no string
+  concatenation for sentences; languages other than English loaded on demand
+  (and precached for offline use).
+- Support the **10 most spoken languages** (Ethnologue, total speakers):
+  English, Mandarin Chinese (Simplified), Hindi, Spanish, Arabic, French,
+  Bengali, Portuguese, Russian, Urdu. **English is the default**, not the
+  browser's language. A language button (文A) in the menu and in the player
+  picker (so it can be changed before any player exists) opens a picker
+  showing each language's name in itself (no flags for languages).
+- Set `<html lang>` and `dir`; Arabic and Urdu are right to left, so use
+  logical CSS properties (`inset-inline-end`, `margin-inline-start`,
+  `padding-inline-end`, `border-start-start-radius`…) instead of left/right.
+- Use `Intl` for numbers (`NumberFormat`), sorting (`Collator`) and names
+  (`DisplayNames` data, generated at build time so it doesn't depend on the
+  browser). Item names come from standard sources: countries and continents
+  from CLDR, other items (e.g. capitals) from Wikidata labels (prefer
+  `zh-hans` for Chinese), with child-friendly overrides where the standard
+  names are technical ("Congo - Kinshasa", "SAR China", abbreviations).
+- A test checks that every catalogue has every key with the same
+  placeholders, and that every item has a name in every language.
+- Say that the first translations were machine-made and invite native
+  speakers to correct them (README, Contributing).
 
 ### Layout and shell
 - One page, `100dvh`, never scrolls — at 1280×720 and on a phone in landscape
   (844×390). A "rotate your phone" overlay in portrait on small screens.
 - No footer, no navigation bar, no logo in the header (the AOSSIE logo is on
   the splash screen and credits page instead).
-- Top left: 🔥 days in a row, ⭐ rounds in a row without mistakes, ✅ total
-  correct answers — side by side, large.
+- Top left, side by side and large: 🔥 days in a row; for the **current
+  game**: gold ⭐ (rounds in a row without mistakes; a mistake resets it to 0),
+  silver ⭐ (+1 per round without mistakes, −1 per mistake, never below 0) and
+  gold ✅ (correct answers in this game); then green ✅ (correct answers in all
+  games).
 - Top right: the current player's name, then their custom flag as the profile
   button. In multiplayer, the next players' small flags appear below it.
 - Profile menu (all buttons the same size; no wider controls): light/dark,
   edit player, difficulty (one button cycling 3 → 6 → 9 options, showing a
   mini grid), choose items (e.g. continents + top N by population), statistics,
-  read-aloud on/off, sound effects on/off, share, save data (export), install
+  read-aloud on/off, sound effects on/off, language, share, save data (export), install
   app (phones/tablets only), credits ⓘ, donate ☕ (gold,
   https://buymeacoffee.com/aossie), change game, switch player.
 - Everything else happens in modals: pick/create/import/delete players,
@@ -98,15 +149,25 @@ user asked for, or corrected, while building Flag Quiz.
 - Filters chosen by the player (e.g. continents, and the N most populous among
   them; defaults: all, 100). If the filter leaves too few items, fill the
   distractors from the whole set.
-- Statistics modal: streaks and bests, 4-week calendar, accuracy and all
-  mastered items per game; it grows to fit them and never overflows.
+- Scores are kept **per player and per game** (correct answers, current and
+  best gold and silver stars), plus the total of correct answers.
+- Statistics modal: at the top the days-in-a-row streak (current and best)
+  and a 4-week calendar of days played; then a table with one row per game
+  (game icon) and the columns best silver stars, best gold stars, and the
+  flags (or pictures) of every mastered item with "n/total". The flags shrink
+  so the modal grows to fit them and never overflows.
 - Multiplayer on one device: 👤/👥 toggle in the player picker; in 👥 mode tap
   to select players, set "rounds in a row per player" (default 3) next to the
-  selection, then ▶. Lowest best run plays first; round-robin; the turn passes
+  selection, then ▶. Lowest best gold-star run (in any game) plays first; round-robin; the turn passes
   after a mistake (answer revealed first) or after the maximum rounds; a
   banner shows and says the next player's name.
 - Export a player as JSON and import it as a new player; validate every field
   of the untrusted file.
+- Saved data must survive updates: version the IndexedDB schema and the export
+  format, migrate old data forward (e.g. old global scores → per-game scores)
+  instead of resetting it, keep importing files from every older version,
+  reject files from newer versions with a clear message, and unit-test every
+  migration.
 - Deleting players is grown-ups only: a small, faded 🗑 enters delete mode;
   confirming requires solving a linear equation (new one after each mistake).
 
@@ -197,9 +258,12 @@ show in Chrome):
 - Screenshot every screen at 1280×720 and 844×390 (touch), light and dark,
   every difficulty, and **look at the screenshots**; also check a range of
   sizes (e.g. 740×360 to 1440×900) for overflow programmatically.
+- Repeat key screens in a right-to-left language (Arabic) and in languages
+  with long words or other scripts (Russian, Hindi, Chinese).
 - Assert no scrolling, no `pageerror`/console errors.
-- Trace speech (`speechSynthesis` start/end/error events) and test the speech
-  module with a fake engine.
+- Trace speech (`speechSynthesis` start/end/error events), test the speech
+  module with a fake engine, and run the hover-after-new-round check in every
+  game (see **Speech without bugs**).
 - Offline: wait until the precache is complete, go offline, reload, play.
 - Export/import (download event, `setInputFiles`, a bad file), stress cases
   (e.g. every item mastered), multiplayer turn order and limits, deletion.

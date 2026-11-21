@@ -52,7 +52,7 @@ No information is shared with any third parties. All flags, photos and map data 
 
 The share button only shares the link to the App, using your device's share sheet (or copies the link to your clipboard). What happens next depends on the app you choose to share it with. No player information is included.
 
-Country names are read aloud using the text-to-speech engine built into your browser or operating system. The App prefers voices installed on your device; if your browser only offers online voices, your browser may send the country name being spoken (never any personal information) to its speech service, under your browser's own privacy policy.
+Country names are read aloud using the text-to-speech engine built into your browser or operating system, in the App's language. The App prefers voices installed on your device; if your browser only offers online voices for that language, your browser may send the name being spoken (never any personal information) to its speech service, under your browser's own privacy policy.
 
 
 ## Data Security

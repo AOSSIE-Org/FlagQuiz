@@ -2,6 +2,7 @@
   import { Trash2, X } from '@lucide/svelte';
   import { isSolved, makeAdultCheck } from '../lib/adultCheck';
   import type { User } from '../lib/types';
+  import { t } from '../lib/i18n.svelte';
   import CustomFlag from './CustomFlag.svelte';
   import Modal from './Modal.svelte';
 
@@ -11,6 +12,8 @@
   let check = $state(makeAdultCheck());
   let answer = $state('');
   let wrong = $state(false);
+  /** The hint around its italic "x". */
+  let hint = $derived(t('grownUpsOnly').split('{x}'));
 
   function submit(e: SubmitEvent) {
     e.preventDefault();
@@ -25,14 +28,14 @@
   }
 </script>
 
-<Modal label="Delete {player.name}?" onclose={oncancel}>
+<Modal label={t('deletePlayer', { name: player.name })} onclose={oncancel}>
   <form class="gate" onsubmit={submit}>
     <div class="who">
       <span class="flag"><CustomFlag flag={player.flag} /></span>
       <span class="name">{player.name}</span>
       <Trash2 class="bin" aria-hidden="true" />
     </div>
-    <p class="hint">Grown-ups only: solve for <i>x</i> to delete this player and all their progress.</p>
+    <p class="hint">{hint[0]}<i>x</i>{hint[1] ?? ''}</p>
     <p class="equation" aria-live="polite">{check.equation}</p>
     <label class="answer" class:wrong>
       <i>x</i> =
@@ -45,8 +48,8 @@
       />
     </label>
     <div class="actions">
-      <button type="button" class="icon-btn" onclick={oncancel} aria-label="Cancel" title="Cancel"><X size={26} /></button>
-      <button type="submit" class="icon-btn danger" disabled={!answer.trim()} aria-label="Delete" title="Delete">
+      <button type="button" class="icon-btn" onclick={oncancel} aria-label={t('cancel')} title={t('cancel')}><X size={26} /></button>
+      <button type="submit" class="icon-btn danger" disabled={!answer.trim()} aria-label={t('delete')} title={t('delete')}>
         <Trash2 size={24} />
       </button>
     </div>

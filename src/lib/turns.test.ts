@@ -4,12 +4,12 @@ import { nextTurn, turnOrder, upcoming } from './turns';
 describe('turnOrder', () => {
   it('puts players with the lowest best run first, keeping ties in order', () => {
     const players = [
-      { name: 'A', bestPerfectRun: 10 },
-      { name: 'B', bestPerfectRun: 2 },
-      { name: 'C', bestPerfectRun: 10 },
-      { name: 'D', bestPerfectRun: 0 },
+      { name: 'A', best: 10 },
+      { name: 'B', best: 2 },
+      { name: 'C', best: 10 },
+      { name: 'D', best: 0 },
     ];
-    expect(turnOrder(players).map((p) => p.name)).toEqual(['D', 'B', 'A', 'C']);
+    expect(turnOrder(players, (p) => p.best).map((p) => p.name)).toEqual(['D', 'B', 'A', 'C']);
   });
 });
 

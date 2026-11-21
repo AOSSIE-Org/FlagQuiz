@@ -9,7 +9,8 @@ adapt its files instead of starting from scratch.
 index.html                 meta tags (OG/Twitter/JSON-LD), icons, theme-color
 vite.config.ts             base './', svelte(), VitePWA({...}), vitest config
 pwa-assets.config.ts       icon generation from public/<app>-logo.svg
-scripts/fetch-*.mjs        reproducible data + asset generation (countries, capitals + photos, map)
+scripts/fetch-*.mjs        reproducible data + asset generation (countries, capitals + photos, map,
+                           names in every language: CLDR + Wikidata → src/locales/names/<lang>.json)
 scripts/build-credits.mjs  credits.html from the data files (brand-styled, donation card)
 public/                    flags, photos, brand logos, fonts (for credits.html), PWA icons,
                            og-image.png, screenshots/ (manifest), credits.html
@@ -20,15 +21,23 @@ src/
   App.svelte               header (Streaks | ProfileMenu), <main> game, modals, turn banner,
                            install help, full-screen button, splash, rotate overlay
   data/*.ts                generated content (code, name, ratio, population, continents, …)
+  locales/en.ts            English messages: source of truth (MessageKey type), fallback
+  locales/<lang>.ts        other languages, typed `Messages` (a missing key is a type error)
+  locales/names/<lang>.json  item names per language (generated)
   lib/
-    types.ts               GameId, Difficulty, Pattern, User, ItemStats, filters
+    types.ts               GameId, Difficulty, Pattern, User, GameScore, ItemStats, filters, Settings
+    languages.ts           LANGUAGES (code, endonym, speech locale, dir), DEFAULT_LANGUAGE 'en'
+    i18n.svelte.ts         $state language; t(key, params), num(), countryName()…, setLanguage()
+                           (lazy import.meta.glob, sets <html lang dir>, speech language)  (tested)
+    scores.ts              per-game gold/silver stars + correct answers, legacy migration  (pure, tested)
+    hoverSpeech.svelte.ts  speak on a real hover only (mutes the option under a resting mouse)
     select.ts              scores, weights, adaptive k, pickRound, filters   (pure, tested)
     dates.ts               dayKey, addDays, lastDays, streaks                 (pure, tested)
     db.ts                  idb schema + versioned migrations                  (tested with fake-indexeddb)
     transfer.ts            export/import JSON + strict validation             (pure, tested)
     turns.ts               multiplayer turn order and round-robin              (pure, tested)
     adultCheck.ts          grown-ups-only equations for destructive actions   (pure, tested)
-    speech.ts              robust speak(), on/off switch                       (tested with a fake engine)
+    speech.ts              robust speak(), on/off switch, language + voice choice (tested with a fake engine)
     sound.ts               Web Audio chime / bonk, on/off switch
     install.svelte.ts      PWA install state: beforeinstallprompt, platform, standalone
     palette.ts             avatar colours, randomFlag()
@@ -41,10 +50,11 @@ src/
     FlagEditor.svelte      name, 3 colour slots, palette, pattern previews
     GamePicker.svelte      one illustrated tile per game
     ProfileMenu.svelte     name + avatar button, next players' flags, icon menu (same-size items)
-    Streaks.svelte         🔥 days, ⭐ perfect rounds, ✅ correct answers
+    LanguageModal.svelte   the 10 languages by their own names; LanguageButton.svelte opens it
+    Streaks.svelte         🔥 days; gold ⭐, silver ⭐, gold ✅ of the current game; green ✅ total
     InstallHelp.svelte     how to install where there is no install prompt (iOS, others)
     FullscreenButton.svelte  discreet toggle, lower-right corner
-    StatsModal.svelte      bests, calendar, accuracy rings, mastered items (fitted)
+    StatsModal.svelte      streak + calendar, table: game × best silver, best gold, mastered flags (fitted)
     FilterModal.svelte     restrict the content pool
     TurnBanner.svelte      multiplayer: next player's flag and name
     Guess*.svelte          one component per game, presentational (map game loads its data lazily)
@@ -58,17 +68,24 @@ src/
 
 | Store | Key | Value |
 | --- | --- | --- |
-| `users` | `id` (autoIncrement) | name, flag, difficulty, theme, filter, adapt (k per game), perfectRun, bestPerfectRun, correctCount, createdAt, lastActiveAt |
+| `users` | `id` (autoIncrement) | name, flag, difficulty, theme, filter, adapt (k per game), scores (per game: correct, gold, bestGold, silver, bestSilver), correctCount (all games), createdAt, lastActiveAt |
 | `stats` | `[userId, game, code]` (+ indexes `byUserGame`, `byUser`) | `s`, `c`, `d` |
 | `playDays` | `[userId, date]` (+ index `byUser`) | — |
-| `settings` | `"settings"` | device-wide: speech on/off, sounds on/off, multiplayer rounds per turn |
+| `settings` | `"settings"` | device-wide: speech on/off, sounds on/off, multiplayer rounds per turn, language |
 
 - Use a `perGame(fn)` helper for per-game records, so adding a game is a type
   error everywhere it must be handled; fill missing games in old records.
 - Use autoIncrement numeric ids: `crypto.randomUUID` is unavailable over plain HTTP.
 - Bump the DB version for every schema/meaning change and migrate in
-  `upgrade(db, oldVersion, newVersion, tx)`. Also fill new user fields with
-  defaults when loading (`withDefaults`).
+  `upgrade(db, oldVersion, newVersion, tx)`, documenting each version in a
+  comment. Also fill new user fields with defaults when loading
+  (`withDefaults`). Flag Quiz v4 turned the global `perfectRun` into per-game
+  scores, moving the old run to the most-played game and deriving per-game
+  correct answers from the statistics; test each migration by creating a
+  database at the old version with `openDB(name, oldVersion, …)`.
+- Version the export format the same way (`EXPORT_VERSION` + supported
+  versions), migrate old files on import, and reject newer ones with a reason
+  code that maps to a translated message.
 
 ## Game loop (in the state class)
 
@@ -77,10 +94,11 @@ newRound():  pickRound(pool, stats[game], k, optionCount, recent, rng, fillers)
 answer(code):
   ignore if solved or already wrong
   mark today as played
-  correct → solved; chime; if no mistakes: record(target, correct), perfectRun++
+  correct → solved; chime; correctCount++; scoreCorrect(scores[game], firstTry)
+            if no mistakes: record(target, correct)
             k = nextK(k, mistakes); save; after 1 s → newRound() if still same round
-  wrong   → record(code, incorrect); if first mistake: record(target, incorrect), perfectRun = 0
-            mistakes++
+  wrong   → record(code, incorrect); scoreMistake(scores[game]) (gold = 0, silver − 1, min 0)
+            if first mistake: record(target, incorrect); mistakes++
 ```
 
 - Guard the delayed `newRound` with the round id and the phase, so switching
@@ -128,9 +146,23 @@ answer(code):
 - **Initial prop values** captured on purpose: wrap in `untrack(() => …)` to
   silence `state_referenced_locally`.
 - **Hover speech after re-render**: when new options render under a mouse that
-  hasn't moved, browsers fire `pointerenter`. Track the last mouse position;
-  after each new round mute the element under it (`elementFromPoint` +
-  `data-code`) until its `pointerleave`.
+  hasn't moved, browsers fire `pointerenter`. `hoverSpeech(() => round.id)`
+  tracks the last mouse position (capture-phase window listener); an effect on
+  the round id mutes the element under it (`elementFromPoint` +
+  `closest('[data-hover-speech]')`) until its `pointerleave`. Use it in every
+  game: Flag Quiz first fixed two games by hand, and the two capital games
+  added later had the bug again.
+- **i18n**: `t()` reads `$state` catalogues, so templates update on a language
+  switch; effects that speak a prompt should read the localized name so they
+  re-run (and re-speak) on a switch. Keep message keys stable; split messages
+  with inline markup on a placeholder (`'solve for {x}'` → `<i>x</i>`).
+  `Intl.DisplayNames` output differs between ICU versions, so generate names
+  at build time. Wikidata `zh` labels mix Traditional and Simplified Chinese —
+  query `zh-hans` first; strip disambiguation (`"Stanley, Falkland Islands"`,
+  `"(ville)"`) and Chinese `市`.
+- **RTL**: `dir="rtl"` flips flex/grid order automatically; absolutely
+  positioned badges and menus need logical properties, or they end up
+  off-screen.
 - **Hover vs touch**: speak on `pointerenter` only when `pointerType ===
   'mouse'`; show 🔊 buttons with `@media (hover: none)`.
 - **`aria-disabled`** (keeps focus/announcements) instead of `disabled` for
@@ -257,4 +289,19 @@ const { sw, sh, w, h } = await page.evaluate(() => ({
   sw: document.documentElement.scrollWidth, sh: document.documentElement.scrollHeight,
   w: innerWidth, h: innerHeight,
 }));
+```
+
+Hover-speech regression check (desktop context, run it in every game):
+
+```js
+// speechSynthesis.speak replaced by a recorder (init script above, without calling speak)
+for (const cell of await page.locator('[data-hover-speech]').all()) {   // options of the round
+  await cell.hover(); await page.mouse.down(); await page.mouse.up();
+  if (/correct/.test(await cell.evaluate((el) => el.closest('li')?.className + el.className))) break;
+}
+await page.evaluate(() => (window.__spoken.length = 0));
+await page.waitForTimeout(1400);                     // next round renders under the resting mouse
+const spoken = await page.evaluate(() => window.__spoken);
+const under = await page.evaluate(() => document.querySelector(':hover[data-hover-speech]')?.textContent?.trim());
+// spoken may contain the new prompt, never the option under the mouse
 ```

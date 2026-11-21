@@ -3,36 +3,40 @@
   import { untrack } from 'svelte';
   import { app } from '../lib/app.svelte';
   import { speak } from '../lib/speech';
+  import { hoverSpeech } from '../lib/hoverSpeech.svelte';
+  import { countryName, t } from '../lib/i18n.svelte';
   import type { Country } from '../data/countries';
   import Flag from './Flag.svelte';
 
-  // Speak the country name whenever a new round starts.
+  const hover = hoverSpeech(() => app.round?.id);
+
+  // Speak the country name whenever a new round starts (or the language changes).
   $effect(() => {
     app.round?.id;
-    untrack(() => app.round && speak(app.round.target.name));
+    const name = app.round && countryName(app.round.target.code);
+    untrack(() => name && speak(name));
   });
 
   function choose(country: Country) {
-    if (app.answer(country.code) === 'wrong') speak(country.name);
-  }
-
-  function hover(e: PointerEvent, text: string) {
-    if (e.pointerType === 'mouse') speak(text);
+    if (app.answer(country.code) === 'wrong') speak(countryName(country.code));
   }
 </script>
 
 {#if app.round}
   {@const round = app.round}
-  <section class="game" aria-label="Guess the Flag">
+  {@const target = countryName(round.target.code)}
+  <section class="game" aria-label={t('game.flag')}>
     <div class="prompt-row">
       <button
         class="prompt"
-        onclick={() => speak(round.target.name)}
-        onpointerenter={(e) => hover(e, round.target.name)}
-        aria-label="{round.target.name}: listen"
+        data-hover-speech
+        onclick={() => speak(target)}
+        onpointerenter={(e) => hover.enter(e, target)}
+        onpointerleave={hover.leave}
+        aria-label={t('listen', { name: target })}
       >
         <Volume2 class="speaker" aria-hidden="true" />
-        <span class="name">{round.target.name}</span>
+        <span class="name">{target}</span>
       </button>
     </div>
 
@@ -46,7 +50,7 @@
               class="cell"
               class:wrong
               class:correct
-              aria-label={wrong || correct ? country.name : `Flag ${i + 1}`}
+              aria-label={wrong || correct ? countryName(country.code) : t('flagNumber', { n: i + 1 })}
               aria-disabled={wrong || round.solved}
               onclick={() => choose(country)}
             >
@@ -56,7 +60,7 @@
                   <span class="badge" aria-hidden="true"><Check size="70%" strokeWidth={4} /></span>
                 {/if}
               </span>
-              <span class="label">{wrong || correct ? country.name : ''}</span>
+              <span class="label">{wrong || correct ? countryName(country.code) : ''}</span>
             </button>
           </li>
         {/each}

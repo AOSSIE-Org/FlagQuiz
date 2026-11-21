@@ -22,6 +22,7 @@
     "fetch-countries": "node scripts/fetch-countries.mjs",
     "fetch-capitals": "node scripts/fetch-capitals.mjs",
     "fetch-map": "node scripts/fetch-map.mjs",
+    "fetch-names": "node scripts/fetch-names.mjs",
     "build-credits": "node scripts/build-credits.mjs"
   },
   "dependencies": {

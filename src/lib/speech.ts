@@ -11,6 +11,9 @@
  * - it resets the engine (`cancel()` + `resume()`) whenever speech is turned
  *   on or off, so an engine left paused or jammed by an interruption recovers;
  * - a watchdog resets the engine and retries once if an utterance never starts.
+ *
+ * Utterances are spoken in the app's language (`setSpeechLanguage`), with a
+ * voice for that language when the device has one.
  */
 
 /** Wait after cancelling before speaking again. */
@@ -21,6 +24,8 @@ export const WATCHDOG_MS = 1500;
 const REPEAT_MS = 700;
 
 let voice: SpeechSynthesisVoice | null = null;
+/** BCP 47 tag of the language to speak, e.g. "fr-FR". */
+let language = 'en-US';
 let enabled = true;
 let lastText = '';
 let lastAt = 0;
@@ -33,15 +38,39 @@ function synth(): SpeechSynthesis | null {
   return typeof globalThis !== 'undefined' && 'speechSynthesis' in globalThis ? globalThis.speechSynthesis : null;
 }
 
+/** Normalises voice tags: some engines report "en_US" instead of "en-US". */
+const norm = (tag: string) => tag.replace('_', '-').toLowerCase();
+
+/**
+ * The best voice for `tag` among `voices`: same language and region, then
+ * same language; offline voices first. Null if no voice speaks the language.
+ */
+export function chooseVoice(voices: readonly SpeechSynthesisVoice[], tag: string): SpeechSynthesisVoice | null {
+  const wanted = norm(tag);
+  const base = wanted.split('-')[0];
+  const same = voices.filter((v) => norm(v.lang).split('-')[0] === base);
+  const exact = same.filter((v) => norm(v.lang) === wanted);
+  return (
+    exact.find((v) => v.localService) ??
+    exact[0] ??
+    same.find((v) => v.localService) ??
+    same[0] ??
+    null
+  );
+}
+
 function pickVoice(): void {
   const s = synth();
   if (!s) return;
-  const english = s.getVoices().filter((v) => v.lang.toLowerCase().startsWith('en'));
-  voice =
-    english.find((v) => v.lang === 'en-US' && v.localService) ??
-    english.find((v) => v.localService) ??
-    english[0] ??
-    null;
+  voice = chooseVoice(s.getVoices(), language);
+}
+
+/** Sets the language of the text to speak, e.g. "fr-FR". */
+export function setSpeechLanguage(tag: string): void {
+  if (tag === language) return;
+  language = tag;
+  pickVoice();
+  reset();
 }
 
 {
@@ -100,7 +129,8 @@ function utter(text: string, attempt: number): void {
   const s = synth();
   if (!enabled || !s) return;
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = voice?.lang ?? 'en-US';
+  // Without a voice for the language, the lang tag still lets the engine pick one.
+  u.lang = voice?.lang.replace('_', '-') ?? language;
   if (voice) u.voice = voice;
   u.rate = 0.9;
   let started = false;

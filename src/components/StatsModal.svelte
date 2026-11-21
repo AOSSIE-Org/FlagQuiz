@@ -1,12 +1,12 @@
 <script lang="ts">
   import { CircleCheck, Flame, Star, Trophy, X } from '@lucide/svelte';
   import { untrack } from 'svelte';
-  import { app } from '../lib/app.svelte';
+  import { app, availableIn } from '../lib/app.svelte';
   import { COUNTRIES, type Country } from '../data/countries';
   import { dayKey, lastDays } from '../lib/dates';
+  import { countryName, i18n, num, t } from '../lib/i18n.svelte';
   import { isMastered } from '../lib/select';
-  import { availableIn } from '../lib/app.svelte';
-  import { GAME_NAMES, GAMES, type GameId } from '../lib/types';
+  import { GAMES, type GameId } from '../lib/types';
   import GameIcon from './GameIcon.svelte';
   import Modal from './Modal.svelte';
 
@@ -21,21 +21,14 @@
 
   function summary(game: GameId) {
     const stats = app.statsFor(game);
-    let c = 0;
-    let d = 0;
-    for (const counts of stats.values()) {
-      c += counts.c;
-      d += counts.d;
-    }
     const items = COUNTRIES.filter(availableIn(game));
-    const mastered = items.filter((country) => isMastered(stats.get(country.code))).sort((a, b) =>
-      a.name.localeCompare(b.name),
-    );
-    return { accuracy: c + d ? Math.round((100 * c) / (c + d)) : null, mastered, total: items.length };
+    const mastered = items
+      .filter((country) => isMastered(stats.get(country.code)))
+      .sort((a, b) => i18n.collator.compare(countryName(a.code), countryName(b.code)));
+    return { game, mastered, total: items.length, score: app.user!.scores[game] };
   }
 
-  const games = GAMES.map((game) => ({ game, ...summary(game) }));
-  const R = 15.9155; // circumference = 100
+  let games = $derived(app.user ? GAMES.map(summary) : []);
 
   let content = $state<HTMLDivElement>();
   let flagH = $state(MAX_FLAG_H);
@@ -90,65 +83,82 @@
 
 <svelte:window onresize={fit} />
 
-<Modal label="Statistics" onclose={() => (app.statsOpen = false)} wide>
+<Modal label={t('statistics')} onclose={() => (app.statsOpen = false)} wide>
   {#if app.user}
     <div class="stats" bind:this={content} style:--flag-h="{flagH}px" style:--gap="{GAP}px">
-      <div class="cards">
-        <div class="card" title="Days in a row">
+      <div class="top">
+        <div class="streak" title={t('daysInARow')}>
           <Flame class="flame" size="1.6em" aria-hidden="true" />
-          <span class="big">{app.dayStreak.current}</span>
-          <span class="best" title="Best"><Trophy size="1em" aria-label="Best" />{app.dayStreak.best}</span>
+          <span class="big" aria-label={t('scoreValue', { label: t('daysInARow'), value: app.dayStreak.current })}>
+            {num(app.dayStreak.current)}
+          </span>
+          <span class="best" title={t('best')}>
+            <Trophy size="1em" aria-label={t('best')} />{num(app.dayStreak.best)}
+          </span>
         </div>
-        <div class="card" title="Correct answers">
-          <CircleCheck class="check" size="1.6em" aria-hidden="true" />
-          <span class="big">{app.user.correctCount}</span>
-        </div>
-        <div class="card" title="Rounds without mistakes">
-          <Star class="star" size="1.6em" aria-hidden="true" />
-          <span class="big">{app.user.perfectRun}</span>
-          <span class="best" title="Best"><Trophy size="1em" aria-label="Best" />{app.user.bestPerfectRun}</span>
+        <div class="calendar" role="img" aria-label={t('daysPlayed')} title={t('daysPlayed')}>
+          {#each days as day (day)}
+            <span class="day" class:on={played.has(day)} class:today={day === today} title={day}></span>
+          {/each}
         </div>
       </div>
 
-      <div class="calendar" aria-label="Days played in the last 4 weeks">
-        {#each days as day (day)}
-          <span class="day" class:on={played.has(day)} class:today={day === today} title={day}></span>
-        {/each}
-      </div>
+      <table>
+        <colgroup>
+          <col class="c-game" />
+          <col class="c-num" />
+          <col class="c-num" />
+          <col />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col"><span class="visually-hidden">{t('game')}</span></th>
+            <th scope="col" title={t('bestSilverStars')}>
+              <span class="head"><Star class="silver-star" aria-hidden="true" /><Trophy class="trophy" aria-hidden="true" /></span>
+              <span class="visually-hidden">{t('bestSilverStars')}</span>
+            </th>
+            <th scope="col" title={t('bestGoldStars')}>
+              <span class="head"><Star class="gold-star" aria-hidden="true" /><Trophy class="trophy" aria-hidden="true" /></span>
+              <span class="visually-hidden">{t('bestGoldStars')}</span>
+            </th>
+            <th scope="col" title={t('mastered')}>
+              <span class="head start"><CircleCheck class="check" aria-hidden="true" /></span>
+              <span class="visually-hidden">{t('mastered')}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each games as g (g.game)}
+            <tr>
+              <th scope="row" class="game-icon" title={t(`game.${g.game}`)}>
+                <GameIcon game={g.game} />
+                <span class="visually-hidden">{t(`game.${g.game}`)}</span>
+              </th>
+              <td class="num">{num(g.score.bestSilver)}</td>
+              <td class="num">{num(g.score.bestGold)}</td>
+              <td class="mastered-cell">
+                <span class="count" aria-label={t('masteredCount', { n: g.mastered.length, total: g.total })}>
+                  {num(g.mastered.length)}<small>/{num(g.total)}</small>
+                </span>
+                {#if g.mastered.length}
+                  <div class="mastered-flags">
+                    {#each g.mastered as country (country.code)}
+                      <img
+                        src="./flags/{country.code.toLowerCase()}.svg"
+                        alt={countryName(country.code)}
+                        title={countryName(country.code)}
+                        style:aspect-ratio={country.ratio}
+                      />
+                    {/each}
+                  </div>
+                {/if}
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
 
-      {#each games as g (g.game)}
-        <section class="game" aria-label={GAME_NAMES[g.game]}>
-          <div class="summary">
-            <span class="game-icon" title={GAME_NAMES[g.game]}>
-              <GameIcon game={g.game} />
-            </span>
-            <svg class="ring" viewBox="0 0 36 36" aria-label="Correct: {g.accuracy ?? 0}%">
-              <circle cx="18" cy="18" r={R} class="track" />
-              {#if g.accuracy}
-                <circle cx="18" cy="18" r={R} class="value" stroke-dasharray="{g.accuracy} 100" />
-              {/if}
-              <text x="18" y="21.5" text-anchor="middle">{g.accuracy === null ? '–' : `${g.accuracy}%`}</text>
-            </svg>
-            <span class="mastered" title="Mastered">
-              <CircleCheck size="1.2em" aria-hidden="true" />{g.mastered.length}<small>/{g.total}</small>
-            </span>
-          </div>
-          {#if g.mastered.length}
-            <div class="mastered-flags">
-              {#each g.mastered as country (country.code)}
-                <img
-                  src="./flags/{country.code.toLowerCase()}.svg"
-                  alt={country.name}
-                  title={country.name}
-                  style:aspect-ratio={country.ratio}
-                />
-              {/each}
-            </div>
-          {/if}
-        </section>
-      {/each}
-
-      <button class="icon-btn close" onclick={() => (app.statsOpen = false)} aria-label="Close" title="Close">
+      <button class="icon-btn close" onclick={() => (app.statsOpen = false)} aria-label={t('close')} title={t('close')}>
         <X size={26} />
       </button>
     </div>
@@ -161,30 +171,23 @@
     gap: clamp(8px, 2vmin, 16px);
     width: min(900px, 90vw);
   }
-  .cards {
+  .top {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: clamp(8px, 2vmin, 16px);
-  }
-  .card {
-    display: flex;
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: clamp(4px, 1.4vmin, 12px);
+    gap: clamp(10px, 3vmin, 24px);
+    padding: clamp(6px, 1.4vmin, 12px) clamp(10px, 2.4vmin, 18px);
     border-radius: var(--radius);
     background: var(--surface);
+  }
+  .streak {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-size: clamp(14px, 3.2vmin, 22px);
   }
-  .card :global(.flame) {
+  .streak :global(.flame) {
     color: #ff8200;
-    fill: var(--gold);
-  }
-  .card :global(.check) {
-    color: var(--green);
-  }
-  .card :global(.star) {
-    color: var(--gold);
     fill: var(--gold);
   }
   .big {
@@ -201,7 +204,7 @@
   }
   .calendar {
     display: grid;
-    grid-template-columns: repeat(28, 1fr);
+    grid-template-columns: repeat(14, 1fr);
     gap: clamp(2px, 0.6vmin, 5px);
   }
   .day {
@@ -217,61 +220,100 @@
     outline: 2px solid var(--gold);
     outline-offset: 1px;
   }
-  .game {
-    display: grid;
-    gap: 8px;
-    padding: clamp(6px, 1.4vmin, 12px) clamp(10px, 2.4vmin, 18px);
-    border-radius: var(--radius);
+  table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0 clamp(4px, 1vmin, 8px);
+    margin-block: calc(-1 * clamp(4px, 1vmin, 8px));
+  }
+  .c-game {
+    width: clamp(44px, 9vmin, 64px);
+  }
+  .c-num {
+    width: clamp(64px, 13vmin, 96px);
+  }
+  th,
+  td {
+    padding: clamp(4px, 1vmin, 8px) clamp(6px, 1.4vmin, 12px);
+    vertical-align: middle;
+    text-align: center;
+  }
+  thead th {
+    padding-block: 0;
+  }
+  tbody th,
+  tbody td {
     background: var(--surface);
   }
-  .summary {
-    display: flex;
+  tbody th {
+    border-start-start-radius: var(--radius);
+    border-end-start-radius: var(--radius);
+  }
+  tbody td:last-child {
+    border-start-end-radius: var(--radius);
+    border-end-end-radius: var(--radius);
+  }
+  .head {
+    display: inline-flex;
     align-items: center;
-    gap: clamp(10px, 3vmin, 24px);
+    gap: 2px;
+  }
+  .head :global(svg) {
+    width: clamp(20px, 4.4vmin, 28px);
+    height: clamp(20px, 4.4vmin, 28px);
+  }
+  .head :global(.trophy) {
+    width: clamp(13px, 2.8vmin, 18px);
+    height: clamp(13px, 2.8vmin, 18px);
+    color: var(--muted);
+  }
+  .head.start {
+    display: flex;
+    justify-content: flex-start;
+  }
+  .head :global(.silver-star) {
+    color: var(--silver-edge);
+    fill: var(--silver);
+  }
+  .head :global(.gold-star) {
+    color: var(--gold);
+    fill: var(--gold);
+  }
+  .head :global(.check) {
+    color: var(--green);
   }
   .game-icon {
     color: var(--green);
-    display: grid;
   }
-  .ring {
-    width: clamp(36px, 8vmin, 56px);
-    height: clamp(36px, 8vmin, 56px);
+  .game-icon :global(svg) {
+    display: block;
+    margin-inline: auto;
   }
-  .ring circle {
-    fill: none;
-    stroke-width: 3.6;
+  .num {
+    font-weight: 900;
+    font-size: clamp(16px, 3.6vmin, 26px);
+    font-variant-numeric: tabular-nums;
   }
-  .ring .track {
-    stroke: var(--surface-2);
+  .mastered-cell {
+    text-align: start;
   }
-  .ring .value {
-    stroke: var(--green);
-    stroke-linecap: round;
-    transform: rotate(-90deg);
-    transform-origin: 50% 50%;
-  }
-  .ring text {
-    fill: var(--text);
-    font-size: 9px;
+  .count {
+    display: block;
     font-weight: 800;
-  }
-  .mastered {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 800;
-    font-size: clamp(14px, 3vmin, 20px);
+    font-size: clamp(13px, 2.8vmin, 18px);
     color: var(--green);
   }
-  .mastered small {
+  .count small {
     color: var(--muted);
     font-weight: 600;
-    font-size: 0.7em;
+    font-size: 0.8em;
   }
   .mastered-flags {
     display: flex;
     flex-wrap: wrap;
     gap: var(--gap);
+    margin-top: 4px;
   }
   .mastered-flags img {
     height: var(--flag-h);

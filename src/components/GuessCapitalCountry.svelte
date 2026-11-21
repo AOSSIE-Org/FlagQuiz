@@ -5,39 +5,42 @@
   import type { Country } from '../data/countries';
   import { app } from '../lib/app.svelte';
   import { speak } from '../lib/speech';
+  import { hoverSpeech } from '../lib/hoverSpeech.svelte';
+  import { capitalName, countryName, t } from '../lib/i18n.svelte';
   import CapitalPhotos from './CapitalPhotos.svelte';
   import Flag from './Flag.svelte';
 
   const capitalOf = new Map(CAPITALS.map((c) => [c.code, c]));
+  const hover = hoverSpeech(() => app.round?.id);
 
-  // Say the capital's name whenever a new round starts.
+  // Say the capital's name whenever a new round starts (or the language changes).
   $effect(() => {
     app.round?.id;
-    untrack(() => app.round && speak(capitalOf.get(app.round.target.code)!.name));
+    const name = app.round && capitalName(app.round.target.code);
+    untrack(() => name && speak(name));
   });
 
   function choose(country: Country) {
-    if (app.answer(country.code) === 'wrong') speak(`${country.name}, ${capitalOf.get(country.code)?.name}`);
-  }
-
-  function hover(e: PointerEvent, text: string) {
-    if (e.pointerType === 'mouse') speak(text);
+    if (app.answer(country.code) === 'wrong') speak(`${countryName(country.code)}, ${capitalName(country.code)}`);
   }
 </script>
 
 {#if app.round}
   {@const round = app.round}
   {@const capital = capitalOf.get(round.target.code)!}
-  <section class="game" aria-label="Guess the Capital's Country">
+  {@const target = capitalName(round.target.code)}
+  <section class="game" aria-label={t('game.capitalCountry')}>
     <div class="prompt-row">
       <button
         class="prompt"
-        onclick={() => speak(capital.name)}
-        onpointerenter={(e) => hover(e, capital.name)}
-        aria-label="{capital.name}: listen"
+        data-hover-speech
+        onclick={() => speak(target)}
+        onpointerenter={(e) => hover.enter(e, target)}
+        onpointerleave={hover.leave}
+        aria-label={t('listen', { name: target })}
       >
         <Volume2 class="speaker" aria-hidden="true" />
-        <span class="name">{capital.name}</span>
+        <span class="name">{target}</span>
       </button>
       {#key round.id}
         <CapitalPhotos {capital} class="prompt-photos" />
@@ -47,6 +50,7 @@
     {#key round.id}
       <ul class="grid" style:--rows={Math.ceil(round.options.length / 3)}>
         {#each round.options as country (country.code)}
+          {@const name = countryName(country.code)}
           {@const wrong = round.wrong.includes(country.code)}
           {@const correct = round.solved && country.code === round.target.code}
           <li>
@@ -54,21 +58,23 @@
               class="cell"
               class:wrong
               class:correct
+              data-hover-speech
               aria-disabled={wrong || round.solved}
               onclick={() => choose(country)}
-              onpointerenter={(e) => hover(e, country.name)}
+              onpointerenter={(e) => hover.enter(e, name)}
+              onpointerleave={hover.leave}
             >
               <span class="flag-box"><Flag {country} decorative /></span>
-              <span class="country-name">{country.name}</span>
+              <span class="country-name">{name}</span>
               {#if wrong || correct}
                 <!-- The capital of the chosen country. -->
-                <span class="its-capital">{capitalOf.get(country.code)?.name}</span>
+                <span class="its-capital">{capitalName(country.code)}</span>
               {/if}
               {#if correct}
                 <span class="badge" aria-hidden="true"><Check size="70%" strokeWidth={4} /></span>
               {/if}
             </button>
-            <button class="listen" onclick={() => speak(country.name)} aria-label="{country.name}: listen">
+            <button class="listen" onclick={() => speak(name)} aria-label={t('listen', { name })}>
               <Volume2 size="100%" aria-hidden="true" />
             </button>
           </li>
@@ -198,7 +204,7 @@
   .badge {
     position: absolute;
     bottom: 6px;
-    right: 6px;
+    inset-inline-end: 6px;
     display: grid;
     place-items: center;
     width: clamp(22px, 5.5vmin, 36px);
@@ -212,7 +218,7 @@
     display: none;
     position: absolute;
     top: 4px;
-    right: 4px;
+    inset-inline-end: 4px;
     width: clamp(26px, 6vmin, 36px);
     height: clamp(26px, 6vmin, 36px);
     padding: 5px;
@@ -226,7 +232,7 @@
       display: block;
     }
     .cell {
-      padding-right: clamp(30px, 7vmin, 44px);
+      padding-inline-end: clamp(30px, 7vmin, 44px);
     }
   }
   @keyframes shake {

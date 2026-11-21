@@ -1,13 +1,14 @@
 /** Turn order for multiplayer games. */
 
 /**
- * Order in which players take turns: players with the lowest best number of
- * rounds without mistakes play first. Ties keep the given order.
+ * Order in which players take turns: players with the lowest `best` (their
+ * best number of rounds in a row without mistakes) play first. Ties keep the
+ * given order.
  */
-export function turnOrder<T extends { bestPerfectRun: number }>(players: readonly T[]): T[] {
+export function turnOrder<T>(players: readonly T[], best: (player: T) => number): T[] {
   return players
-    .map((player, index) => ({ player, index }))
-    .sort((x, y) => x.player.bestPerfectRun - y.player.bestPerfectRun || x.index - y.index)
+    .map((player, index) => ({ player, index, best: best(player) }))
+    .sort((x, y) => x.best - y.best || x.index - y.index)
     .map(({ player }) => player);
 }
 

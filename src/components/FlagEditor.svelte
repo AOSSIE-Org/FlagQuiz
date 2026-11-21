@@ -4,6 +4,7 @@
   import { app, type EditorMode } from '../lib/app.svelte';
   import { PALETTE, randomFlag } from '../lib/palette';
   import { PATTERNS, type UserFlag } from '../lib/types';
+  import { t } from '../lib/i18n.svelte';
   import CustomFlag from './CustomFlag.svelte';
   import Modal from './Modal.svelte';
 
@@ -40,13 +41,13 @@
   }
 </script>
 
-<Modal label={mode === 'edit' ? 'Edit player' : 'New player'} onclose={canCancel ? cancel : undefined} wide>
+<Modal label={mode === 'edit' ? t('editPlayer') : t('newPlayer')} onclose={canCancel ? cancel : undefined} wide>
   <form class="editor" onsubmit={(e) => (e.preventDefault(), save())}>
     <div class="left">
       <CustomFlag {flag} class="preview" />
       <label class="name">
         <Pencil size={20} aria-hidden="true" />
-        <span class="visually-hidden">Name</span>
+        <span class="visually-hidden">{t('name')}</span>
         <input
           bind:value={name}
           maxlength="16"
@@ -59,13 +60,14 @@
     </div>
 
     <div class="right">
-      <div class="patterns" role="radiogroup" aria-label="Pattern">
+      <div class="patterns" role="radiogroup" aria-label={t('pattern')}>
         {#each PATTERNS as pattern (pattern)}
           <button
             type="button"
             role="radio"
             aria-checked={flag.pattern === pattern}
-            aria-label={pattern}
+            aria-label={t(`pattern.${pattern}`)}
+            title={t(`pattern.${pattern}`)}
             class="pattern"
             class:active={flag.pattern === pattern}
             onclick={() => (flag.pattern = pattern)}
@@ -75,13 +77,13 @@
         {/each}
       </div>
 
-      <div class="slots" role="radiogroup" aria-label="Colour to change">
+      <div class="slots" role="radiogroup" aria-label={t('colourToChange')}>
         {#each flag.colors as color, i (i)}
           <button
             type="button"
             role="radio"
             aria-checked={slot === i}
-            aria-label="Colour {i + 1}"
+            aria-label={t('colourNumber', { n: i + 1 })}
             class="slot"
             class:active={slot === i}
             style:background={color}
@@ -92,7 +94,7 @@
         {/each}
       </div>
 
-      <div class="palette" role="radiogroup" aria-label="Colours">
+      <div class="palette" role="radiogroup" aria-label={t('colours')}>
         {#each PALETTE as color (color)}
           <button
             type="button"
@@ -110,9 +112,9 @@
           class="swatch custom"
           class:active={isCustom}
           style:--custom={isCustom ? flag.colors[slot] : null}
-          title="Other colour"
+          title={t('otherColour')}
         >
-          <span class="visually-hidden">Other colour</span>
+          <span class="visually-hidden">{t('otherColour')}</span>
           <input
             type="color"
             value={flag.colors[slot].toLowerCase()}
@@ -125,13 +127,13 @@
 
     <div class="actions">
       {#if canCancel}
-        <button type="button" class="icon-btn" onclick={cancel} aria-label="Cancel" title="Cancel">
+        <button type="button" class="icon-btn" onclick={cancel} aria-label={t('cancel')} title={t('cancel')}>
           <X size={28} />
         </button>
       {:else}
         <span></span>
       {/if}
-      <button type="submit" class="icon-btn primary" disabled={!valid || saving} aria-label="Save" title="Save">
+      <button type="submit" class="icon-btn primary" disabled={!valid || saving} aria-label={t('save')} title={t('save')}>
         <Check size={32} strokeWidth={3} />
       </button>
     </div>

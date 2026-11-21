@@ -1,6 +1,9 @@
 /* AOSSIE brand tokens: https://github.com/AOSSIE-Org/Info/blob/main/Brand.md */
 :root {
   --gold: #ffcd00;
+  --gold-edge: #b8860b;
+  --silver: #cfd4db;
+  --silver-edge: #8a929c;
   --green: #00843d;
   --ink: #121212;
   --paper: #ffffff;

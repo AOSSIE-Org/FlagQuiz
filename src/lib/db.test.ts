@@ -12,6 +12,7 @@ import {
   putStat,
   saveUser,
 } from './db';
+import { emptyScores } from './scores';
 import { DEFAULT_FILTER, type User } from './types';
 
 let n = 0;
@@ -25,8 +26,7 @@ function user(name: string, lastActiveAt: number): User {
     difficulty: 'easy',
     theme: 'light',
     adapt: { flag: 1, country: 1, location: 1, capital: 1, capitalCountry: 1 },
-    perfectRun: 0,
-    bestPerfectRun: 0,
+    scores: emptyScores(),
     correctCount: 0,
     filter: structuredClone(DEFAULT_FILTER),
     createdAt: lastActiveAt,
@@ -94,6 +94,32 @@ describe('stats', () => {
 
     const db = await openDatabase(name);
     expect((await getStats(db, 1, 'flag')).get('FR')).toEqual({ s: 0.25, c: 2, d: 0 });
+  });
+
+  it('migrates version 3 players to per-game scores', async () => {
+    const name = freshName();
+    const v3 = await openDB(name, 3, {
+      upgrade(db) {
+        db.createObjectStore('users', { keyPath: 'id', autoIncrement: true });
+        const stats = db.createObjectStore('stats', { keyPath: ['userId', 'game', 'code'] });
+        stats.createIndex('byUserGame', ['userId', 'game']);
+        stats.createIndex('byUser', 'userId');
+        const days = db.createObjectStore('playDays', { keyPath: ['userId', 'date'] });
+        days.createIndex('byUser', 'userId');
+        db.createObjectStore('settings');
+      },
+    });
+    const { scores: _scores, ...legacy } = user('Old', 1);
+    await v3.put('users', { ...legacy, id: 1, perfectRun: 4, bestPerfectRun: 9 });
+    await v3.put('stats', { userId: 1, game: 'flag', code: 'FR', s: 0.2, c: 3, d: 1 });
+    await v3.put('stats', { userId: 1, game: 'capital', code: 'FR', s: 0.2, c: 5, d: 2 });
+    v3.close();
+
+    const db = await openDatabase(name);
+    const [migrated] = await listUsers(db);
+    expect(migrated).not.toHaveProperty('perfectRun');
+    expect(migrated.scores.flag).toEqual({ correct: 3, gold: 0, bestGold: 0, silver: 0, bestSilver: 0 });
+    expect(migrated.scores.capital).toEqual({ correct: 5, gold: 4, bestGold: 9, silver: 4, bestSilver: 9 });
   });
 });
 

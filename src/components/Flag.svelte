@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Country } from '../data/countries';
+  import { countryName } from '../lib/i18n.svelte';
 
   interface Props {
     country: Country;
@@ -18,7 +19,7 @@
 <img
   class="flag {className}"
   src="./flags/{country.code.toLowerCase()}.svg"
-  alt={decorative ? '' : country.name}
+  alt={decorative ? '' : countryName(country.code)}
   draggable="false"
   style:--ratio={country.ratio}
 />

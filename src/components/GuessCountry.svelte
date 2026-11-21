@@ -2,48 +2,21 @@
   import { Check, Volume2 } from '@lucide/svelte';
   import { app } from '../lib/app.svelte';
   import { speak } from '../lib/speech';
+  import { hoverSpeech } from '../lib/hoverSpeech.svelte';
+  import { countryName, t } from '../lib/i18n.svelte';
   import type { Country } from '../data/countries';
   import Flag from './Flag.svelte';
 
+  const hover = hoverSpeech(() => app.round?.id);
+
   function choose(country: Country) {
-    if (app.answer(country.code) === 'wrong') speak(country.name);
-  }
-
-  // Last known mouse position, to know what is under a stationary mouse.
-  let mouse: { x: number; y: number } | null = null;
-  /**
-   * When a new round appears, the name under the (unmoved) mouse is muted
-   * until the mouse leaves it: only a deliberate hover is spoken.
-   */
-  let muted: string | null = null;
-
-  $effect(() => {
-    app.round?.id; // runs after each new round is rendered
-    muted = null;
-    if (!mouse) return;
-    const el = document.elementFromPoint(mouse.x, mouse.y)?.closest<HTMLElement>('[data-code]');
-    muted = el?.dataset.code ?? null;
-  });
-
-  function trackMouse(e: PointerEvent) {
-    if (e.pointerType === 'mouse') mouse = { x: e.clientX, y: e.clientY };
-  }
-
-  function hover(e: PointerEvent, country: Country) {
-    if (e.pointerType !== 'mouse' || muted === country.code) return;
-    speak(country.name);
-  }
-
-  function leave(country: Country) {
-    if (muted === country.code) muted = null;
+    if (app.answer(country.code) === 'wrong') speak(countryName(country.code));
   }
 </script>
 
-<svelte:window onpointermove={trackMouse} onpointerdown={trackMouse} />
-
 {#if app.round}
   {@const round = app.round}
-  <section class="game" aria-label="Guess the Country">
+  <section class="game" aria-label={t('game.country')}>
     <div class="prompt-row">
       <div class="prompt-box">
         {#key round.id}
@@ -55,24 +28,25 @@
     {#key round.id}
       <ul class="grid" style:--rows={Math.ceil(round.options.length / 3)}>
         {#each round.options as country (country.code)}
+          {@const name = countryName(country.code)}
           {@const wrong = round.wrong.includes(country.code)}
           {@const correct = round.solved && country.code === round.target.code}
           <li class="cell" class:wrong class:correct>
             <button
               class="name"
-              data-code={country.code}
+              data-hover-speech
               aria-disabled={wrong || round.solved}
               onclick={() => choose(country)}
-              onpointerenter={(e) => hover(e, country)}
-              onpointerleave={() => leave(country)}
+              onpointerenter={(e) => hover.enter(e, name)}
+              onpointerleave={hover.leave}
             >
-              <span>{country.name}</span>
+              <span>{name}</span>
               {#if correct}
                 <span class="badge" aria-hidden="true"><Check size="70%" strokeWidth={4} /></span>
               {/if}
             </button>
             <!-- Touch screens have no hover: offer an explicit "listen" button. -->
-            <button class="listen" onclick={() => speak(country.name)} aria-label="{country.name}: listen">
+            <button class="listen" onclick={() => speak(name)} aria-label={t('listen', { name })}>
               <Volume2 size="100%" aria-hidden="true" />
             </button>
             <span class="reveal">
@@ -170,7 +144,7 @@
   }
   .badge {
     position: absolute;
-    right: 6px;
+    inset-inline-end: 6px;
     top: 50%;
     translate: 0 -50%;
     display: grid;
@@ -185,7 +159,7 @@
     display: none;
     position: absolute;
     top: 4px;
-    right: 4px;
+    inset-inline-end: 4px;
     width: clamp(26px, 6vmin, 40px);
     height: clamp(26px, 6vmin, 40px);
     padding: 5px;
@@ -199,7 +173,7 @@
       display: block;
     }
     .name {
-      padding-right: clamp(30px, 7vmin, 46px);
+      padding-inline-end: clamp(30px, 7vmin, 46px);
     }
   }
   .reveal {

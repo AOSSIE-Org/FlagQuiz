@@ -1,5 +1,7 @@
 <script lang="ts">
   /** Shown while the app starts; tapping it skips it. */
+  import { t } from '../lib/i18n.svelte';
+
   let { onclose }: { onclose: () => void } = $props();
 </script>
 
@@ -8,7 +10,7 @@
   <img class="logo" src="./flag-quiz-logo.svg" alt="" />
   <h1>Flag Quiz</h1>
   <p class="made-by">
-    <span>made by</span>
+    <span>{t('madeBy')}</span>
     <img class="aossie" src="./brand/aossie-secondary.svg" alt="AOSSIE" />
   </p>
 </div>

@@ -3,6 +3,8 @@ import { COUNTRIES, type Country } from '../data/countries';
 import * as store from './db';
 import { dayKey, streaks } from './dates';
 import { applyFilter, K_START, nextK, pickRound, recordGuess } from './select';
+import { setLanguage, t } from './i18n.svelte';
+import { bestGoldOverall, emptyScores, migrateLegacyScores, normalizeScores, scoreCorrect, scoreMistake } from './scores';
 import { playCorrect, playWrong, setSoundsEnabled } from './sound';
 import { setSpeechEnabled, speak } from './speech';
 import { buildExport, exportFileName, parseImport, type ImportedPlayer } from './transfer';
@@ -67,12 +69,15 @@ export function systemTheme(): Theme {
     : 'light';
 }
 
-/** Fills in fields added in later versions of the app. */
+/** Fills in fields added in later versions of the app (the database migrates saved players too). */
 function withDefaults(user: User): User {
+  const legacy = user as User & { perfectRun?: number; bestPerfectRun?: number };
+  const { perfectRun: _run, bestPerfectRun: _best, ...rest } = legacy;
   return {
-    ...user,
+    ...rest,
     filter: user.filter ?? structuredClone(DEFAULT_FILTER),
     correctCount: user.correctCount ?? 0,
+    scores: user.scores ? normalizeScores(user.scores) : migrateLegacyScores(legacy, perGame(() => [])),
     adapt: { ...perGame(() => K_START), ...user.adapt },
   };
 }
@@ -86,6 +91,7 @@ class AppState {
   menuOpen = $state(false);
   statsOpen = $state(false);
   filterOpen = $state(false);
+  languageOpen = $state(false);
   settings = $state<Settings>({ ...DEFAULT_SETTINGS });
 
   /** Player picker: one player, or several players taking turns. */
@@ -130,6 +136,7 @@ class AppState {
     }
     setSpeechEnabled(this.settings.speech);
     setSoundsEnabled(this.settings.sounds);
+    await setLanguage(this.settings.language);
     this.phase = 'pickUser';
     if (this.users.length === 0) this.editor = 'new';
   }
@@ -139,7 +146,9 @@ class AppState {
   setSettings(patch: Partial<Settings>): void {
     const next = { ...this.settings, ...patch };
     next.turnRounds = Math.min(TURN_ROUNDS_MAX, Math.max(TURN_ROUNDS_MIN, Math.round(next.turnRounds)));
+    const languageChanged = next.language !== this.settings.language;
     this.settings = next;
+    if (languageChanged) void setLanguage(next.language);
     setSpeechEnabled(next.speech);
     setSoundsEnabled(next.sounds);
     if (this.#db) void store.saveSettings(this.#db, $state.snapshot(next) as Settings);
@@ -168,7 +177,7 @@ class AppState {
     this.#session++;
     const now = Date.now();
     let players = selected.map((u) => ({ ...withDefaults(u), lastActiveAt: now }));
-    if (players.length > 1) players = turnOrder(players);
+    if (players.length > 1) players = turnOrder(players, (p) => bestGoldOverall(p.scores));
     await Promise.all(players.map((p) => this.#load(p)));
     this.players = players;
     this.turn = 0;
@@ -205,8 +214,7 @@ class AppState {
       difficulty: 'easy',
       theme: currentTheme(),
       adapt: perGame(() => K_START),
-      perfectRun: 0,
-      bestPerfectRun: 0,
+      scores: emptyScores(),
       correctCount: 0,
       filter: structuredClone(DEFAULT_FILTER),
       createdAt: now,
@@ -372,11 +380,8 @@ class AppState {
       round.solved = true;
       playCorrect();
       user.correctCount++;
-      if (this.#mistakes === 0) {
-        this.#record(user, game, code, false);
-        user.perfectRun++;
-        user.bestPerfectRun = Math.max(user.bestPerfectRun, user.perfectRun);
-      }
+      scoreCorrect(user.scores[game], this.#mistakes === 0);
+      if (this.#mistakes === 0) this.#record(user, game, code, false);
       user.adapt[game] = nextK(user.adapt[game], this.#mistakes);
       void this.#saveUser(user);
       // Multiplayer: after the maximum number of rounds in a row, the next player plays.
@@ -390,11 +395,10 @@ class AppState {
     playWrong();
     // The wrongly chosen item was not recognised either.
     this.#record(user, game, code, true);
-    if (this.#mistakes === 0) {
-      // The target counts as missed once per round.
-      this.#record(user, game, round.target.code, true);
-      user.perfectRun = 0;
-    }
+    // Every mistake costs a silver star; gold stars restart from zero.
+    scoreMistake(user.scores[game]);
+    // The target counts as missed once per round.
+    if (this.#mistakes === 0) this.#record(user, game, round.target.code, true);
     this.#mistakes++;
 
     if (this.multiplayer) {
@@ -460,7 +464,7 @@ export function applyTheme(theme: Theme): void {
 /** Shares the app with the system share sheet, or copies its link. Returns what happened. */
 export async function shareApp(): Promise<'shared' | 'copied' | 'failed'> {
   const url = new URL('./', location.href).href;
-  const data = { title: 'Flag Quiz', text: 'Learn the flags of the world with Flag Quiz!', url };
+  const data = { title: 'Flag Quiz', text: t('shareText'), url };
   try {
     if (navigator.share && (!navigator.canShare || navigator.canShare(data))) {
       await navigator.share(data);

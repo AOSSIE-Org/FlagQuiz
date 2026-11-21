@@ -10,6 +10,7 @@
   import GameFlag from './components/GuessFlag.svelte';
   import GameLocation from './components/GuessLocation.svelte';
   import InstallHelp from './components/InstallHelp.svelte';
+  import LanguageModal from './components/LanguageModal.svelte';
   import Splash from './components/Splash.svelte';
   import { install } from './lib/install.svelte';
   import GamePicker from './components/GamePicker.svelte';
@@ -70,6 +71,9 @@
     <TurnBanner player={app.banner} />
   {/if}
 
+  {#if app.languageOpen}
+    <LanguageModal />
+  {/if}
   {#if install.helpOpen}
     <InstallHelp />
   {/if}

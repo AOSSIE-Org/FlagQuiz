@@ -1,34 +1,35 @@
 <script lang="ts">
   import { ArrowRight, EllipsisVertical, Share, SquarePlus, X, Smartphone } from '@lucide/svelte';
   import { install } from '../lib/install.svelte';
+  import { t } from '../lib/i18n.svelte';
   import Modal from './Modal.svelte';
 
   const close = () => (install.helpOpen = false);
 </script>
 
-<Modal label="Install the app" onclose={close}>
+<Modal label={t('installTheApp')} onclose={close}>
   <div class="help">
     <img class="logo" src="./flag-quiz-logo.svg" alt="" />
     {#if install.platform === 'ios'}
       <!-- Safari: Share → Add to Home Screen -->
       <div class="steps">
-        <span class="step"><Share aria-hidden="true" /><small>Share</small></span>
+        <span class="step"><Share aria-hidden="true" /><small>{t('iosShare')}</small></span>
         <ArrowRight class="arrow" aria-hidden="true" />
-        <span class="step"><SquarePlus aria-hidden="true" /><small>Add to Home Screen</small></span>
+        <span class="step"><SquarePlus aria-hidden="true" /><small>{t('addToHomeScreen')}</small></span>
         <ArrowRight class="arrow" aria-hidden="true" />
         <span class="step"><Smartphone aria-hidden="true" /><small>Flag Quiz</small></span>
       </div>
     {:else}
       <!-- Browser menu → Install app / Add to Home screen -->
       <div class="steps">
-        <span class="step"><EllipsisVertical aria-hidden="true" /><small>Menu</small></span>
+        <span class="step"><EllipsisVertical aria-hidden="true" /><small>{t('browserMenu')}</small></span>
         <ArrowRight class="arrow" aria-hidden="true" />
-        <span class="step"><SquarePlus aria-hidden="true" /><small>Install app</small></span>
+        <span class="step"><SquarePlus aria-hidden="true" /><small>{t('installApp')}</small></span>
         <ArrowRight class="arrow" aria-hidden="true" />
         <span class="step"><Smartphone aria-hidden="true" /><small>Flag Quiz</small></span>
       </div>
     {/if}
-    <button class="icon-btn" onclick={close} aria-label="Close" title="Close"><X size={26} /></button>
+    <button class="icon-btn" onclick={close} aria-label={t('close')} title={t('close')}><X size={26} /></button>
   </div>
 </Modal>
 

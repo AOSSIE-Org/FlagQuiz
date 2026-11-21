@@ -1,5 +1,7 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
-import { DEFAULT_SETTINGS, type GameId, type ItemStats, type Settings, type StatRecord, type User } from './types';
+import { isLanguage } from './languages';
+import { migrateLegacyScores } from './scores';
+import { DEFAULT_SETTINGS, GAMES, perGame, type GameId, type ItemStats, type Settings, type StatRecord, type User } from './types';
 
 interface FlagQuizDB extends DBSchema {
   users: { key: number; value: User };
@@ -20,7 +22,14 @@ interface FlagQuizDB extends DBSchema {
 export type DB = IDBPDatabase<FlagQuizDB>;
 
 export const DB_NAME = 'flag-quiz';
-const DB_VERSION = 3;
+/**
+ * Version history:
+ * 1. users, stats (counts), playDays
+ * 2. stats get a difficulty score
+ * 3. settings
+ * 4. users: per-game scores instead of one run of rounds without mistakes
+ */
+const DB_VERSION = 4;
 const SETTINGS_KEY = 'settings';
 
 export function openDatabase(name: string = DB_NAME): Promise<DB> {
@@ -45,6 +54,19 @@ export function openDatabase(name: string = DB_NAME): Promise<DB> {
       }
       if (oldVersion < 3) {
         db.createObjectStore('settings');
+      }
+      if (oldVersion >= 1 && oldVersion < 4) {
+        const stats = tx.objectStore('stats');
+        let cursor = await tx.objectStore('users').openCursor();
+        while (cursor) {
+          const legacy = cursor.value as User & { perfectRun?: number; bestPerfectRun?: number };
+          const rows = await stats.index('byUser').getAll(legacy.id!);
+          const byGame = perGame(() => [] as ItemStats[]);
+          for (const r of rows) if (GAMES.includes(r.game)) byGame[r.game].push(r);
+          const { perfectRun: _run, bestPerfectRun: _best, ...user } = legacy;
+          await cursor.update({ ...user, scores: migrateLegacyScores(legacy, byGame) });
+          cursor = await cursor.continue();
+        }
       }
     },
   });
@@ -119,7 +141,9 @@ export async function deleteUserWithData(db: DB, userId: number): Promise<void> 
 }
 
 export async function getSettings(db: DB): Promise<Settings> {
-  return { ...DEFAULT_SETTINGS, ...((await db.get('settings', SETTINGS_KEY)) ?? {}) };
+  const settings = { ...DEFAULT_SETTINGS, ...((await db.get('settings', SETTINGS_KEY)) ?? {}) };
+  if (!isLanguage(settings.language)) settings.language = DEFAULT_SETTINGS.language;
+  return settings;
 }
 
 export async function saveSettings(db: DB, settings: Settings): Promise<void> {

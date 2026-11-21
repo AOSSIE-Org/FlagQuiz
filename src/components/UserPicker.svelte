@@ -4,7 +4,9 @@
   import { ImportError, MAX_IMPORT_BYTES } from '../lib/transfer';
   import type { User } from '../lib/types';
   import { TURN_ROUNDS_MAX, TURN_ROUNDS_MIN } from '../lib/types';
+  import { num, t } from '../lib/i18n.svelte';
   import CustomFlag from './CustomFlag.svelte';
+  import LanguageButton from './LanguageButton.svelte';
   import DeletePlayer from './DeletePlayer.svelte';
   import Modal from './Modal.svelte';
 
@@ -46,27 +48,27 @@
     fileInput.value = '';
     if (!file) return;
     try {
-      if (file.size > MAX_IMPORT_BYTES) throw new ImportError('File too large');
+      if (file.size > MAX_IMPORT_BYTES) throw new ImportError('tooLarge');
       const user = await app.importUser(await file.text());
       imported = user.id ?? null;
       importError = null;
     } catch (err) {
-      importError = err instanceof ImportError ? err.message : 'Could not import this file';
+      importError = err instanceof ImportError ? t(`import.${err.reason}`) : t('import.failed');
       clearTimeout(errorTimer);
       errorTimer = setTimeout(() => (importError = null), 3000);
     }
   }
 </script>
 
-<Modal label="Who is playing?">
-  <div class="mode" role="radiogroup" aria-label="Players">
+<Modal label={t('whoIsPlaying')}>
+  <div class="mode" role="radiogroup" aria-label={t('players')}>
     <button
       role="radio"
       aria-checked={!multi}
       class:active={!multi}
       onclick={() => app.setPickerMode('single')}
-      aria-label="One player"
-      title="One player"
+      aria-label={t('onePlayer')}
+      title={t('onePlayer')}
     >
       <UserIcon />
     </button>
@@ -75,8 +77,8 @@
       aria-checked={multi}
       class:active={multi}
       onclick={() => app.setPickerMode('multi')}
-      aria-label="Several players"
-      title="Several players"
+      aria-label={t('severalPlayers')}
+      title={t('severalPlayers')}
     >
       <Users />
     </button>
@@ -107,7 +109,7 @@
       </li>
     {/each}
     <li>
-      <button class="tile add" onclick={() => (app.editor = 'new')} aria-label="New player" title="New player">
+      <button class="tile add" onclick={() => (app.editor = 'new')} aria-label={t('newPlayer')} title={t('newPlayer')}>
         <span class="plus"><Plus size="60%" strokeWidth={3} /></span>
         <span class="name" aria-hidden="true">&nbsp;</span>
       </button>
@@ -119,8 +121,8 @@
       class="icon-btn"
       class:error={importError}
       onclick={() => fileInput.click()}
-      aria-label="Load a player from a file"
-      title={importError ?? 'Load a player from a file'}
+      aria-label={t('loadPlayer')}
+      title={importError ?? t('loadPlayer')}
     >
       {#if importError}<X size={26} />{:else}<Upload size={24} />{/if}
     </button>
@@ -140,27 +142,28 @@
       class:active={deleting}
       onclick={() => (deleting = !deleting)}
       aria-pressed={deleting}
-      aria-label="Delete players"
-      title="Delete players"
+      aria-label={t('deletePlayers')}
+      title={t('deletePlayers')}
     >
       <Trash2 size="100%" />
     </button>
+    <LanguageButton />
     {#if multi}
       <!-- Maximum rounds in a row per player. -->
-      <div class="rounds" role="group" aria-label="Rounds in a row per player" title="Rounds in a row per player">
+      <div class="rounds" role="group" aria-label={t('roundsPerPlayer')} title={t('roundsPerPlayer')}>
         <Repeat class="rounds-icon" aria-hidden="true" />
         <button
           onclick={() => app.setSettings({ turnRounds: app.settings.turnRounds - 1 })}
           disabled={app.settings.turnRounds <= TURN_ROUNDS_MIN}
-          aria-label="Fewer rounds"
+          aria-label={t('fewerRounds')}
         >
           <Minus size={18} />
         </button>
-        <output aria-label="Rounds in a row">{app.settings.turnRounds}</output>
+        <output aria-label={t('roundsPerPlayer')}>{num(app.settings.turnRounds)}</output>
         <button
           onclick={() => app.setSettings({ turnRounds: app.settings.turnRounds + 1 })}
           disabled={app.settings.turnRounds >= TURN_ROUNDS_MAX}
-          aria-label="More rounds"
+          aria-label={t('moreRounds')}
         >
           <Plus size={18} />
         </button>
@@ -169,8 +172,8 @@
         class="icon-btn primary play"
         disabled={selectedCount < 2}
         onclick={() => app.startMultiplayer()}
-        aria-label="Play"
-        title="Play"
+        aria-label={t('play')}
+        title={t('play')}
       >
         <Play size={30} fill="currentColor" />
       </button>
@@ -246,7 +249,7 @@
   .tick {
     position: absolute;
     top: -8px;
-    right: -8px;
+    inset-inline-end: -8px;
     width: 24px;
     height: 24px;
     padding: 3px;
@@ -281,13 +284,13 @@
     margin-top: clamp(8px, 2vmin, 16px);
   }
   .play {
-    margin-left: 12px;
+    margin-inline-start: 12px;
   }
   .rounds {
     display: flex;
     align-items: center;
     gap: 4px;
-    margin-left: auto;
+    margin-inline-start: auto;
     padding: 4px 6px;
     border-radius: 999px;
     background: var(--surface);

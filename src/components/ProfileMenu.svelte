@@ -8,6 +8,7 @@
     FileDown,
     Gamepad2,
     Info,
+    Languages,
     Moon,
     Pencil,
     Share2,
@@ -20,6 +21,7 @@
   } from '@lucide/svelte';
   import { app, shareApp } from '../lib/app.svelte';
   import { install } from '../lib/install.svelte';
+  import { LANGUAGES, t } from '../lib/i18n.svelte';
   import { upcoming } from '../lib/turns';
   import { DIFFICULTIES } from '../lib/types';
   import CustomFlag from './CustomFlag.svelte';
@@ -63,7 +65,7 @@
   <div class="profile" bind:this={root}>
     <button
       class="me"
-      aria-label="{user.name}: menu"
+      aria-label={t('playerMenu', { name: user.name })}
       aria-haspopup="menu"
       aria-expanded={app.menuOpen}
       title={user.name}
@@ -75,7 +77,7 @@
 
     {#if app.multiplayer && !app.menuOpen}
       <!-- Who plays next, in order. -->
-      <ol class="queue" aria-label="Next players">
+      <ol class="queue" aria-label={t('nextPlayers')}>
         {#each upcoming(app.players, app.turn) as next (next.id)}
           <li title={next.name} aria-label={next.name}><CustomFlag flag={next.flag} /></li>
         {/each}
@@ -83,32 +85,32 @@
     {/if}
 
     {#if app.menuOpen}
-      <div class="menu" role="menu" aria-label="Menu">
+      <div class="menu" role="menu" aria-label={t('menu')}>
         <button
           role="menuitem"
           class="item"
           onclick={() => app.toggleTheme()}
-          aria-label={user.theme === 'dark' ? 'Light mode' : 'Dark mode'}
-          title={user.theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          aria-label={user.theme === 'dark' ? t('lightMode') : t('darkMode')}
+          title={user.theme === 'dark' ? t('lightMode') : t('darkMode')}
         >
           {#if user.theme === 'dark'}<Sun />{:else}<Moon />{/if}
         </button>
-        <button role="menuitem" class="item" onclick={() => open(() => (app.editor = 'edit'))} aria-label="Edit player" title="Edit player">
+        <button role="menuitem" class="item" onclick={() => open(() => (app.editor = 'edit'))} aria-label={t('editPlayer')} title={t('editPlayer')}>
           <Pencil />
         </button>
         <button
           role="menuitem"
           class="item difficulty"
           onclick={cycleDifficulty}
-          aria-label="Difficulty: {user.difficulty}"
-          title="Difficulty: {user.difficulty}"
+          aria-label={t('difficulty', { level: t(`difficulty.${user.difficulty}`) })}
+          title={t('difficulty', { level: t(`difficulty.${user.difficulty}`) })}
         >
           <DifficultyIcon difficulty={user.difficulty} />
         </button>
-        <button role="menuitem" class="item" onclick={() => open(() => (app.filterOpen = true))} aria-label="Countries" title="Countries">
+        <button role="menuitem" class="item" onclick={() => open(() => (app.filterOpen = true))} aria-label={t('countries')} title={t('countries')}>
           <Earth />
         </button>
-        <button role="menuitem" class="item" onclick={() => open(() => (app.statsOpen = true))} aria-label="Statistics" title="Statistics">
+        <button role="menuitem" class="item" onclick={() => open(() => (app.statsOpen = true))} aria-label={t('statistics')} title={t('statistics')}>
           <ChartColumn />
         </button>
         <button
@@ -117,8 +119,8 @@
           class="item"
           class:off={!app.settings.speech}
           onclick={() => app.setSettings({ speech: !app.settings.speech })}
-          aria-label="Read names aloud"
-          title={app.settings.speech ? 'Reading names aloud: on' : 'Reading names aloud: off'}
+          aria-label={t('readAloud')}
+          title={app.settings.speech ? t('readAloudOn') : t('readAloudOff')}
         >
           <Speech />
         </button>
@@ -128,10 +130,19 @@
           class="item"
           class:off={!app.settings.sounds}
           onclick={() => app.setSettings({ sounds: !app.settings.sounds })}
-          aria-label="Sound effects"
-          title={app.settings.sounds ? 'Sound effects: on' : 'Sound effects: off'}
+          aria-label={t('soundEffects')}
+          title={app.settings.sounds ? t('soundEffectsOn') : t('soundEffectsOff')}
         >
           {#if app.settings.sounds}<Volume2 />{:else}<VolumeX />{/if}
+        </button>
+        <button
+          role="menuitem"
+          class="item"
+          onclick={() => open(() => (app.languageOpen = true))}
+          aria-label={t('language')}
+          title="{t('language')}: {LANGUAGES.find((l) => l.code === app.settings.language)?.name}"
+        >
+          <Languages />
         </button>
         <button
           role="menuitem"
@@ -139,20 +150,20 @@
           class:ok={shareResult === 'copied'}
           class:bad={shareResult === 'failed'}
           onclick={share}
-          aria-label={shareResult === 'copied' ? 'Link copied' : 'Share'}
-          title={shareResult === 'copied' ? 'Link copied' : 'Share'}
+          aria-label={shareResult === 'copied' ? t('linkCopied') : t('share')}
+          title={shareResult === 'copied' ? t('linkCopied') : t('share')}
         >
           {#if shareResult === 'copied'}<Check />{:else if shareResult === 'failed'}<X />{:else}<Share2 />{/if}
         </button>
-        <button role="menuitem" class="item" onclick={() => app.exportUser()} aria-label="Save my data" title="Save my data">
+        <button role="menuitem" class="item" onclick={() => app.exportUser()} aria-label={t('saveMyData')} title={t('saveMyData')}>
           <FileDown />
         </button>
         {#if install.available}
-          <button role="menuitem" class="item" onclick={() => open(() => install.install())} aria-label="Install app" title="Install app">
+          <button role="menuitem" class="item" onclick={() => open(() => install.install())} aria-label={t('installApp')} title={t('installApp')}>
             <Download />
           </button>
         {/if}
-        <a role="menuitem" class="item" href="./credits.html" target="_blank" rel="noopener" aria-label="Credits" title="Credits">
+        <a role="menuitem" class="item" href="./credits.html" target="_blank" rel="noopener" aria-label={t('credits')} title={t('credits')}>
           <Info />
         </a>
         <a
@@ -161,15 +172,15 @@
           href="https://buymeacoffee.com/aossie"
           target="_blank"
           rel="noopener"
-          aria-label="Support AOSSIE with a donation"
-          title="Support AOSSIE with a donation"
+          aria-label={t('donate')}
+          title={t('donate')}
         >
           <Coffee />
         </a>
-        <button role="menuitem" class="item" onclick={() => app.changeGame()} aria-label="Change game" title="Change game">
+        <button role="menuitem" class="item" onclick={() => app.changeGame()} aria-label={t('changeGame')} title={t('changeGame')}>
           <Gamepad2 />
         </button>
-        <button role="menuitem" class="item" onclick={() => app.switchUser()} aria-label="Switch player" title="Switch player">
+        <button role="menuitem" class="item" onclick={() => app.switchUser()} aria-label={t('switchPlayer')} title={t('switchPlayer')}>
           <Users />
         </button>
       </div>
@@ -213,7 +224,7 @@
   .queue {
     position: absolute;
     top: calc(100% + 6px);
-    right: 0;
+    inset-inline-end: 0;
     display: flex;
     gap: 4px;
     margin: 0;
@@ -234,7 +245,7 @@
   .menu {
     position: absolute;
     top: calc(100% + 8px);
-    right: 0;
+    inset-inline-end: 0;
     z-index: 15;
     display: grid;
     grid-template-columns: repeat(2, auto);

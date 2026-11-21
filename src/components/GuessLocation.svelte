@@ -4,6 +4,7 @@
   import { COUNTRIES } from '../data/countries';
   import { app } from '../lib/app.svelte';
   import { speak } from '../lib/speech';
+  import { countryName, t } from '../lib/i18n.svelte';
   import Flag from './Flag.svelte';
 
   interface MapCountry {
@@ -64,14 +65,15 @@
     });
   });
 
-  // Say the country's name whenever a new round starts.
+  // Say the country's name whenever a new round starts (or the language changes).
   $effect(() => {
     app.round?.id;
-    untrack(() => app.round && speak(app.round.target.name));
+    const name = app.round && countryName(app.round.target.code);
+    untrack(() => name && speak(name));
   });
 
   function choose(code: string) {
-    if (app.answer(code) === 'wrong') speak(byCode.get(code)?.name ?? '');
+    if (app.answer(code) === 'wrong') speak(countryName(code));
   }
 
   // ------------------------------------------------------------ zoom & pan
@@ -165,11 +167,12 @@
 
 {#if app.round}
   {@const round = app.round}
-  <section class="game" aria-label="Guess the Location">
+  {@const target = countryName(round.target.code)}
+  <section class="game" aria-label={t('game.location')}>
     <div class="prompt-row">
-      <button class="prompt" onclick={() => speak(round.target.name)} aria-label="{round.target.name}: listen">
+      <button class="prompt" onclick={() => speak(target)} aria-label={t('listen', { name: target })}>
         <span class="prompt-flag"><Flag country={round.target} decorative /></span>
-        <span class="name">{round.target.name}</span>
+        <span class="name">{target}</span>
         <Volume2 class="speaker" aria-hidden="true" />
       </button>
     </div>
@@ -182,7 +185,7 @@
           class:solved={round.solved}
           viewBox="{view.x} {view.y} {view.w} {view.h}"
           role="img"
-          aria-label="World map"
+          aria-label={t('worldMap')}
           {onwheel}
           {onpointerdown}
           {onpointermove}
@@ -221,15 +224,15 @@
           {#each labels as l (l.code)}
             <g class="label" class:correct={l.correct} transform="translate({l.x} {l.y}) scale({1 / k})">
               <image href="./flags/{l.code.toLowerCase()}.svg" x={-15} y={-30} width="30" height="20" preserveAspectRatio="xMidYMid meet" />
-              <text y="6" text-anchor="middle">{l.country.name}</text>
+              <text y="6" text-anchor="middle">{countryName(l.code)}</text>
             </g>
           {/each}
         </svg>
 
         <div class="zoom">
-          <button onclick={() => zoomAt(1.6)} disabled={k >= MAX_ZOOM} aria-label="Zoom in" title="Zoom in"><Plus size={20} /></button>
-          <button onclick={() => zoomAt(1 / 1.6)} disabled={k <= 1} aria-label="Zoom out" title="Zoom out"><Minus size={20} /></button>
-          <button onclick={reset} disabled={k <= 1} aria-label="Whole world" title="Whole world"><Maximize2 size={18} /></button>
+          <button onclick={() => zoomAt(1.6)} disabled={k >= MAX_ZOOM} aria-label={t('zoomIn')} title={t('zoomIn')}><Plus size={20} /></button>
+          <button onclick={() => zoomAt(1 / 1.6)} disabled={k <= 1} aria-label={t('zoomOut')} title={t('zoomOut')}><Minus size={20} /></button>
+          <button onclick={reset} disabled={k <= 1} aria-label={t('wholeWorld')} title={t('wholeWorld')}><Maximize2 size={18} /></button>
         </div>
       {/if}
     </div>
