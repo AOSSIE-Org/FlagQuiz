@@ -35,8 +35,12 @@
     aspect-ratio: 3 / 2;
     width: min(100cqw, 100cqh * 1.5);
   }
-  /* Wide and short: one row of four. */
-  @container (min-aspect-ratio: 4.2 / 1) {
+  /*
+   * One row of four as soon as it shows bigger photos than 2×2: with 3:2 photos
+   * in a box of width W and height H, a photo is min(W, 1.5H)/2 wide in 2×2 and
+   * min(W, 6H)/4 in a row, so the row wins once W > 3H.
+   */
+  @container (min-aspect-ratio: 3 / 1) {
     .photos {
       grid-template-columns: repeat(4, 1fr);
       aspect-ratio: 6 / 1;

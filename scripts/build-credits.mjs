@@ -4,14 +4,22 @@
  * authors and licences, and how to support AOSSIE), from src/data/*.ts.
  * Styled according to AOSSIE's brand guidelines.
  *
+ * The page is written in English; public/credits-i18n/<lang>.json holds its
+ * texts and names in every other language of the app, and a small script in
+ * the page applies them when the page is opened as credits.html#<lang> (the
+ * app links to it that way). Texts come from the 'credits.*' messages of
+ * src/locales, names from src/locales/names.
+ *
  * Usage: npm run build-credits (also run by npm run fetch-capitals)
+ * Needs Node 22.18+ (imports the messages from TypeScript).
  */
-import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'public', 'credits.html');
+const I18N_DIR = join(ROOT, 'public', 'credits-i18n');
 const FONT = 'inter-latin-wght-normal.woff2';
 export const DONATE_URL = 'https://buymeacoffee.com/aossie';
 
@@ -24,7 +32,49 @@ async function readData(file) {
 const esc = (s = '') =>
   String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
+/** Links that the {placeholders} of the 'credits.*' messages stand for. */
+const LINKS = {
+  aossie: '<a href="https://aossie.org/">AOSSIE</a>',
+  link: '<a href="https://github.com/AOSSIE-Org/FlagQuiz">github.com/AOSSIE-Org/FlagQuiz</a>',
+  cldr: '<a href="https://cldr.unicode.org/">Unicode CLDR</a>',
+  wikidata: '<a href="https://www.wikidata.org/">Wikidata</a>',
+  commons: '<a href="https://commons.wikimedia.org/">Wikimedia Commons</a>',
+  via: '<a href="https://github.com/topojson/world-atlas">world-atlas</a>',
+};
+/** Placeholders whose link depends on the message. */
+const MESSAGE_LINKS = {
+  'credits.flags': { source: '<a href="https://github.com/hampusborgos/country-flags">hampusborgos/country-flags</a>' },
+  'credits.population': {
+    source: '<a href="https://www.geonames.org/">GeoNames</a>',
+    licence: '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>',
+  },
+  'credits.capitals': { source: '<a href="https://www.wikidata.org/">Wikidata</a>' },
+  'credits.names': { licence: '<a href="https://www.unicode.org/license.txt">Unicode License v3</a>' },
+  'credits.map': { source: '<a href="https://www.naturalearthdata.com/">Natural Earth</a>' },
+};
+const TEXT_KEYS = ['credits.donateTitle', 'credits.donateButton', 'credits.data', 'credits.photos', 'madeBy'];
+const HTML_KEYS = [
+  'credits.lead',
+  'credits.source',
+  'credits.donateText',
+  'credits.flags',
+  'credits.population',
+  'credits.capitals',
+  'credits.names',
+  'credits.map',
+  'credits.photosNote',
+];
+
+/** A message as HTML: text escaped, {placeholders} replaced by their links. */
+function render(messages, key) {
+  const links = { ...LINKS, ...MESSAGE_LINKS[key] };
+  return esc(messages[key]).replace(/\{(\w+)\}/g, (m, name) => links[name] ?? m);
+}
+
 export async function buildCredits() {
+  const { LANGUAGES } = await import('../src/lib/languages.ts');
+  const english = (await import('../src/locales/en.ts')).default;
+  const t = (key) => (HTML_KEYS.includes(key) ? render(english, key) : esc(english[key]));
   const capitals = await readData('capitals.ts');
   const countries = new Map((await readData('countries.ts')).map((c) => [c.code, c]));
 
@@ -48,7 +98,7 @@ export async function buildCredits() {
         .join('');
       return `
     <article class="card">
-      <h3><img class="flag" src="flags/${c.code.toLowerCase()}.svg" alt="" /> ${esc(c.name)} <small>${esc(country?.name ?? c.code)}</small></h3>
+      <h3><img class="flag" src="flags/${c.code.toLowerCase()}.svg" alt="" /> <span data-capital="${c.code}">${esc(c.name)}</span> <small data-country="${c.code}">${esc(country?.name ?? c.code)}</small></h3>
       <div class="photos">${photos}
       </div>
     </article>`;
@@ -177,38 +227,88 @@ export async function buildCredits() {
     <h1>Flag Quiz</h1>
   </header>
 
-  <p class="lead">Flag Quiz is free and open source software by <a href="https://aossie.org/">AOSSIE</a>.</p>
-  <p>Source code: <a href="https://github.com/AOSSIE-Org/FlagQuiz">github.com/AOSSIE-Org/FlagQuiz</a>.</p>
+  <p class="lead" data-i18n="credits.lead">${t('credits.lead')}</p>
+  <p data-i18n="credits.source">${t('credits.source')}</p>
 
   <section class="donate">
-    <h2>Help keep learning free</h2>
-    <p>AOSSIE is a not-for-profit organization. Flag Quiz has no ads, no subscriptions and never collects your data — and we want to keep it that way for every child, everywhere. If Flag Quiz has made your children curious about the world, please consider buying us a coffee: every donation, however small, helps us build and maintain more free educational apps. Contributions of code, ideas, translations and feedback are just as welcome!</p>
-    <a class="button" href="${DONATE_URL}" target="_blank" rel="noopener">☕ Support AOSSIE</a>
+    <h2 data-i18n="credits.donateTitle">${t('credits.donateTitle')}</h2>
+    <p data-i18n="credits.donateText">${t('credits.donateText')}</p>
+    <a class="button" href="${DONATE_URL}" target="_blank" rel="noopener">☕ <span data-i18n="credits.donateButton">${t('credits.donateButton')}</span></a>
   </section>
 
-  <h2>Data</h2>
+  <h2 data-i18n="credits.data">${t('credits.data')}</h2>
   <ul class="data">
-    <li>Flags: <a href="https://github.com/hampusborgos/country-flags">hampusborgos/country-flags</a> (public domain, from Wikimedia Commons).</li>
-    <li>Populations and continents: <a href="https://www.geonames.org/">GeoNames</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>).</li>
-    <li>Capitals: <a href="https://www.wikidata.org/">Wikidata</a> (CC0).</li>
-    <li>Names of countries and continents in other languages: <a href="https://cldr.unicode.org/">Unicode CLDR</a> (<a href="https://www.unicode.org/license.txt">Unicode License v3</a>); names of capitals: <a href="https://www.wikidata.org/">Wikidata</a> (CC0).</li>
-    <li>World map: <a href="https://www.naturalearthdata.com/">Natural Earth</a> (public domain), via <a href="https://github.com/topojson/world-atlas">world-atlas</a>.</li>
+    <li data-i18n="credits.flags">${t('credits.flags')}</li>
+    <li data-i18n="credits.population">${t('credits.population')}</li>
+    <li data-i18n="credits.capitals">${t('credits.capitals')}</li>
+    <li data-i18n="credits.names">${t('credits.names')}</li>
+    <li data-i18n="credits.map">${t('credits.map')}</li>
   </ul>
 
-  <h2>Photos of capitals</h2>
-  <p class="note">All photos are from <a href="https://commons.wikimedia.org/">Wikimedia Commons</a>, resized and cropped. Follow the links for the originals and the full licence terms.</p>
+  <h2 data-i18n="credits.photos">${t('credits.photos')}</h2>
+  <p class="note" data-i18n="credits.photosNote">${t('credits.photosNote')}</p>
   <div class="cards">${cards}
   </div>
 
   <footer>
-    <span>made by</span>
+    <span data-i18n="madeBy">${t('madeBy')}</span>
     <a href="https://aossie.org/"><img src="brand/aossie-secondary.svg" alt="AOSSIE" /></a>
   </footer>
 </main>
+<script>
+  // Translation: credits.html#<lang> (see scripts/build-credits.mjs).
+  (function () {
+    function apply() {
+      var lang = location.hash.slice(1);
+      if (!/^[a-z]{2,3}$/.test(lang) || lang === 'en') return;
+      fetch('credits-i18n/' + lang + '.json')
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          if (!d) return;
+          document.documentElement.lang = d.lang;
+          document.documentElement.dir = d.dir;
+          document.querySelectorAll('[data-i18n]').forEach(function (el) {
+            var key = el.getAttribute('data-i18n');
+            if (d.html[key] !== undefined) el.innerHTML = d.html[key];
+            else if (d.text[key] !== undefined) el.textContent = d.text[key];
+          });
+          document.querySelectorAll('[data-capital]').forEach(function (el) {
+            var n = d.capitals[el.getAttribute('data-capital')];
+            if (n) el.textContent = n;
+          });
+          document.querySelectorAll('[data-country]').forEach(function (el) {
+            var n = d.countries[el.getAttribute('data-country')];
+            if (n) el.textContent = n;
+          });
+        })
+        .catch(function () {});
+    }
+    apply();
+    addEventListener('hashchange', function () { location.reload(); });
+  })();
+</script>
 </body>
 </html>
 `;
   await writeFile(OUT, html);
+
+  // Translations of the page.
+  await rm(I18N_DIR, { recursive: true, force: true });
+  await mkdir(I18N_DIR, { recursive: true });
+  for (const lang of LANGUAGES) {
+    if (lang.code === 'en') continue;
+    const messages = { ...english, ...(await import(`../src/locales/${lang.code}.ts`)).default };
+    const names = JSON.parse(await readFile(join(ROOT, 'src', 'locales', 'names', `${lang.code}.json`), 'utf8'));
+    const data = {
+      lang: lang.code,
+      dir: lang.dir,
+      text: Object.fromEntries(TEXT_KEYS.map((k) => [k, messages[k]])),
+      html: Object.fromEntries(HTML_KEYS.map((k) => [k, render(messages, k)])),
+      capitals: Object.fromEntries(capitals.map((c) => [c.code, names.capitals[c.code]])),
+      countries: Object.fromEntries(capitals.map((c) => [c.code, names.countries[c.code]])),
+    };
+    await writeFile(join(I18N_DIR, `${lang.code}.json`), JSON.stringify(data));
+  }
   return OUT;
 }
 

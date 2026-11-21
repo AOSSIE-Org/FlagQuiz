@@ -10,17 +10,18 @@
  * English uses the curated names of src/data/countries.ts and capitals.ts.
  *
  * Usage: npm run fetch-names (after fetch-countries / fetch-capitals)
+ * Needs Node 22.18+ (imports the language list from TypeScript).
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { LANGUAGES } from '../src/lib/languages.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = join(ROOT, 'src', 'locales', 'names');
 const UA = 'FlagQuizDataBuilder/1.0 (https://github.com/AOSSIE-Org/FlagQuiz)';
 
-/** Must match LANGUAGES in src/lib/i18n.svelte.ts. */
-const LANGS = ['en', 'zh', 'hi', 'es', 'ar', 'fr', 'bn', 'pt', 'ru', 'ur'];
+const LANGS = LANGUAGES.map((l) => l.code);
 
 /** Continent codes of the app → UN M.49 / CLDR region codes. */
 const CONTINENT_REGIONS = { AF: '002', AS: '142', EU: '150', NA: '003', SA: '005', OC: '009', AN: 'AQ' };
@@ -72,7 +73,48 @@ const COUNTRY_OVERRIDES = {
     PS: 'فلسطین',
     GS: 'جنوبی جارجیا',
   },
+  id: {"CD": "Republik Demokratik Kongo", "CG": "Republik Kongo", "PS": "Palestina", "GS": "Georgia Selatan"},
+  de: {"CD": "Demokratische Republik Kongo", "CG": "Republik Kongo", "PS": "Palästina", "GS": "Südgeorgien"},
+  ja: {"CD": "コンゴ民主共和国", "CG": "コンゴ共和国", "HK": "香港", "MO": "マカオ", "PS": "パレスチナ", "GS": "南ジョージア"},
+  mr: {"CD": "काँगो लोकशाही प्रजासत्ताक", "CG": "काँगोचे प्रजासत्ताक", "PS": "पॅलेस्टाईन", "GS": "दक्षिण जॉर्जिया"},
+  vi: {"CD": "Cộng hòa Dân chủ Congo", "CG": "Cộng hòa Congo", "PS": "Palestine", "GS": "Nam Georgia"},
+  te: {"CD": "కాంగో ప్రజాస్వామ్య గణతంత్రం", "CG": "కాంగో గణతంత్రం", "HK": "హాంకాంగ్", "MO": "మకావ్", "PS": "పాలస్తీనా", "GS": "దక్షిణ జార్జియా"},
+  sw: {"CD": "Jamhuri ya Kidemokrasia ya Kongo", "CG": "Jamhuri ya Kongo", "HK": "Hong Kong", "MO": "Makau", "PS": "Palestina", "GS": "Georgia Kusini"},
+  tr: {"CD": "Demokratik Kongo Cumhuriyeti", "CG": "Kongo Cumhuriyeti", "PS": "Filistin", "GS": "Güney Georgia"},
+  fil: {"CD": "Demokratikong Republika ng Congo", "CG": "Republika ng Congo", "HK": "Hong Kong", "MO": "Macau", "PS": "Palestina", "GS": "Timog Georgia"},
+  ta: {"CD": "காங்கோ ஜனநாயகக் குடியரசு", "CG": "காங்கோ குடியரசு", "PS": "பாலஸ்தீனம்", "GS": "தெற்கு ஜார்ஜியா"},
+  yue: {"CD": "剛果民主共和國", "CG": "剛果共和國", "HK": "香港", "MO": "澳門", "PS": "巴勒斯坦", "GS": "南喬治亞"},
+  fa: {"CD": "جمهوری دموکراتیک کنگو", "CG": "جمهوری کنگو", "PS": "فلسطین", "GS": "جورجیای جنوبی"},
+  ko: {"HK": "홍콩", "MO": "마카오", "PS": "팔레스타인", "GS": "사우스조지아"},
+  am: {"PS": "ፍልስጤም", "GS": "ደቡብ ጆርጂያ"},
+  th: {"CD": "สาธารณรัฐประชาธิปไตยคองโก", "CG": "สาธารณรัฐคองโก", "PS": "ปาเลสไตน์", "GS": "เซาท์จอร์เจีย"},
+  jv: {"CD": "Républik Démokratik Kongo", "CG": "Républik Kongo", "PS": "Palestina", "GS": "Georgia Kidul"},
+  it: {"CD": "Repubblica Democratica del Congo", "CG": "Repubblica del Congo", "PS": "Palestina", "GS": "Georgia del Sud"},
+  gu: {"CD": "કોંગો લોકશાહી પ્રજાસત્તાક", "CG": "કોંગો પ્રજાસત્તાક", "HK": "હોંગકોંગ", "MO": "મકાઉ", "PS": "પેલેસ્ટાઇન", "GS": "દક્ષિણ જ્યોર્જિયા"},
+  kn: {"CD": "ಕಾಂಗೋ ಪ್ರಜಾಸತ್ತಾತ್ಮಕ ಗಣರಾಜ್ಯ", "CG": "ಕಾಂಗೋ ಗಣರಾಜ್ಯ", "PS": "ಪ್ಯಾಲೆಸ್ಟೈನ್", "GS": "ದಕ್ಷಿಣ ಜಾರ್ಜಿಯಾ"},
 };
+
+/** CLDR's long official names of Hong Kong and Macao ("Special Administrative Region…"). */
+const HONG_KONG_MACAO = {
+  am: {"HK": "ሆንግ ኮንግ", "MO": "ማካኦ"},
+  ar: {"MO": "ماكاو"},
+  bn: {"HK": "হংকং", "MO": "ম্যাকাও"},
+  de: {"HK": "Hongkong", "MO": "Macau"},
+  fa: {"HK": "هنگ‌کنگ", "MO": "ماکائو"},
+  fr: {"HK": "Hong Kong", "MO": "Macao"},
+  id: {"HK": "Hong Kong", "MO": "Makau"},
+  it: {"HK": "Hong Kong", "MO": "Macao"},
+  jv: {"HK": "Hong Kong", "MO": "Makau"},
+  kn: {"HK": "ಹಾಂಗ್ ಕಾಂಗ್", "MO": "ಮಕಾವು"},
+  mr: {"HK": "हाँगकाँग", "MO": "मकाओ"},
+  ta: {"HK": "ஹாங்காங்", "MO": "மகாவ்"},
+  th: {"HK": "ฮ่องกง", "MO": "มาเก๊า"},
+  tr: {"HK": "Hong Kong", "MO": "Makao"},
+  vi: {"HK": "Hồng Kông", "MO": "Ma Cao"},
+};
+for (const [lang, names] of Object.entries(HONG_KONG_MACAO)) {
+  COUNTRY_OVERRIDES[lang] = { ...COUNTRY_OVERRIDES[lang], ...names };
+}
 
 /** CLDR abbreviations that children wouldn't understand. */
 function expand(lang, name) {
@@ -81,12 +123,19 @@ function expand(lang, name) {
 }
 
 /** Wikidata labels to query per language, best first (Simplified Chinese before generic Chinese). */
-const LABEL_LANGS = { zh: ['zh-hans', 'zh-cn', 'zh'] };
+const LABEL_LANGS = {
+  zh: ['zh-hans', 'zh-cn', 'zh'],
+  yue: ['yue', 'zh-hk', 'zh-hant'],
+  fil: ['fil', 'tl'],
+};
 const labelLangs = (lang) => LABEL_LANGS[lang] ?? [lang];
 
 /** Capital names where Wikidata's label is a district, a different city or a mistranslation. */
 const CAPITAL_OVERRIDES = {
   zh: { NR: '亚伦', JP: '东京', US: '华盛顿' },
+  yue: { JP: '東京' },
+  ja: { BE: 'ブリュッセル', CN: '北京', KP: '平壌', TW: '台北', JP: '東京', KR: 'ソウル', NR: 'ヤレン' },
+  ko: { CN: '베이징', JP: '도쿄', KP: '평양', KR: '서울', NR: '야렌', TW: '타이베이' },
   hi: { NR: 'यारेन', AG: 'सेंट जॉन्स' },
   ar: { NR: 'يارين' },
   bn: { NR: 'ইয়ারেন' },
@@ -99,7 +148,7 @@ function tidyCapital(lang, label) {
   let name = label.replace(/\s*\(.*\)$/, '');
   if (!/D\.\s?C\./.test(name)) name = name.replace(/,\s*[^,]+$/, '');
   // Chinese labels often end in 市 ("city"), which children don't say.
-  if (lang === 'zh' && name.length > 2) name = name.replace(/市$/, '');
+  if ((lang === 'zh' || lang === 'yue') && name.length > 2) name = name.replace(/市$/, '');
   return name;
 }
 

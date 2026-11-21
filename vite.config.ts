@@ -44,7 +44,7 @@ export default defineConfig({
       workbox: {
         // Everything, including the photos of capitals, is downloaded at install,
         // so that every game works offline.
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,webp}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,webp}', 'credits-i18n/*.json'],
         // Only used by social media previews and install dialogs.
         globIgnores: ['og-image.png', 'screenshots/**'],
         maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,

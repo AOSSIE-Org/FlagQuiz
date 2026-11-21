@@ -64,7 +64,8 @@ src/
     UpdateButton.svelte    gold ↻ (lower right) when a new version is ready; full-screen notices when
                            outdated (VersionError / blocking) or blocked by an older copy
     Guess*.svelte          one component per game, presentational (map game loads its data lazily)
-    CapitalPhotos.svelte   four photos: 2×2, or one row in wide short spaces (container query)
+    CapitalPhotos.svelte   four photos: one row once the box is wider than 3:1 (then the row shows
+                           bigger photos than 2×2), else 2×2 (container query)
     GameIcon.svelte        one icon per game (statistics)
     CustomFlag.svelte      SVG avatar renderer (viewBox 0 0 30 20)
     Flag.svelte            image fitted to a size container, real aspect ratio

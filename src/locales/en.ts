@@ -128,6 +128,23 @@ const en = {
   closeOtherCopies: 'Flag Quiz is open in another tab or window. Close it to continue.',
   saveAllPlayers: 'Save all players in one file',
 
+  // Credits page ({placeholders} become links)
+  'credits.lead': 'Flag Quiz is free and open source software by {aossie}.',
+  'credits.source': 'Source code: {link}.',
+  'credits.donateTitle': 'Help keep learning free',
+  'credits.donateText':
+    'AOSSIE is a not-for-profit organization. Flag Quiz has no ads, no subscriptions and never collects your data — and we want to keep it that way for every child, everywhere. If Flag Quiz has made your children curious about the world, please consider buying us a coffee: every donation, however small, helps us build and maintain more free educational apps. Contributions of code, ideas, translations and feedback are just as welcome!',
+  'credits.donateButton': 'Support AOSSIE',
+  'credits.data': 'Data',
+  'credits.flags': 'Flags: {source} (public domain, from Wikimedia Commons).',
+  'credits.population': 'Populations and continents: {source} ({licence}).',
+  'credits.capitals': 'Capitals: {source} (CC0).',
+  'credits.names': 'Names of countries and continents in other languages: {cldr} ({licence}); names of capitals: {wikidata} (CC0).',
+  'credits.map': 'World map: {source} (public domain), via {via}.',
+  'credits.photos': 'Photos of capitals',
+  'credits.photosNote':
+    'All photos are from {commons}, resized and cropped. Follow the links for the originals and the full licence terms.',
+
   // Installing
   installTheApp: 'Install the app',
   iosShare: 'Share',

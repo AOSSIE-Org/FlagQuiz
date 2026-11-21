@@ -163,7 +163,7 @@
             <Download />
           </button>
         {/if}
-        <a role="menuitem" class="item" href="./credits.html" target="_blank" rel="noopener" aria-label={t('credits')} title={t('credits')}>
+        <a role="menuitem" class="item" href={app.settings.language === 'en' ? './credits.html' : `./credits.html#${app.settings.language}`} target="_blank" rel="noopener" aria-label={t('credits')} title={t('credits')}>
           <Info />
         </a>
         <a
