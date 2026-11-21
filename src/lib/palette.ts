@@ -13,6 +13,7 @@ export const PALETTE: readonly string[] = [
   '#F472B6', // pink
   '#8B5A2B', // brown
   '#FFFFFF', // white
+  '#7A7A7A', // AOSSIE muted grey
   '#121212', // black
 ];
 
