@@ -3,7 +3,8 @@ import { COUNTRIES, type Country } from '../data/countries';
 import * as store from './db';
 import { dayKey, streaks } from './dates';
 import { applyFilter, K_START, nextK, pickRound, recordGuess } from './select';
-import { setLanguage, t } from './i18n.svelte';
+import { i18n, LANGUAGES, setLanguage, t } from './i18n.svelte';
+import { disableReminders, enableReminders, notificationsAllowed } from './reminders';
 import { bestGoldOverall, emptyScores, scoreCorrect, scoreMistake } from './scores';
 import { withDefaults } from './users';
 import { playCorrect, playWrong, setSoundsEnabled } from './sound';
@@ -82,6 +83,8 @@ class AppState {
   statsOpen = $state(false);
   filterOpen = $state(false);
   languageOpen = $state(false);
+  /** The daily reminder could not be switched on (notifications not allowed). */
+  reminderBlocked = $state(false);
   settings = $state<Settings>({ ...DEFAULT_SETTINGS });
 
   /** Player picker: one player, or several players taking turns. */
@@ -141,6 +144,8 @@ class AppState {
     setSpeechEnabled(this.settings.speech);
     setSoundsEnabled(this.settings.sounds);
     await setLanguage(this.settings.language);
+    // Keep the reminder registered (e.g. after reinstalling) and its text current.
+    if (this.settings.reminders && notificationsAllowed()) void enableReminders().then(() => this.#saveReminder());
     this.phase = 'pickUser';
     if (this.users.length === 0) this.editor = 'new';
   }
@@ -152,10 +157,36 @@ class AppState {
     next.turnRounds = Math.min(TURN_ROUNDS_MAX, Math.max(TURN_ROUNDS_MIN, Math.round(next.turnRounds)));
     const languageChanged = next.language !== this.settings.language;
     this.settings = next;
-    if (languageChanged) void setLanguage(next.language);
+    if (languageChanged) void setLanguage(next.language).then(() => this.#saveReminder());
     setSpeechEnabled(next.speech);
     setSoundsEnabled(next.sounds);
     if (this.#db) void store.saveSettings(this.#db, $state.snapshot(next) as Settings);
+  }
+
+  /** Switches the daily reminder on or off (from a tap: it may ask for permission). */
+  async toggleReminders(): Promise<void> {
+    if (this.settings.reminders) {
+      await disableReminders();
+      this.reminderBlocked = false;
+      this.setSettings({ reminders: false });
+    } else {
+      const on = await enableReminders();
+      this.reminderBlocked = !on;
+      if (on) this.setSettings({ reminders: true });
+    }
+    await this.#saveReminder();
+  }
+
+  /** Writes the reminder's state and text (in the current language) for the service worker. */
+  async #saveReminder(): Promise<void> {
+    if (!this.#db) return;
+    const lang = LANGUAGES.find((l) => l.code === i18n.lang) ?? LANGUAGES[0];
+    await store.saveReminder(this.#db, {
+      enabled: this.settings.reminders,
+      body: t('reminderBody'),
+      lang: lang.code,
+      dir: lang.dir,
+    });
   }
 
   // ---------------------------------------------------------------- players

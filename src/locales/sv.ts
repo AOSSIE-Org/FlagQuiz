@@ -115,6 +115,12 @@ const sv: Messages = {
   closeOtherCopies: 'Flag Quiz är öppet i en annan flik eller ett annat fönster. Stäng det för att fortsätta.',
   saveAllPlayers: 'Spara alla spelare i en fil',
 
+  reminders: 'Daglig påminnelse',
+  remindersOn: 'Daglig påminnelse: på',
+  remindersOff: 'Daglig påminnelse: av',
+  remindersBlocked: 'Aviseringar är blockerade: tillåt dem i enhetens inställningar',
+  reminderBody: '🔥 Bryt inte din svit! Spela Flag Quiz i dag och lär dig fler länder, flaggor och huvudstäder.',
+
   'credits.lead': 'Flag Quiz är fri programvara med öppen källkod från {aossie}.',
   'credits.source': 'Källkod: {link}.',
   'credits.donateTitle': 'Hjälp oss att hålla lärandet gratis',

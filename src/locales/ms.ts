@@ -115,6 +115,12 @@ const ms: Messages = {
   closeOtherCopies: 'Flag Quiz sedang dibuka dalam tab atau tetingkap lain. Tutupnya untuk meneruskan.',
   saveAllPlayers: 'Simpan semua pemain dalam satu fail',
 
+  reminders: 'Peringatan harian',
+  remindersOn: 'Peringatan harian: hidup',
+  remindersOff: 'Peringatan harian: mati',
+  remindersBlocked: 'Pemberitahuan disekat: benarkannya dalam tetapan peranti anda',
+  reminderBody: '🔥 Teruskan rentetan kamu! Main Flag Quiz hari ini dan belajar lebih banyak negara, bendera dan ibu negara.',
+
   'credits.lead': 'Flag Quiz ialah perisian bebas dan sumber terbuka oleh {aossie}.',
   'credits.source': 'Kod sumber: {link}.',
   'credits.donateTitle': 'Bantu kekalkan pembelajaran percuma',

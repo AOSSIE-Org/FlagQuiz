@@ -115,6 +115,12 @@ const tr: Messages = {
   closeOtherCopies: 'Flag Quiz başka bir sekmede veya pencerede açık. Devam etmek için onu kapatın.',
   saveAllPlayers: 'Tüm oyuncuları tek dosyaya kaydet',
 
+  reminders: 'Günlük hatırlatıcı',
+  remindersOn: 'Günlük hatırlatıcı: açık',
+  remindersOff: 'Günlük hatırlatıcı: kapalı',
+  remindersBlocked: 'Bildirimler engellendi: cihazınızın ayarlarından izin verin',
+  reminderBody: '🔥 Serini bozma! Bugün Flag Quiz oyna, daha fazla ülke, bayrak ve başkent öğren.',
+
   'credits.lead': 'Flag Quiz, {aossie} tarafından geliştirilen özgür ve açık kaynaklı bir yazılımdır.',
   'credits.source': 'Kaynak kodu: {link}.',
   'credits.donateTitle': 'Öğrenmenin ücretsiz kalmasına yardım edin',

@@ -115,6 +115,12 @@ const bs: Messages = {
   closeOtherCopies: 'Flag Quiz je otvoren u drugoj kartici ili prozoru. Zatvorite ga da biste nastavili.',
   saveAllPlayers: 'Sačuvaj sve igrače u jednu datoteku',
 
+  reminders: 'Dnevni podsjetnik',
+  remindersOn: 'Dnevni podsjetnik: uključen',
+  remindersOff: 'Dnevni podsjetnik: isključen',
+  remindersBlocked: 'Obavještenja su blokirana: dozvolite ih u postavkama svog uređaja',
+  reminderBody: '🔥 Nastavi svoj niz dana zaredom! Igraj Flag Quiz danas i nauči još država, zastava i glavnih gradova.',
+
   'credits.lead': 'Flag Quiz je besplatan softver otvorenog koda koji je napravio {aossie}.',
   'credits.source': 'Izvorni kod: {link}.',
   'credits.donateTitle': 'Pomozite da učenje ostane besplatno',

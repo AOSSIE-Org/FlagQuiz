@@ -115,6 +115,12 @@ const zh: Messages = {
   closeOtherCopies: 'Flag Quiz 已在另一个标签页或窗口中打开。请关闭它以继续。',
   saveAllPlayers: '把所有玩家保存到一个文件',
 
+  reminders: '每日提醒',
+  remindersOn: '每日提醒：开',
+  remindersOff: '每日提醒：关',
+  remindersBlocked: '通知已被阻止：请在设备设置中允许通知',
+  reminderBody: '🔥 别让连续纪录中断！今天玩一玩 Flag Quiz，认识更多国家、国旗和首都。',
+
   'credits.lead': 'Flag Quiz 是 {aossie} 开发的自由开源软件。',
   'credits.source': '源代码：{link}。',
   'credits.donateTitle': '帮助学习保持免费',

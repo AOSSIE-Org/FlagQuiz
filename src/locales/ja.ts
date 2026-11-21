@@ -115,6 +115,12 @@ const ja: Messages = {
   closeOtherCopies: 'Flag Quiz が別のタブまたはウィンドウで開かれています。続けるには、そちらを閉じてください。',
   saveAllPlayers: 'ぜんいんを ひとつの ファイルに ほぞん',
 
+  reminders: 'まいにちの おしらせ',
+  remindersOn: 'まいにちの おしらせ：オン',
+  remindersOff: 'まいにちの おしらせ：オフ',
+  remindersBlocked: '通知がブロックされています：端末の設定で通知を許可してください',
+  reminderBody: '🔥 れんぞく きろくを つづけよう！きょうも Flag Quiz で あそんで、もっと たくさんの くにや こっき、しゅとを おぼえよう！',
+
   'credits.lead': 'Flag Quiz は {aossie} による無料のオープンソースソフトウェアです。',
   'credits.source': 'ソースコード：{link}',
   'credits.donateTitle': '学びをずっと無料に',

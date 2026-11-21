@@ -115,6 +115,12 @@ const zu: Messages = {
   closeOtherCopies: 'I-Flag Quiz ivuliwe kwenye ithebhu noma iwindi. Yivale ukuze uqhubeke.',
   saveAllPlayers: 'Londoloza bonke abadlali efayeleni elilodwa',
 
+  reminders: 'Isikhumbuzi sansuku zonke',
+  remindersOn: 'Isikhumbuzi sansuku zonke: sivuliwe',
+  remindersOff: 'Isikhumbuzi sansuku zonke: sivaliwe',
+  remindersBlocked: 'Izaziso zivinjiwe: zivumele kuzilungiselelo zedivayisi yakho',
+  reminderBody: '🔥 Qhubeka nochungechunge lwakho! Dlala i-Flag Quiz namuhla ufunde amazwe amaningi, amafulegi nezinhloko-dolobha.',
+
   'credits.lead': 'I-Flag Quiz iyisofthiwe yamahhala nomthombo ovulekile eyenziwe ngu-{aossie}.',
   'credits.source': 'Ikhodi yomthombo: {link}.',
   'credits.donateTitle': 'Siza ukugcina ukufunda kumahhala',

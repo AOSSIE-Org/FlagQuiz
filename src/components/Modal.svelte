@@ -6,10 +6,12 @@
     /** When given, Escape and clicking the backdrop close the modal. */
     onclose?: () => void;
     wide?: boolean;
+    /** Smaller margins and padding, for dialogs that need every pixel (e.g. the language picker). */
+    tight?: boolean;
     children: Snippet;
   }
 
-  let { label, onclose, wide = false, children }: Props = $props();
+  let { label, onclose, wide = false, tight = false, children }: Props = $props();
   let panel: HTMLDivElement;
 
   $effect(() => {
@@ -27,7 +29,7 @@
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-<div class="scrim" onclick={(e) => e.target === e.currentTarget && onclose?.()} {onkeydown}>
+<div class="scrim" class:tight onclick={(e) => e.target === e.currentTarget && onclose?.()} {onkeydown}>
   <div
     class="panel"
     class:wide
@@ -64,6 +66,12 @@
     box-shadow: var(--shadow);
     outline: none;
     animation: pop 0.18s ease;
+  }
+  .tight {
+    padding: 6px;
+  }
+  .tight .panel {
+    padding: clamp(6px, 1.6vmin, 20px);
   }
   .panel.wide {
     max-width: min(960px, 100%);

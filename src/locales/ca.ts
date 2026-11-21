@@ -115,6 +115,12 @@ const ca: Messages = {
   closeOtherCopies: 'Flag Quiz està obert en una altra pestanya o finestra. Tanqueu-la per continuar.',
   saveAllPlayers: 'Desa tots els jugadors en un fitxer',
 
+  reminders: 'Recordatori diari',
+  remindersOn: 'Recordatori diari: sí',
+  remindersOff: 'Recordatori diari: no',
+  remindersBlocked: 'Les notificacions estan bloquejades: permeteu-les a la configuració del dispositiu',
+  reminderBody: '🔥 No perdis la ratxa! Juga avui a Flag Quiz i aprèn més països, banderes i capitals.',
+
   'credits.lead': 'Flag Quiz és programari lliure i de codi obert de {aossie}.',
   'credits.source': 'Codi font: {link}.',
   'credits.donateTitle': 'Ajudeu-nos a mantenir l’aprenentatge gratuït',

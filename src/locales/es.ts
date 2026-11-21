@@ -115,6 +115,12 @@ const es: Messages = {
   closeOtherCopies: 'Flag Quiz está abierto en otra pestaña o ventana. Ciérrala para continuar.',
   saveAllPlayers: 'Guardar todos los jugadores en un archivo',
 
+  reminders: 'Recordatorio diario',
+  remindersOn: 'Recordatorio diario: sí',
+  remindersOff: 'Recordatorio diario: no',
+  remindersBlocked: 'Las notificaciones están bloqueadas: permítelas en los ajustes de tu dispositivo',
+  reminderBody: '🔥 ¡No pierdas tu racha! Juega hoy a Flag Quiz y aprende más países, banderas y capitales.',
+
   'credits.lead': 'Flag Quiz es software libre y de código abierto de {aossie}.',
   'credits.source': 'Código fuente: {link}.',
   'credits.donateTitle': 'Ayuda a que aprender siga siendo gratis',

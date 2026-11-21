@@ -24,9 +24,11 @@ export interface Settings {
   turnRounds: number;
   /** Language of the app. */
   language: LanguageCode;
+  /** Daily reminder notification (installed app only). */
+  reminders: boolean;
 }
 
-export const DEFAULT_SETTINGS: Settings = { speech: true, sounds: true, turnRounds: 3, language: DEFAULT_LANGUAGE };
+export const DEFAULT_SETTINGS: Settings = { speech: true, sounds: true, turnRounds: 3, language: DEFAULT_LANGUAGE, reminders: false };
 export const TURN_ROUNDS_MIN = 1;
 export const TURN_ROUNDS_MAX = 10;
 

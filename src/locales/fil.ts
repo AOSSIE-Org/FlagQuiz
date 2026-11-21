@@ -115,6 +115,12 @@ const fil: Messages = {
   closeOtherCopies: 'Bukas ang Flag Quiz sa ibang tab o window. Isara ito para makapagpatuloy.',
   saveAllPlayers: 'I-save ang lahat ng manlalaro sa iisang file',
 
+  reminders: 'Araw-araw na paalala',
+  remindersOn: 'Araw-araw na paalala: naka-on',
+  remindersOff: 'Araw-araw na paalala: naka-off',
+  remindersBlocked: 'Naka-block ang mga notification: payagan ang mga ito sa settings ng iyong device',
+  reminderBody: '🔥 Ituloy ang sunod-sunod mong araw! Laruin ang Flag Quiz ngayon at matuto ng mas maraming bansa, watawat at kabisera.',
+
   'credits.lead': 'Ang Flag Quiz ay libre at open source na software ng {aossie}.',
   'credits.source': 'Source code: {link}.',
   'credits.donateTitle': 'Tumulong na panatilihing libre ang pag-aaral',

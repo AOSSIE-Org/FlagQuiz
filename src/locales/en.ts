@@ -128,6 +128,13 @@ const en = {
   closeOtherCopies: 'Flag Quiz is open in another tab or window. Close it to continue.',
   saveAllPlayers: 'Save all players in one file',
 
+  // Daily reminder (installed app only)
+  reminders: 'Daily reminder',
+  remindersOn: 'Daily reminder: on',
+  remindersOff: 'Daily reminder: off',
+  remindersBlocked: 'Notifications are blocked: allow them in the settings of your device',
+  reminderBody: '🔥 Keep your streak going! Play Flag Quiz today and learn more countries, flags and capitals.',
+
   // Credits page ({placeholders} become links)
   'credits.lead': 'Flag Quiz is free and open source software by {aossie}.',
   'credits.source': 'Source code: {link}.',

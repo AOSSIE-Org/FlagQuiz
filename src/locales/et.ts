@@ -115,6 +115,12 @@ const et: Messages = {
   closeOtherCopies: 'Flag Quiz on avatud teisel vahelehel või teises aknas. Jätkamiseks sulgege see.',
   saveAllPlayers: 'Salvesta kõik mängijad ühte faili',
 
+  reminders: 'Igapäevane meeldetuletus',
+  remindersOn: 'Igapäevane meeldetuletus: sees',
+  remindersOff: 'Igapäevane meeldetuletus: väljas',
+  remindersBlocked: 'Teavitused on blokeeritud: lubage need oma seadme seadetes',
+  reminderBody: '🔥 Hoia oma seeriat käimas! Mängi täna Flag Quizi ja õpi rohkem riike, lippe ja pealinnu.',
+
   'credits.lead': 'Flag Quiz on vaba ja avatud lähtekoodiga tarkvara, mille on loonud {aossie}.',
   'credits.source': 'Lähtekood: {link}.',
   'credits.donateTitle': 'Aidake hoida õppimine tasuta',

@@ -115,6 +115,12 @@ const he: Messages = {
   closeOtherCopies: 'Flag Quiz פתוח בכרטיסייה או בחלון אחר. יש לסגור אותם כדי להמשיך.',
   saveAllPlayers: 'שמירת כל השחקנים בקובץ אחד',
 
+  reminders: 'תזכורת יומית',
+  remindersOn: 'תזכורת יומית: פועלת',
+  remindersOff: 'תזכורת יומית: כבויה',
+  remindersBlocked: 'ההתראות חסומות: יש לאפשר אותן בהגדרות המכשיר',
+  reminderBody: '🔥 אל תשברו את הרצף! שחקו היום ב-Flag Quiz ולמדו עוד מדינות, דגלים וערי בירה.',
+
   'credits.lead': 'Flag Quiz הוא תוכנה חופשית בקוד פתוח מאת {aossie}.',
   'credits.source': 'קוד מקור: {link}.',
   'credits.donateTitle': 'עזרו לנו לשמור על הלמידה בחינם',

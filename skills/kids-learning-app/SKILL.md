@@ -3,7 +3,7 @@ name: kids-learning-app
 description: Plan, build, verify and ship a small, purely local educational web game for young children (e.g. learning flags, capitals, maps, animals, letters, numbers, shapes, colours) with AOSSIE's stack and conventions — Svelte 5 + TypeScript + Vite, IndexedDB storage, offline PWA that also works as a plain static site and installs on phones, AOSSIE branding, icon-first minimal UI that fits one screen without scrolling, multilingual (every language browsers can speak and the CLDR names countries in — 77 in Flag Quiz — i18n with right-to-left support), spoken prompts in the chosen language, safe updates that never lose players' progress, multiple players and multiplayer turns, adaptive difficulty, streaks and statistics, JSON export/import, grown-ups-only deletion, credits and donation pages, social sharing metadata, the AOSSIE Template-Repo with every TODO and checklist filled, CI and GitHub Pages deployment. Use when asked to create a new learning app, quiz or game for kids, or to extend one built this way.
 compatibility: Needs Node.js 20+, npm, git, the GitHub CLI (gh) and network access (template repo, brand assets, open data). playwright-core with the system Chrome and Playwright's WebKit build (`npx playwright install webkit`) is required for verification in both browser engines.
 metadata:
-  version: "1.5"
+  version: "1.6"
   category: app-generation
   origin: Distilled from building Flag Quiz (https://github.com/AOSSIE-Org/FlagQuiz); the full conversation is in prompts/1.md of that repo.
 user-invocable: true
@@ -42,6 +42,35 @@ user asked for, or corrected, while building Flag Quiz.
 - Ask for persistent storage (`navigator.storage.persist()`) when a player
   starts playing, so the browser doesn't evict the data (Safari deletes data
   of sites not on the home screen after 7 days without use).
+
+### Daily reminder notification (the user's choices)
+- A daily notification reminding the child to keep their streak, **without
+  any third-party or push service and without a server** (so no Web Push,
+  no FCM/APNs, no OneSignal…). Use **Periodic Background Sync**: the app
+  registers a sync (`minInterval` 12 h); the browser wakes the service worker
+  (a file added with `workbox.importScripts`), which reads IndexedDB and shows
+  a local notification only if the reminder is on, there is a player, nobody
+  has played today, it's afternoon (≥ 15:00) and none was shown today.
+  Tapping it opens/focuses the app. The text, in the app's language, is
+  written by the app to IndexedDB (`settings` store, key `reminder`) and
+  rewritten when the language changes.
+- The service worker must open the database **without a version** and abort
+  `onupgradeneeded`, so it never creates an empty database the app would
+  then fail to upgrade.
+- A menu toggle (🔔/🔕, `menuitemcheckbox`) **only when the app is installed
+  as a PWA and the browser supports it** (`display-mode: standalone|fullscreen`
+  and `'periodicSync' in ServiceWorkerRegistration.prototype` — Chromium
+  browsers). Switching on asks for notification permission from the tap; if
+  it's refused, show the item in red with "notifications are blocked".
+  Safari/iOS and Firefox can't do this without a push server: hide the item
+  and say so in the README.
+- Mention it in PRIVACY (local, nothing sent).
+- Test it in Chrome with the DevTools protocol: grant `notifications` and
+  `periodicBackgroundSync` with the test context's `browserContextId`, fake
+  installed mode by overriding `matchMedia` (CDP can't emulate
+  `display-mode`), fire `ServiceWorker.dispatchPeriodicSyncEvent`, and read
+  `registration.getNotifications()`: shown once, not twice a day, not after
+  playing, text in the chosen language, sync removed when switched off.
 
 ### Updates and saved data (the user's choices)
 Nobody should ever need to clear site data to get a new version, and an
@@ -136,9 +165,11 @@ Speech bugs came back twice while building Flag Quiz; avoid them from the start:
   for the longest word), names that break only between words, a
   viewport-based width (a dialog that shrinks to its content makes
   `width: 100%` collapse), and a `fit()` that picks the largest text size
-  (18 → 9 px) at which neither the dialog nor any name overflows — measure
-  the name element, not the button (the ✓ badge sticks out). Check from
-  667×375 to 1440×900.
+  (18 → 7.5 px) at which neither the dialog nor any name overflows — measure
+  the name element, not the button (the ✓ badge sticks out). No header row
+  (the close button is the last cell) and tight dialog margins. Check from
+  568×260 (a phone in landscape with the browser's bars visible) to
+  1440×900, not only full-screen sizes.
 - **Everything is translated, including the credits page**: generate it in
   English with `data-i18n`, `data-country` and `data-capital` attributes, plus
   one small JSON per language (texts with links filled in, names); the app

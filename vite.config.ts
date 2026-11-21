@@ -49,7 +49,7 @@ export default defineConfig({
         globIgnores: ['og-image.png', 'screenshots/**'],
         maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,
         // One-time switch from the earlier auto-updating service worker (see the file).
-        importScripts: ['sw-transition.js'],
+        importScripts: ['sw-transition.js', 'sw-reminder.js'],
       },
     }),
   ],

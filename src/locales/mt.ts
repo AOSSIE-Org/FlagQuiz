@@ -115,6 +115,12 @@ const mt: Messages = {
   closeOtherCopies: 'Flag Quiz huwa miftuħ f’tab jew tieqa oħra. Agħlqu biex tkompli.',
   saveAllPlayers: 'Issejvja l-plejers kollha f’fajl wieħed',
 
+  reminders: 'Tifkira ta’ kuljum',
+  remindersOn: 'Tifkira ta’ kuljum: mixgħula',
+  remindersOff: 'Tifkira ta’ kuljum: mitfija',
+  remindersBlocked: 'In-notifiki huma mblukkati: ippermettihom fis-settings tal-apparat tiegħek',
+  reminderBody: '🔥 Tiqtax is-sensiela tiegħek! Ilgħab Flag Quiz illum u tgħallem aktar pajjiżi, bnadar u bliet kapitali.',
+
   'credits.lead': 'Flag Quiz huwa softwer liberu u open source minn {aossie}.',
   'credits.source': 'Kodiċi sors: {link}.',
   'credits.donateTitle': 'Għinuna nżommu t-tagħlim b’xejn',

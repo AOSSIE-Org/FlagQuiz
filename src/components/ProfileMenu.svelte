@@ -1,5 +1,7 @@
 <script lang="ts">
   import {
+    Bell,
+    BellOff,
     ChartColumn,
     Check,
     Coffee,
@@ -21,6 +23,7 @@
   } from '@lucide/svelte';
   import { app, shareApp } from '../lib/app.svelte';
   import { install } from '../lib/install.svelte';
+  import { remindersSupported } from '../lib/reminders';
   import { LANGUAGES, t } from '../lib/i18n.svelte';
   import { upcoming } from '../lib/turns';
   import { DIFFICULTIES } from '../lib/types';
@@ -135,6 +138,21 @@
         >
           {#if app.settings.sounds}<Volume2 />{:else}<VolumeX />{/if}
         </button>
+        {#if install.standalone && remindersSupported()}
+          <!-- Daily reminder: only in the installed app, where browsers allow it. -->
+          <button
+            role="menuitemcheckbox"
+            aria-checked={app.settings.reminders}
+            class="item"
+            class:off={!app.settings.reminders}
+            class:bad={app.reminderBlocked}
+            onclick={() => app.toggleReminders()}
+            aria-label={t('reminders')}
+            title={app.reminderBlocked ? t('remindersBlocked') : app.settings.reminders ? t('remindersOn') : t('remindersOff')}
+          >
+            {#if app.settings.reminders}<Bell />{:else}<BellOff />{/if}
+          </button>
+        {/if}
         <button
           role="menuitem"
           class="item"

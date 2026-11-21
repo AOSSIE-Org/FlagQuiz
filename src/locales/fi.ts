@@ -115,6 +115,12 @@ const fi: Messages = {
   closeOtherCopies: 'Flag Quiz on auki toisessa välilehdessä tai ikkunassa. Sulje se jatkaaksesi.',
   saveAllPlayers: 'Tallenna kaikki pelaajat yhteen tiedostoon',
 
+  reminders: 'Päivittäinen muistutus',
+  remindersOn: 'Päivittäinen muistutus: päällä',
+  remindersOff: 'Päivittäinen muistutus: pois',
+  remindersBlocked: 'Ilmoitukset on estetty: salli ne laitteesi asetuksista',
+  reminderBody: '🔥 Jatka putkeasi! Pelaa Flag Quizia tänään ja opi lisää maita, lippuja ja pääkaupunkeja.',
+
   'credits.lead': 'Flag Quiz on vapaa ja avoimen lähdekoodin ohjelmisto. Tekijä: {aossie}.',
   'credits.source': 'Lähdekoodi: {link}.',
   'credits.donateTitle': 'Auta pitämään oppiminen ilmaisena',

@@ -115,6 +115,12 @@ const ne: Messages = {
   closeOtherCopies: 'Flag Quiz अर्को ट्याब वा विन्डोमा खुला छ। जारी राख्न त्यसलाई बन्द गर्नुहोस्।',
   saveAllPlayers: 'सबै खेलाडीहरूलाई एउटै फाइलमा सेभ गर्नुहोस्',
 
+  reminders: 'दैनिक सम्झना',
+  remindersOn: 'दैनिक सम्झना: अन',
+  remindersOff: 'दैनिक सम्झना: अफ',
+  remindersBlocked: 'सूचनाहरू रोकिएका छन्: आफ्नो उपकरणको सेटिङमा तिनलाई अनुमति दिनुहोस्',
+  reminderBody: '🔥 लगातार खेल्ने क्रम नतोड! आज Flag Quiz खेल र अझ धेरै देश, झन्डा र राजधानीहरू सिक।',
+
   'credits.lead': 'Flag Quiz {aossie} द्वारा बनाइएको निःशुल्क र खुला स्रोत सफ्टवेयर हो।',
   'credits.source': 'स्रोत कोड: {link}।',
   'credits.donateTitle': 'सिकाइलाई निःशुल्क राख्न मद्दत गर्नुहोस्',

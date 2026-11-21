@@ -115,6 +115,12 @@ const hi: Messages = {
   closeOtherCopies: 'Flag Quiz दूसरे टैब या विंडो में खुला है। आगे बढ़ने के लिए उसे बंद करें।',
   saveAllPlayers: 'सभी खिलाड़ियों को एक फ़ाइल में सहेजें',
 
+  reminders: 'रोज़ का रिमाइंडर',
+  remindersOn: 'रोज़ का रिमाइंडर: चालू',
+  remindersOff: 'रोज़ का रिमाइंडर: बंद',
+  remindersBlocked: 'सूचनाएँ ब्लॉक हैं: अपने डिवाइस की सेटिंग में इनकी अनुमति दें',
+  reminderBody: '🔥 अपना सिलसिला जारी रखो! आज Flag Quiz खेलो और ज़्यादा देश, झंडे और राजधानियाँ सीखो।',
+
   'credits.lead': 'Flag Quiz, {aossie} का मुफ़्त और ओपन सोर्स सॉफ़्टवेयर है।',
   'credits.source': 'सोर्स कोड: {link}।',
   'credits.donateTitle': 'सीखने को मुफ़्त बनाए रखने में मदद करें',

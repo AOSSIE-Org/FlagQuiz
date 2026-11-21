@@ -115,6 +115,12 @@ const ar: Messages = {
   closeOtherCopies: 'Flag Quiz مفتوح في علامة تبويب أو نافذة أخرى. أغلقها للمتابعة.',
   saveAllPlayers: 'حفظ كل اللاعبين في ملف واحد',
 
+  reminders: 'تذكير يومي',
+  remindersOn: 'تذكير يومي: تشغيل',
+  remindersOff: 'تذكير يومي: إيقاف',
+  remindersBlocked: 'الإشعارات محظورة: اسمح بها في إعدادات جهازك',
+  reminderBody: '🔥 حافظ على أيامك المتتالية! العب Flag Quiz اليوم وتعلّم المزيد من الدول والأعلام والعواصم.',
+
   'credits.lead': 'Flag Quiz برنامج حر ومفتوح المصدر من {aossie}.',
   'credits.source': 'الشيفرة المصدرية: {link}.',
   'credits.donateTitle': 'ساعدنا على إبقاء التعلّم مجانيًا',

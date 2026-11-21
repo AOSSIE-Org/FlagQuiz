@@ -115,6 +115,12 @@ const it: Messages = {
   closeOtherCopies: 'Flag Quiz è aperto in un’altra scheda o finestra. Chiudila per continuare.',
   saveAllPlayers: 'Salva tutti i giocatori in un file',
 
+  reminders: 'Promemoria giornaliero',
+  remindersOn: 'Promemoria giornaliero: sì',
+  remindersOff: 'Promemoria giornaliero: no',
+  remindersBlocked: 'Le notifiche sono bloccate: consentile nelle impostazioni del dispositivo',
+  reminderBody: '🔥 Non interrompere la tua serie! Gioca a Flag Quiz oggi e impara tanti altri paesi, bandiere e capitali.',
+
   'credits.lead': 'Flag Quiz è software libero e open source di {aossie}.',
   'credits.source': 'Codice sorgente: {link}.',
   'credits.donateTitle': 'Aiutaci a mantenere l’apprendimento gratuito',

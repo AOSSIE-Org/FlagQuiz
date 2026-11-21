@@ -115,6 +115,12 @@ const ro: Messages = {
   closeOtherCopies: 'Flag Quiz este deschis într-o altă filă sau fereastră. Închideți-l pentru a continua.',
   saveAllPlayers: 'Salvează toți jucătorii într-un singur fișier',
 
+  reminders: 'Memento zilnic',
+  remindersOn: 'Memento zilnic: pornit',
+  remindersOff: 'Memento zilnic: oprit',
+  remindersBlocked: 'Notificările sunt blocate: permiteți-le în setările dispozitivului',
+  reminderBody: '🔥 Nu-ți întrerupe seria! Joacă Flag Quiz azi și învață mai multe țări, steaguri și capitale.',
+
   'credits.lead': 'Flag Quiz este un software liber și open source creat de {aossie}.',
   'credits.source': 'Cod sursă: {link}.',
   'credits.donateTitle': 'Ajutați-ne să păstrăm învățarea gratuită',

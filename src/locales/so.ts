@@ -115,6 +115,12 @@ const so: Messages = {
   closeOtherCopies: 'Flag Quiz waxay ku furan tahay tab ama daaqad kale. Xir si aad u sii wadato.',
   saveAllPlayers: 'Ciyaartoyda oo dhan ku kaydi hal fayl',
 
+  reminders: 'Xasuusin maalinle ah',
+  remindersOn: 'Xasuusin maalinle ah: shidan',
+  remindersOff: 'Xasuusin maalinle ah: dansan',
+  remindersBlocked: 'Ogeysiisyada waa la xannibay: ku oggolow goobaha qalabkaaga',
+  reminderBody: '🔥 Sii wad maalmahaaga isku xiga! Maanta ciyaar Flag Quiz oo baro dalal, calammo iyo caasimado kale.',
+
   'credits.lead': 'Flag Quiz waa software bilaash ah oo il furan ah, oo ay samaysay {aossie}.',
   'credits.source': 'Koodhka isha: {link}.',
   'credits.donateTitle': 'Naga caawi in waxbarashadu sii ahaato bilaash',

@@ -115,6 +115,12 @@ const pl: Messages = {
   closeOtherCopies: 'Flag Quiz jest otwarty w innej karcie lub innym oknie. Zamknij go, aby kontynuować.',
   saveAllPlayers: 'Zapisz wszystkich graczy w jednym pliku',
 
+  reminders: 'Codzienne przypomnienie',
+  remindersOn: 'Codzienne przypomnienie: włączone',
+  remindersOff: 'Codzienne przypomnienie: wyłączone',
+  remindersBlocked: 'Powiadomienia są zablokowane: należy na nie zezwolić w ustawieniach urządzenia',
+  reminderBody: '🔥 Nie przerywaj swojej serii! Zagraj dziś w Flag Quiz i poznaj więcej krajów, flag i stolic.',
+
   'credits.lead': 'Flag Quiz to wolne i otwarte oprogramowanie stworzone przez {aossie}.',
   'credits.source': 'Kod źródłowy: {link}.',
   'credits.donateTitle': 'Pomóż, by nauka pozostała bezpłatna',

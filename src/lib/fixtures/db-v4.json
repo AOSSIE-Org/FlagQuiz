@@ -367,7 +367,8 @@
    "speech": true,
    "sounds": true,
    "turnRounds": 3,
-   "language": "fr"
+   "language": "fr",
+   "reminders": false
   }
  }
 }

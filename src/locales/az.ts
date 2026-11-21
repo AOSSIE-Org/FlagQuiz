@@ -115,6 +115,12 @@ const az: Messages = {
   closeOtherCopies: 'Flag Quiz başqa tabda və ya pəncərədə açıqdır. Davam etmək üçün onu bağlayın.',
   saveAllPlayers: 'Bütün oyunçuları bir faylda yadda saxla',
 
+  reminders: 'Gündəlik xatırlatma',
+  remindersOn: 'Gündəlik xatırlatma: açıq',
+  remindersOff: 'Gündəlik xatırlatma: bağlı',
+  remindersBlocked: 'Bildirişlər bloklanıb: onlara cihazınızın parametrlərində icazə verin',
+  reminderBody: '🔥 Ardıcıl günlərini davam etdir! Bu gün Flag Quiz oyna və daha çox ölkə, bayraq və paytaxt öyrən.',
+
   'credits.lead': 'Flag Quiz {aossie} tərəfindən hazırlanmış azad və açıq mənbəli proqramdır.',
   'credits.source': 'Mənbə kodu: {link}.',
   'credits.donateTitle': 'Təhsilin pulsuz qalmasına kömək edin',

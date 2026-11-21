@@ -115,6 +115,12 @@ const fa: Messages = {
   closeOtherCopies: 'Flag Quiz در زبانه یا پنجرهٔ دیگری باز است. برای ادامه، آن را ببندید.',
   saveAllPlayers: 'ذخیرهٔ همهٔ بازیکنان در یک فایل',
 
+  reminders: 'یادآوری روزانه',
+  remindersOn: 'یادآوری روزانه: روشن',
+  remindersOff: 'یادآوری روزانه: خاموش',
+  remindersBlocked: 'اعلان‌ها مسدود شده‌اند: در تنظیمات دستگاهتان به آن‌ها اجازه بدهید',
+  reminderBody: '🔥 روزهای پشت سر همت را ادامه بده! امروز Flag Quiz بازی کن و کشورها، پرچم‌ها و پایتخت‌های بیشتری یاد بگیر.',
+
   'credits.lead': 'Flag Quiz نرم‌افزاری رایگان و متن‌باز از {aossie} است.',
   'credits.source': 'کد منبع: {link}.',
   'credits.donateTitle': 'کمک کنید یادگیری رایگان بماند',

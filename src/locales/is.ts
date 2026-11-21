@@ -115,6 +115,12 @@ const is_: Messages = {
   closeOtherCopies: 'Flag Quiz er opið í öðrum flipa eða glugga. Lokaðu því til að halda áfram.',
   saveAllPlayers: 'Vista alla leikmenn í einni skrá',
 
+  reminders: 'Dagleg áminning',
+  remindersOn: 'Dagleg áminning: kveikt',
+  remindersOff: 'Dagleg áminning: slökkt',
+  remindersBlocked: 'Tilkynningar eru útilokaðar: leyfðu þær í stillingum tækisins',
+  reminderBody: '🔥 Haltu röðinni gangandi! Spilaðu Flag Quiz í dag og lærðu um fleiri lönd, fána og höfuðborgir.',
+
   'credits.lead': 'Flag Quiz er frjáls og opinn hugbúnaður frá {aossie}.',
   'credits.source': 'Frumkóði: {link}.',
   'credits.donateTitle': 'Hjálpaðu okkur að halda námi ókeypis',

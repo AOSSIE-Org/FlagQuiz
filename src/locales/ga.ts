@@ -115,6 +115,12 @@ const ga: Messages = {
   closeOtherCopies: 'Tá Flag Quiz oscailte i gcluaisín nó i bhfuinneog eile. Dún é chun leanúint ar aghaidh.',
   saveAllPlayers: 'Sábháil na himreoirí go léir i gcomhad amháin',
 
+  reminders: 'Meabhrúchán laethúil',
+  remindersOn: 'Meabhrúchán laethúil: ar siúl',
+  remindersOff: 'Meabhrúchán laethúil: múchta',
+  remindersBlocked: 'Tá fógraí blocáilte: ceadaigh iad i socruithe do ghléis',
+  reminderBody: '🔥 Coinnigh do shraith ag dul! Imir Flag Quiz inniu agus foghlaim tuilleadh tíortha, bratacha agus príomhchathracha.',
+
   'credits.lead': 'Is bogearraí saora foinse oscailte é Flag Quiz, déanta ag {aossie}.',
   'credits.source': 'Cód foinseach: {link}.',
   'credits.donateTitle': 'Cabhraigh linn an fhoghlaim a choinneáil saor in aisce',

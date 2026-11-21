@@ -115,6 +115,12 @@ const lv: Messages = {
   closeOtherCopies: 'Flag Quiz ir atvērts citā cilnē vai logā. Aizveriet to, lai turpinātu.',
   saveAllPlayers: 'Saglabāt visus spēlētājus vienā failā',
 
+  reminders: 'Ikdienas atgādinājums',
+  remindersOn: 'Ikdienas atgādinājums: ieslēgts',
+  remindersOff: 'Ikdienas atgādinājums: izslēgts',
+  remindersBlocked: 'Paziņojumi ir bloķēti: atļaujiet tos savas ierīces iestatījumos',
+  reminderBody: '🔥 Nepārtrauc savu sēriju! Spēlē Flag Quiz šodien un uzzini vairāk valstu, karogu un galvaspilsētu.',
+
   'credits.lead': 'Flag Quiz ir brīva atvērtā pirmkoda programmatūra, ko izstrādājusi {aossie}.',
   'credits.source': 'Pirmkods: {link}.',
   'credits.donateTitle': 'Palīdziet saglabāt mācīšanos bezmaksas',

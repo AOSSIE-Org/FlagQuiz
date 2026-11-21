@@ -115,6 +115,12 @@ const uz: Messages = {
   closeOtherCopies: 'Flag Quiz boshqa varaq yoki oynada ochiq. Davom etish uchun uni yoping.',
   saveAllPlayers: 'Barcha oʻyinchilarni bitta faylga saqlash',
 
+  reminders: 'Kunlik eslatma',
+  remindersOn: 'Kunlik eslatma: yoqilgan',
+  remindersOff: 'Kunlik eslatma: oʻchirilgan',
+  remindersBlocked: 'Bildirishnomalar bloklangan: ularga qurilmangiz sozlamalarida ruxsat bering',
+  reminderBody: '🔥 Ketma-ket kunlaringni uzma! Bugun Flag Quiz oʻyna va yana koʻproq mamlakatlar, bayroqlar va poytaxtlarni oʻrgan.',
+
   'credits.lead': 'Flag Quiz — {aossie} tomonidan yaratilgan erkin va ochiq kodli dastur.',
   'credits.source': 'Manba kodi: {link}.',
   'credits.donateTitle': 'Taʼlim bepul qolishiga yordam bering',

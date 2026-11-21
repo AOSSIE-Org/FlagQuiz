@@ -10,7 +10,9 @@ import {
   listUsers,
   openDatabase,
   putStat,
+  saveReminder,
   saveUser,
+  getSettings,
 } from './db';
 import { emptyScores } from './scores';
 import { DEFAULT_FILTER, type User } from './types';
@@ -173,5 +175,16 @@ describe('several copies of the app', () => {
     const db = await opening;
     expect(db.version).toBeGreaterThan(3);
     db.close();
+  });
+});
+
+describe('daily reminder', () => {
+  it('saves what the service worker needs and keeps the day of the last reminder', async () => {
+    const db = await fresh();
+    await saveReminder(db, { enabled: true, body: 'Play!', lang: 'en', dir: 'ltr' });
+    await db.put('settings', { ...(await db.get('settings', 'reminder')), lastShown: '2026-11-21' } as never, 'reminder');
+    await saveReminder(db, { enabled: true, body: 'Joue !', lang: 'fr', dir: 'ltr' });
+    expect(await db.get('settings', 'reminder')).toEqual({ enabled: true, body: 'Joue !', lang: 'fr', dir: 'ltr', lastShown: '2026-11-21' });
+    expect((await getSettings(db)).reminders).toBe(false);
   });
 });

@@ -115,6 +115,12 @@ const sq: Messages = {
   closeOtherCopies: 'Flag Quiz është i hapur në një skedë ose dritare tjetër. Mbylleni për të vazhduar.',
   saveAllPlayers: 'Ruaj të gjithë lojtarët në një skedar',
 
+  reminders: 'Kujtesë ditore',
+  remindersOn: 'Kujtesë ditore: aktive',
+  remindersOff: 'Kujtesë ditore: joaktive',
+  remindersBlocked: 'Njoftimet janë bllokuar: lejojini te cilësimet e pajisjes suaj',
+  reminderBody: '🔥 Mos e ndërprit serinë tënde! Luaj Flag Quiz sot dhe mëso më shumë shtete, flamuj dhe kryeqytete.',
+
   'credits.lead': 'Flag Quiz është softuer i lirë dhe me burim të hapur nga {aossie}.',
   'credits.source': 'Kodi burimor: {link}.',
   'credits.donateTitle': 'Ndihmoni që mësimi të mbetet falas',

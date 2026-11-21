@@ -115,6 +115,12 @@ const jv: Messages = {
   closeOtherCopies: 'Flag Quiz lagi kebukak ing tab utawa jendhela liya. Tutupen dhisik supaya bisa nerusaké.',
   saveAllPlayers: 'Simpen kabèh pemain ing siji file',
 
+  reminders: 'Pangéling saben dina',
+  remindersOn: 'Pangéling saben dina: urip',
+  remindersOff: 'Pangéling saben dina: mati',
+  remindersBlocked: 'Notifikasi diblokir: idinaké ing setelan piranti',
+  reminderBody: '🔥 Aja nganti urutanmu pedhot! Dolanan Flag Quiz dina iki lan sinau luwih akèh negara, gendéra lan ibukutha.',
+
   'credits.lead': 'Flag Quiz iku piranti lunak bébas lan open source saka {aossie}.',
   'credits.source': 'Kode sumber: {link}.',
   'credits.donateTitle': 'Bantu supaya sinau tetep gratis',

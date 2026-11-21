@@ -129,7 +129,8 @@
    "speech": false,
    "sounds": true,
    "turnRounds": 5,
-   "language": "en"
+   "language": "en",
+   "reminders": false
   }
  }
 }

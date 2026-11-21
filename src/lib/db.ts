@@ -1,5 +1,6 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import { isLanguage } from './languages';
+import type { ReminderConfig } from './reminders';
 import { migrateLegacyScores } from './scores';
 import { DEFAULT_SETTINGS, GAMES, perGame, type GameId, type ItemStats, type Settings, type StatRecord, type User } from './types';
 
@@ -15,8 +16,11 @@ interface FlagQuizDB extends DBSchema {
     value: { userId: number; date: string };
     indexes: { byUser: number };
   };
-  /** Device-wide preferences, under the key "settings". */
-  settings: { key: string; value: Settings };
+  /**
+   * Device-wide preferences, under the key "settings"; under "reminder", what
+   * the service worker needs for the daily reminder (public/sw-reminder.js).
+   */
+  settings: { key: string; value: Settings | ReminderConfig };
 }
 
 export type DB = IDBPDatabase<FlagQuizDB>;
@@ -160,9 +164,16 @@ export async function deleteUserWithData(db: DB, userId: number): Promise<void> 
 }
 
 export async function getSettings(db: DB): Promise<Settings> {
-  const settings = { ...DEFAULT_SETTINGS, ...((await db.get('settings', SETTINGS_KEY)) ?? {}) };
+  const settings = { ...DEFAULT_SETTINGS, ...(((await db.get('settings', SETTINGS_KEY)) as Settings | undefined) ?? {}) };
+  if (typeof settings.reminders !== 'boolean') settings.reminders = false;
   if (!isLanguage(settings.language)) settings.language = DEFAULT_SETTINGS.language;
   return settings;
+}
+
+/** Writes what the service worker needs for the daily reminder, keeping the day it was last shown. */
+export async function saveReminder(db: DB, config: Omit<ReminderConfig, 'lastShown'>): Promise<void> {
+  const previous = (await db.get('settings', 'reminder')) as ReminderConfig | undefined;
+  await db.put('settings', { ...config, lastShown: previous?.lastShown }, 'reminder');
 }
 
 export async function saveSettings(db: DB, settings: Settings): Promise<void> {

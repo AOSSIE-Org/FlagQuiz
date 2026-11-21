@@ -115,6 +115,12 @@ const ko: Messages = {
   closeOtherCopies: 'Flag Quiz가 다른 탭이나 창에서 열려 있습니다. 계속하려면 그 탭이나 창을 닫아 주세요.',
   saveAllPlayers: '모든 플레이어를 파일 하나에 저장',
 
+  reminders: '매일 알림',
+  remindersOn: '매일 알림: 켬',
+  remindersOff: '매일 알림: 끔',
+  remindersBlocked: '알림이 차단되어 있습니다: 기기 설정에서 알림을 허용해 주세요',
+  reminderBody: '🔥 연속 기록을 이어 가요! 오늘도 Flag Quiz를 하면서 더 많은 나라와 국기, 수도를 배워요.',
+
   'credits.lead': 'Flag Quiz는 {aossie}이(가) 만든 무료 오픈 소스 소프트웨어입니다.',
   'credits.source': '소스 코드: {link}',
   'credits.donateTitle': '배움이 계속 무료일 수 있도록 도와주세요',

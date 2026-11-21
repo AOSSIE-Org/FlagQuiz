@@ -115,6 +115,12 @@ const nb: Messages = {
   closeOtherCopies: 'Flag Quiz er åpent i en annen fane eller et annet vindu. Lukk det for å fortsette.',
   saveAllPlayers: 'Lagre alle spillere i én fil',
 
+  reminders: 'Daglig påminnelse',
+  remindersOn: 'Daglig påminnelse: på',
+  remindersOff: 'Daglig påminnelse: av',
+  remindersBlocked: 'Varsler er blokkert: tillat dem i innstillingene på enheten din',
+  reminderBody: '🔥 Ikke bryt rekken din! Spill Flag Quiz i dag og lær flere land, flagg og hovedsteder.',
+
   'credits.lead': 'Flag Quiz er fri programvare med åpen kildekode fra {aossie}.',
   'credits.source': 'Kildekode: {link}.',
   'credits.donateTitle': 'Hjelp oss å holde læring gratis',

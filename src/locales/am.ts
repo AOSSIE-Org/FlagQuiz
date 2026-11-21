@@ -115,6 +115,12 @@ const am: Messages = {
   closeOtherCopies: 'Flag Quiz በሌላ ትር ወይም መስኮት ውስጥ ክፍት ነው። ለመቀጠል እሱን ይዝጉ።',
   saveAllPlayers: 'ሁሉንም ተጫዋቾች በአንድ ፋይል አስቀምጥ',
 
+  reminders: 'ዕለታዊ ማስታወሻ',
+  remindersOn: 'ዕለታዊ ማስታወሻ: በርቷል',
+  remindersOff: 'ዕለታዊ ማስታወሻ: ጠፍቷል',
+  remindersBlocked: 'ማሳወቂያዎች ታግደዋል: በመሣሪያዎ ቅንብሮች ውስጥ ይፍቀዱላቸው',
+  reminderBody: '🔥 ተከታታይ ቀናትህን ቀጥል! ዛሬ Flag Quiz ተጫወት እና ተጨማሪ አገሮችን፣ ባንዲራዎችን እና ዋና ከተሞችን ተማር።',
+
   'credits.lead': 'Flag Quiz በ{aossie} የተሠራ ነፃ እና ክፍት ምንጭ ሶፍትዌር ነው።',
   'credits.source': 'የምንጭ ኮድ: {link}።',
   'credits.donateTitle': 'መማር ነፃ ሆኖ እንዲቀጥል ያግዙ',

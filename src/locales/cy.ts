@@ -115,6 +115,12 @@ const cy: Messages = {
   closeOtherCopies: 'Mae Flag Quiz ar agor mewn tab neu ffenestr arall. Caewch hwnnw i barhau.',
   saveAllPlayers: 'Cadw pob chwaraewr mewn un ffeil',
 
+  reminders: 'Nodyn atgoffa dyddiol',
+  remindersOn: 'Nodyn atgoffa dyddiol: ymlaen',
+  remindersOff: 'Nodyn atgoffa dyddiol: i ffwrdd',
+  remindersBlocked: 'Mae hysbysiadau wedi’u rhwystro: caniatewch nhw yng ngosodiadau eich dyfais',
+  reminderBody: '🔥 Cadwa dy rediad i fynd! Chwaraea Flag Quiz heddiw a dysga ragor o wledydd, baneri a phrifddinasoedd.',
+
   'credits.lead': 'Mae Flag Quiz yn feddalwedd rydd a chod agored gan {aossie}.',
   'credits.source': 'Cod ffynhonnell: {link}.',
   'credits.donateTitle': 'Helpwch i gadw dysgu’n rhad ac am ddim',

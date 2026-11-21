@@ -115,6 +115,12 @@ const ur: Messages = {
   closeOtherCopies: 'Flag Quiz کسی اور ٹیب یا ونڈو میں کھلا ہے۔ جاری رکھنے کے لیے اسے بند کریں۔',
   saveAllPlayers: 'تمام کھلاڑیوں کو ایک فائل میں محفوظ کریں',
 
+  reminders: 'روزانہ یاد دہانی',
+  remindersOn: 'روزانہ یاد دہانی: آن',
+  remindersOff: 'روزانہ یاد دہانی: آف',
+  remindersBlocked: 'اطلاعات بلاک ہیں: اپنے آلے کی ترتیبات میں انہیں اجازت دیں',
+  reminderBody: '🔥 اپنا سلسلہ جاری رکھیں! آج Flag Quiz کھیلیں اور مزید ممالک، جھنڈوں اور دارالحکومتوں کے بارے میں سیکھیں۔',
+
   'credits.lead': 'Flag Quiz، {aossie} کا مفت اور اوپن سورس سافٹ ویئر ہے۔',
   'credits.source': 'سورس کوڈ: {link}۔',
   'credits.donateTitle': 'سیکھنے کو مفت رکھنے میں مدد کریں',

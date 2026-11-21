@@ -115,6 +115,12 @@ const fr: Messages = {
   closeOtherCopies: 'Flag Quiz est ouvert dans un autre onglet ou une autre fenêtre. Ferme-le pour continuer.',
   saveAllPlayers: 'Sauvegarder tous les joueurs dans un fichier',
 
+  reminders: 'Rappel quotidien',
+  remindersOn: 'Rappel quotidien : oui',
+  remindersOff: 'Rappel quotidien : non',
+  remindersBlocked: 'Les notifications sont bloquées : autorise-les dans les réglages de ton appareil',
+  reminderBody: '🔥 Continue ta série ! Joue à Flag Quiz aujourd’hui et découvre encore plus de pays, de drapeaux et de capitales.',
+
   'credits.lead': 'Flag Quiz est un logiciel libre et open source créé par {aossie}.',
   'credits.source': 'Code source : {link}.',
   'credits.donateTitle': 'Aidez-nous à garder l’apprentissage gratuit',

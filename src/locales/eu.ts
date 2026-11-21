@@ -115,6 +115,12 @@ const eu: Messages = {
   closeOtherCopies: 'Flag Quiz beste fitxa edo leiho batean irekita dago. Itxi hura jarraitzeko.',
   saveAllPlayers: 'Gorde jokalari guztiak fitxategi bakarrean',
 
+  reminders: 'Eguneroko oroigarria',
+  remindersOn: 'Eguneroko oroigarria: bai',
+  remindersOff: 'Eguneroko oroigarria: ez',
+  remindersBlocked: 'Jakinarazpenak blokeatuta daude: baimendu itzazu gailuaren ezarpenetan',
+  reminderBody: '🔥 Jarraitu egunez egun! Jokatu gaur Flag Quiz-en eta ikasi herrialde, bandera eta hiriburu gehiago.',
+
   'credits.lead': 'Flag Quiz {aossie} erakundeak egindako software libre eta kode irekikoa da.',
   'credits.source': 'Iturburu-kodea: {link}.',
   'credits.donateTitle': 'Lagundu ikastea doakoa izaten jarraitzen',

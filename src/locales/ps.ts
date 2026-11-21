@@ -115,6 +115,12 @@ const ps: Messages = {
   closeOtherCopies: 'Flag Quiz په بل ټب یا کړکۍ کې پرانیستی دی. د دوام لپاره یې وتړئ.',
   saveAllPlayers: 'ټول لوبغاړي په یوه فایل کې خوندي کړه',
 
+  reminders: 'ورځنۍ یادونه',
+  remindersOn: 'ورځنۍ یادونه: فعال',
+  remindersOff: 'ورځنۍ یادونه: غیرفعال',
+  remindersBlocked: 'خبرتیاوې بندې شوې دي: د خپلې وسیلې په تنظیماتو کې یې اجازه ورکړئ',
+  reminderBody: '🔥 خپله پرله‌پسې لړۍ مه ماتوه! نن Flag Quiz ولوبوه او نور هېوادونه، بیرغونه او پلازمېنې زده کړه.',
+
   'credits.lead': 'Flag Quiz د {aossie} له خوا جوړ شوی وړیا او پرانیستې سرچینې سافټویر دی.',
   'credits.source': 'سرچینه کوډ: {link}.',
   'credits.donateTitle': 'مرسته وکړئ چې زده کړه وړیا پاتې شي',

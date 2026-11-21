@@ -115,6 +115,12 @@ const sw: Messages = {
   closeOtherCopies: 'Flag Quiz iko wazi kwenye kichupo au dirisha jingine. Lifunge ili kuendelea.',
   saveAllPlayers: 'Hifadhi wachezaji wote katika faili moja',
 
+  reminders: 'Kikumbusho cha kila siku',
+  remindersOn: 'Kikumbusho cha kila siku: kimewashwa',
+  remindersOff: 'Kikumbusho cha kila siku: kimezimwa',
+  remindersBlocked: 'Arifa zimezuiwa: ziruhusu katika mipangilio ya kifaa chako',
+  reminderBody: '🔥 Endeleza mfululizo wako! Cheza Flag Quiz leo ujifunze nchi, bendera na miji mikuu zaidi.',
+
   'credits.lead': 'Flag Quiz ni programu huria na ya bure iliyotengenezwa na {aossie}.',
   'credits.source': 'Msimbo chanzo: {link}.',
   'credits.donateTitle': 'Saidia kujifunza kuendelee kuwa bure',

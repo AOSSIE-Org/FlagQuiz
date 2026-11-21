@@ -115,6 +115,12 @@ const gu: Messages = {
   closeOtherCopies: 'Flag Quiz બીજા ટૅબ કે વિન્ડોમાં ખુલ્લું છે. આગળ વધવા માટે તેને બંધ કરો.',
   saveAllPlayers: 'બધા ખેલાડીઓને એક ફાઇલમાં સાચવો',
 
+  reminders: 'રોજનું રિમાઇન્ડર',
+  remindersOn: 'રોજનું રિમાઇન્ડર: ચાલુ',
+  remindersOff: 'રોજનું રિમાઇન્ડર: બંધ',
+  remindersBlocked: 'નોટિફિકેશન બ્લૉક કરેલાં છે: તમારા ડિવાઇસનાં સેટિંગમાં તેમને મંજૂરી આપો',
+  reminderBody: '🔥 તમારો સિલસિલો ચાલુ રાખો! આજે Flag Quiz રમો અને વધુ દેશો, ઝંડા અને રાજધાનીઓ શીખો.',
+
   'credits.lead': 'Flag Quiz એ {aossie} દ્વારા બનાવેલું મફત અને ઓપન સોર્સ સૉફ્ટવેર છે.',
   'credits.source': 'સોર્સ કોડ: {link}.',
   'credits.donateTitle': 'શીખવાનું મફત રાખવામાં મદદ કરો',

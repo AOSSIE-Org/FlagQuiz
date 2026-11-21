@@ -115,6 +115,12 @@ const id: Messages = {
   closeOtherCopies: 'Flag Quiz terbuka di tab atau jendela lain. Tutup dulu untuk melanjutkan.',
   saveAllPlayers: 'Simpan semua pemain dalam satu file',
 
+  reminders: 'Pengingat harian',
+  remindersOn: 'Pengingat harian: nyala',
+  remindersOff: 'Pengingat harian: mati',
+  remindersBlocked: 'Notifikasi diblokir: izinkan di pengaturan perangkat',
+  reminderBody: '🔥 Jangan sampai rangkaianmu terputus! Mainkan Flag Quiz hari ini dan pelajari lebih banyak negara, bendera, dan ibu kota.',
+
   'credits.lead': 'Flag Quiz adalah perangkat lunak bebas dan sumber terbuka dari {aossie}.',
   'credits.source': 'Kode sumber: {link}.',
   'credits.donateTitle': 'Bantu agar belajar tetap gratis',

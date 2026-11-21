@@ -115,6 +115,12 @@ const yue: Messages = {
   closeOtherCopies: 'Flag Quiz 已經喺另一個分頁或者視窗打開咗。請關閉佢先可以繼續。',
   saveAllPlayers: '將所有玩家儲存喺一個檔案',
 
+  reminders: '每日提醒',
+  remindersOn: '每日提醒：開',
+  remindersOff: '每日提醒：關',
+  remindersBlocked: '通知已被封鎖：請喺裝置設定入面允許通知',
+  reminderBody: '🔥 唔好中斷你嘅連續紀錄！今日玩吓 Flag Quiz，認識更多國家、國旗同首都。',
+
   'credits.lead': 'Flag Quiz 係由 {aossie} 開發嘅免費開源軟件。',
   'credits.source': '原始碼：{link}。',
   'credits.donateTitle': '幫我哋令學習繼續免費',

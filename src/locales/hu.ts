@@ -115,6 +115,12 @@ const hu: Messages = {
   closeOtherCopies: 'A Flag Quiz egy másik lapon vagy ablakban is meg van nyitva. A folytatáshoz zárja be azt.',
   saveAllPlayers: 'Az összes játékos mentése egy fájlba',
 
+  reminders: 'Napi emlékeztető',
+  remindersOn: 'Napi emlékeztető: be',
+  remindersOff: 'Napi emlékeztető: ki',
+  remindersBlocked: 'Az értesítések le vannak tiltva: engedélyezze őket az eszköz beállításaiban',
+  reminderBody: '🔥 Ne szakítsd meg a sorozatodat! Játssz ma is a Flag Quiz játékkal, és tanulj meg még több országot, zászlót és fővárost.',
+
   'credits.lead': 'A Flag Quiz szabad és nyílt forráskódú szoftver, készítője: {aossie}.',
   'credits.source': 'Forráskód: {link}.',
   'credits.donateTitle': 'Segítsen, hogy a tanulás ingyenes maradjon',

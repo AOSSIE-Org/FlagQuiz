@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Check, Languages, X } from '@lucide/svelte';
+  import { Check, X } from '@lucide/svelte';
   import { tick } from 'svelte';
   import { app } from '../lib/app.svelte';
   import { LANGUAGES, t, type LanguageCode } from '../lib/i18n.svelte';
@@ -12,7 +12,7 @@
 
   /** Text size (px) of the language buttons, the largest that fits on screen without scrolling. */
   const MAX_SIZE = 18;
-  const MIN_SIZE = 9;
+  const MIN_SIZE = 7.5;
   let size = $state(MAX_SIZE);
   let picker = $state<HTMLDivElement>();
 
@@ -39,12 +39,8 @@
 
 <svelte:window onresize={() => void fit()} />
 
-<Modal label={t('language')} onclose={close} wide>
+<Modal label={t('language')} onclose={close} wide tight>
   <div class="picker" bind:this={picker} style:--size="{size}px">
-    <div class="head">
-      <Languages class="icon" aria-hidden="true" />
-      <button class="icon-btn close" onclick={close} aria-label={t('close')} title={t('close')}><X size={22} /></button>
-    </div>
     <div class="languages" role="radiogroup" aria-label={t('language')}>
       {#each languages as lang (lang.code)}
         {@const active = app.settings.language === lang.code}
@@ -62,6 +58,10 @@
           {#if active}<span class="tick" aria-hidden="true"><Check size="100%" strokeWidth={4} /></span>{/if}
         </button>
       {/each}
+      <!-- The last cell, so that no header row takes height away from the languages. -->
+      <button class="lang close" onclick={close} aria-label={t('close')} title={t('close')}>
+        <X size="1.6em" />
+      </button>
     </div>
   </div>
 </Modal>
@@ -71,21 +71,7 @@
     display: grid;
     gap: clamp(6px, 1.6vmin, 12px);
     /* The dialog shrinks to its content, so the width must not depend on it. */
-    width: min(880px, 84vw);
-  }
-  .head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .head :global(.icon) {
-    width: clamp(22px, 5vmin, 30px);
-    height: clamp(22px, 5vmin, 30px);
-    color: var(--green);
-  }
-  .close {
-    width: clamp(34px, 7vmin, 44px);
-    height: clamp(34px, 7vmin, 44px);
+    width: min(880px, 92vw);
   }
   .languages {
     display: grid;
@@ -98,7 +84,7 @@
     display: grid;
     place-items: center;
     min-width: 0;
-    min-height: calc(var(--size) * 2.5);
+    min-height: calc(var(--size) * 2.2);
     padding: 1px 4px;
     border-radius: var(--radius-sm, 10px);
     background: var(--surface);
@@ -121,6 +107,10 @@
   .lang:hover {
     border-color: var(--gold);
     transform: translateY(-1px);
+  }
+  .lang.close {
+    background: var(--surface-2);
+    color: var(--text);
   }
   .lang.active {
     border-color: var(--green);

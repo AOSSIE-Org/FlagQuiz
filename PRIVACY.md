@@ -38,7 +38,9 @@ Some features may not work if the permissions required for those features are no
 
 The App is designed to minimize the storage and transmission of personal information.
 
-All information is stored locally on your device, in your browser's IndexedDB storage, and is not uploaded to or maintained on any remote server. When a player starts playing, the App asks the browser to keep this storage persistent, so that the browser doesn't delete it on its own (for example when the device runs low on space). Your browser decides whether to grant this; Firefox may ask you.
+All information is stored locally on your device, in your browser's IndexedDB storage, and is not uploaded to or maintained on any remote server.
+
+If you switch on the daily reminder (installed app only), the App asks your permission to show notifications. The reminder is created on your device by the App itself, from the data on your device; no push service, server or third party is involved, and nothing is sent anywhere. You can switch it off in the menu or in your device's notification settings. When a player starts playing, the App asks the browser to keep this storage persistent, so that the browser doesn't delete it on its own (for example when the device runs low on space). Your browser decides whether to grant this; Firefox may ask you.
 The App has no accounts, no backend and no analytics. After the App is loaded (or installed as a Progressive Web App), it works fully offline.
 
 

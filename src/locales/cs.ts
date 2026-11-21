@@ -115,6 +115,12 @@ const cs: Messages = {
   closeOtherCopies: 'Flag Quiz je otevřený v jiné kartě nebo okně. Zavřete ho, abyste mohli pokračovat.',
   saveAllPlayers: 'Uložit všechny hráče do jednoho souboru',
 
+  reminders: 'Denní připomínka',
+  remindersOn: 'Denní připomínka: zapnuto',
+  remindersOff: 'Denní připomínka: vypnuto',
+  remindersBlocked: 'Oznámení jsou zablokovaná: povolte je v nastavení svého zařízení',
+  reminderBody: '🔥 Nepřeruš svou sérii! Zahraj si dnes Flag Quiz a nauč se další země, vlajky a hlavní města.',
+
   'credits.lead': 'Flag Quiz je svobodný software s otevřeným zdrojovým kódem od {aossie}.',
   'credits.source': 'Zdrojový kód: {link}.',
   'credits.donateTitle': 'Pomozte, aby učení zůstalo zdarma',

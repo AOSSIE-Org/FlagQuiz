@@ -115,6 +115,12 @@ const vi: Messages = {
   closeOtherCopies: 'Flag Quiz đang mở ở một thẻ hoặc cửa sổ khác. Vui lòng đóng nó để tiếp tục.',
   saveAllPlayers: 'Lưu tất cả người chơi vào một tệp',
 
+  reminders: 'Lời nhắc hằng ngày',
+  remindersOn: 'Lời nhắc hằng ngày: bật',
+  remindersOff: 'Lời nhắc hằng ngày: tắt',
+  remindersBlocked: 'Thông báo đang bị chặn: hãy cho phép thông báo trong phần cài đặt của thiết bị',
+  reminderBody: '🔥 Đừng để chuỗi ngày chơi bị gián đoạn nhé! Hôm nay hãy chơi Flag Quiz và tìm hiểu thêm nhiều quốc gia, lá cờ và thủ đô.',
+
   'credits.lead': 'Flag Quiz là phần mềm miễn phí và mã nguồn mở của {aossie}.',
   'credits.source': 'Mã nguồn: {link}.',
   'credits.donateTitle': 'Hãy giúp việc học mãi miễn phí',

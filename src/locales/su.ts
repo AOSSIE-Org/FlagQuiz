@@ -115,6 +115,12 @@ const su: Messages = {
   closeOtherCopies: 'Flag Quiz kabuka dina tab atanapi jandéla sanés. Tutup heula kanggo neraskeun.',
   saveAllPlayers: 'Simpen sadaya pamaén dina hiji file',
 
+  reminders: 'Panginget unggal poé',
+  remindersOn: 'Panginget unggal poé: hurung',
+  remindersOff: 'Panginget unggal poé: pareum',
+  remindersBlocked: 'Béwara diblokir: idinan dina setélan alat anjeun',
+  reminderBody: '🔥 Teraskeun runtuyan poé anjeun! Ulin Flag Quiz dinten ieu sareng diajar langkung seueur nagara, bandéra sareng ibukota.',
+
   'credits.lead': 'Flag Quiz mangrupikeun parangkat lunak bébas sareng sumber kabuka ti {aossie}.',
   'credits.source': 'Kode sumber: {link}.',
   'credits.donateTitle': 'Bantosan supados diajar tetep gratis',

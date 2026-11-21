@@ -115,6 +115,12 @@ const bn: Messages = {
   closeOtherCopies: 'Flag Quiz অন্য একটি ট্যাব বা উইন্ডোতে খোলা আছে। চালিয়ে যেতে সেটি বন্ধ করো।',
   saveAllPlayers: 'সব খেলোয়াড়কে একটি ফাইলে সংরক্ষণ করো',
 
+  reminders: 'দৈনিক অনুস্মারক',
+  remindersOn: 'দৈনিক অনুস্মারক: চালু',
+  remindersOff: 'দৈনিক অনুস্মারক: বন্ধ',
+  remindersBlocked: 'বিজ্ঞপ্তি ব্লক করা আছে: তোমার ডিভাইসের সেটিংসে এগুলোর অনুমতি দাও',
+  reminderBody: '🔥 টানা দিনের ধারা চালিয়ে যাও! আজই Flag Quiz খেলো আর আরও দেশ, পতাকা ও রাজধানী শেখো।',
+
   'credits.lead': 'Flag Quiz হলো {aossie}-এর বিনামূল্যের ও ওপেন সোর্স সফটওয়্যার।',
   'credits.source': 'সোর্স কোড: {link}।',
   'credits.donateTitle': 'শেখাকে বিনামূল্যে রাখতে সাহায্য করুন',

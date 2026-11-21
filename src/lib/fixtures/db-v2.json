@@ -181,7 +181,8 @@
    "speech": true,
    "sounds": true,
    "turnRounds": 3,
-   "language": "en"
+   "language": "en",
+   "reminders": false
   }
  }
 }

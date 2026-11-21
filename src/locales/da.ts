@@ -115,6 +115,12 @@ const da: Messages = {
   closeOtherCopies: 'Flag Quiz er åben i en anden fane eller et andet vindue. Luk den for at fortsætte.',
   saveAllPlayers: 'Gem alle spillere i én fil',
 
+  reminders: 'Daglig påmindelse',
+  remindersOn: 'Daglig påmindelse: til',
+  remindersOff: 'Daglig påmindelse: fra',
+  remindersBlocked: 'Notifikationer er blokeret: tillad dem i indstillingerne på din enhed',
+  reminderBody: '🔥 Hold gang i dine dage i træk! Spil Flag Quiz i dag, og lær flere lande, flag og hovedstæder.',
+
   'credits.lead': 'Flag Quiz er fri og open source-software fra {aossie}.',
   'credits.source': 'Kildekode: {link}.',
   'credits.donateTitle': 'Hjælp med at holde læring gratis',

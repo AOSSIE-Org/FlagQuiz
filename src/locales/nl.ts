@@ -115,6 +115,12 @@ const nl: Messages = {
   closeOtherCopies: 'Flag Quiz is geopend in een ander tabblad of venster. Sluit het om verder te gaan.',
   saveAllPlayers: 'Alle spelers in één bestand opslaan',
 
+  reminders: 'Dagelijkse herinnering',
+  remindersOn: 'Dagelijkse herinnering: aan',
+  remindersOff: 'Dagelijkse herinnering: uit',
+  remindersBlocked: 'Meldingen zijn geblokkeerd: sta ze toe in de instellingen van je apparaat',
+  reminderBody: '🔥 Houd je reeks in stand! Speel vandaag Flag Quiz en leer meer landen, vlaggen en hoofdsteden.',
+
   'credits.lead': 'Flag Quiz is vrije en opensourcesoftware van {aossie}.',
   'credits.source': 'Broncode: {link}.',
   'credits.donateTitle': 'Help leren gratis te houden',

@@ -115,6 +115,12 @@ const lt: Messages = {
   closeOtherCopies: 'Flag Quiz atidarytas kitame skirtuke ar lange. Uždarykite jį, kad galėtumėte tęsti.',
   saveAllPlayers: 'Išsaugoti visus žaidėjus viename faile',
 
+  reminders: 'Kasdienis priminimas',
+  remindersOn: 'Kasdienis priminimas: įjungtas',
+  remindersOff: 'Kasdienis priminimas: išjungtas',
+  remindersBlocked: 'Pranešimai užblokuoti: leiskite juos savo įrenginio nustatymuose',
+  reminderBody: '🔥 Nenutrauk savo serijos! Žaisk Flag Quiz šiandien ir sužinok daugiau šalių, vėliavų ir sostinių.',
+
   'credits.lead': 'Flag Quiz yra laisva atvirojo kodo programinė įranga, kurią sukūrė {aossie}.',
   'credits.source': 'Pirminis kodas: {link}.',
   'credits.donateTitle': 'Padėkite išlaikyti mokymąsi nemokamą',
