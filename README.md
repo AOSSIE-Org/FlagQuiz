@@ -75,7 +75,8 @@
 - **Adaptive practice**: every country has a difficulty score per player and game, which starts at 0.5 and moves 10% towards 1 after each mistake and 10% towards 0 after each correct guess. Rounds without mistakes make the next questions harder; mistakes make them easier.
 - **Three difficulty levels**: 3, 6 or 9 options per round.
 - **Choose the countries**: practise only some continents, and only the N most populous countries (all continents and the top 100 by default).
-- **Multiple players**: each player has a name and a custom flag (3 colours and 6 patterns), which is also their profile button.
+- **Multiple players**: each player has a name and a custom flag (3 colours, from a palette or any colour, and 12 patterns with stripes, crosses, circles, rhombuses, stars and moons). The current player's name and flag are shown top right.
+- **Multiplayer mode**: several children take turns on one device. A player keeps playing until they make a mistake; then the right answer is shown and it's the next player's turn. Each player keeps their own difficulty level (3, 6 or 9 options), so children of different ages can play together, and players with the lowest best run play first.
 - **Streaks and statistics**: 🔥 days played in a row and ⭐ rounds in a row without mistakes (top left), plus a statistics view with the all-time bests, a 4-week calendar, accuracy, and every mastered flag (difficulty score below 0.2).
 - **Save and load players**: export a player's data as a JSON file and import it on another device or browser.
 - **Share**: share the app with the device's share sheet (or copy its link).
@@ -142,6 +143,7 @@ flowchart LR
     Select["Adaptive selection<br/>(src/lib/select.ts)"]
     Dates["Streaks<br/>(src/lib/dates.ts)"]
     Transfer["Export / import<br/>(src/lib/transfer.ts)"]
+    Turns["Multiplayer turns<br/>(src/lib/turns.ts)"]
     DB["IndexedDB layer<br/>(src/lib/db.ts)"]
     IDB[("IndexedDB<br/>users · stats · playDays")]
     Speech["Web Speech API"]
@@ -154,6 +156,7 @@ flowchart LR
   State --> Select
   State --> Dates
   State --> Transfer
+  State --> Turns
   State <--> DB <--> IDB
   UI --> Speech
   State --> Audio
@@ -177,6 +180,8 @@ flowchart LR
 
 **Adaptive selection**: each round, the target and the other options are drawn from the filtered countries with weight `s^k`. The exponent `k` (from −3 to 4, starting at 1, kept per player and game) goes up by 0.5 after a round without mistakes and down by 0.5 for each mistake, so harder or easier flags come up more often. Recent targets are not repeated (the last 15, or fewer when the filter leaves few countries).
 
+**Multiplayer**: the players of a session are ordered by their best number of rounds without mistakes (lowest first, ties in selection order) and play in round-robin. A correct answer keeps the turn. A mistake reveals the right answer for 1.5 s, then a banner shows and says the next player's name, and a new round starts with that player's difficulty, countries filter and statistics. Light/dark mode applies to everyone.
+
 **Export format**: a JSON file `{ format: "flag-quiz-player", version: 1, player, stats, playDays }`. Imported files are validated before anything is saved, and an import always creates a new player.
 
 ---
@@ -187,7 +192,7 @@ flowchart LR
 flowchart TD
   Start([Open the app]) --> Users{Saved players?}
   Users -- no --> New[Create player:<br/>name + 3 colours + pattern]
-  Users -- yes --> Pick[Pick a player or ➕]
+  Users -- yes --> Pick[Pick a player or ➕<br/>👤 one player / 👥 several players]
   Pick -- ➕ --> New
   Pick --> Game
   New --> Game[Choose a game]
@@ -197,6 +202,7 @@ flowchart TD
   GC --> Round
   Round -- wrong --> Feedback[Red feedback,<br/>name / flag revealed] --> Round
   Round -- correct --> Next[✓ + chime, 1 s] --> Round
+  Round -- "wrong (multiplayer)" --> Turn[Right answer shown,<br/>next player's turn] --> Round
   Round -. profile button .-> Menu[Menu: 🌙 theme · ✏️ edit · difficulty · 🌍 countries ·<br/>📊 statistics · 🔗 share · ⬇️ save data · 🎮 change game · 👥 switch player]
   Pick -- ⬆️ --> Import[Load a player<br/>from a JSON file] --> Pick
 ```
@@ -222,7 +228,12 @@ flowchart TD
    - The 🔥 days-in-a-row streak and the ⭐ rounds-without-mistakes streak are always shown at the top left.
    - Tapping the profile flag (top right) opens the menu: theme, edit player, difficulty (tap to cycle 3 → 6 → 9 options), countries (continents and top N by population), statistics, share, save data, change game, switch player.
 
-5. **Moving to another device**:
+5. **Playing together**:
+   - In the "Who is playing?" dialog, switch from 👤 to 👥 and tap the players who will play (each gets a ✓), then ▶.
+   - The player with the lowest best run starts. Their name and flag are shown top right, with the next players' flags below.
+   - After a mistake, the right answer is shown, then the next player's flag and name appear (and the name is said aloud).
+
+6. **Moving to another device**:
    - In the menu, ⬇️ saves the player's data as a JSON file.
    - On the other device, the ⬆️ button in the "Who is playing?" dialog loads that file as a new player.
 
@@ -293,8 +304,8 @@ Every push to `main` is built, tested and deployed to [flagquiz.aossie.org](http
 | New player | Choose a game | Guess the Flag |
 | ![Guess the Country](docs/screenshots/guess-the-country.png) | ![Menu](docs/screenshots/menu.png) | ![Statistics](docs/screenshots/statistics.png) |
 | Guess the Country (dark mode, hard) | Menu | Statistics |
-| ![Countries](docs/screenshots/countries.png) | | |
-| Choose continents and top N by population | | |
+| ![Countries](docs/screenshots/countries.png) | ![Multiplayer: choose players](docs/screenshots/multiplayer-players.png) | ![Multiplayer: next player](docs/screenshots/multiplayer-turn.png) |
+| Choose continents and top N by population | Multiplayer: choose players | Multiplayer: next player's turn |
 
 ---
 

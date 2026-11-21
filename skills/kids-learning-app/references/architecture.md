@@ -22,6 +22,7 @@ src/
     dates.ts               dayKey, addDays, lastDays, streaks                 (pure, tested)
     db.ts                  idb schema + versioned migrations                  (tested with fake-indexeddb)
     transfer.ts            export/import JSON + strict validation             (pure, tested)
+    turns.ts               multiplayer turn order and round-robin              (pure, tested)
     speech.ts              speak() with local-voice preference and de-duplication
     sound.ts               Web Audio chime / bonk
     palette.ts             avatar colours, randomFlag()
@@ -35,6 +36,7 @@ src/
     Streaks.svelte         🔥 days, ⭐ perfect rounds
     StatsModal.svelte      bests, calendar, accuracy rings, mastered items (fitted)
     FilterModal.svelte     restrict the content pool
+    TurnBanner.svelte      multiplayer: next player's flag and name
     Guess*.svelte          one component per game, presentational
     CustomFlag.svelte      SVG avatar renderer (viewBox 0 0 30 20)
     Flag.svelte            image fitted to a size container, real aspect ratio
@@ -70,6 +72,18 @@ answer(code):
   games or difficulty doesn't produce a stray round.
 - When a filter leaves fewer items than options, take the extra distractors
   from the full set; reduce the "recent" window to half the pool.
+
+## Multiplayer
+
+- The state class holds `players` (session, in turn order) and `turn`; the
+  current player is `$derived(players[turn])`, so every per-player feature
+  (difficulty, filter, stats, streaks, menu actions) follows the turn for free.
+- Keep per-player caches keyed by user id (stats maps, play days).
+- Guard every delayed action (next round, reveal, banner) with both the round
+  id and a session counter that is bumped on switching players or games.
+- Keep picker state (single/multi, selected ids) in the app state, not in the
+  picker component: the editor modal replaces the picker while creating a
+  player.
 
 ## Layout techniques
 

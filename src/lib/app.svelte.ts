@@ -3,7 +3,9 @@ import * as store from './db';
 import { dayKey, streaks } from './dates';
 import { applyFilter, K_START, nextK, pickRound, recordGuess } from './select';
 import { playCorrect, playWrong } from './sound';
+import { speak } from './speech';
 import { buildExport, exportFileName, parseImport, type ImportedPlayer } from './transfer';
+import { nextTurn, turnOrder } from './turns';
 import {
   DEFAULT_FILTER,
   OPTION_COUNT,
@@ -18,6 +20,7 @@ import {
 
 export type Phase = 'loading' | 'pickUser' | 'pickGame' | 'playing';
 export type EditorMode = 'new' | 'edit';
+export type PickerMode = 'single' | 'multi';
 export type AnswerResult = 'correct' | 'wrong' | null;
 
 export interface Round {
@@ -26,14 +29,22 @@ export interface Round {
   options: Country[];
   /** Codes of wrongly chosen options, in order. */
   wrong: string[];
+  /** True once the target is found, or revealed after a mistake in multiplayer. */
   solved: boolean;
 }
 
 /** Delay between a correct answer and the next round. */
 export const NEXT_ROUND_DELAY_MS = 1000;
+/** Multiplayer: how long the correct answer is shown after a mistake. */
+export const REVEAL_MS = 1500;
+/** Multiplayer: how long the "next player" banner is shown. */
+export const TURN_BANNER_MS = 1600;
 /** Maximum number of recent targets that are not repeated. */
 const RECENT_SIZE = 15;
 const KNOWN_CODES = new Set(COUNTRIES.map((c) => c.code));
+
+type PlayerStats = Record<GameId, Map<string, ItemStats>>;
+const emptyStats = (): PlayerStats => ({ flag: new Map(), country: new Map() });
 
 export function systemTheme(): Theme {
   return typeof matchMedia !== 'undefined' && matchMedia('(prefers-color-scheme: dark)').matches
@@ -49,24 +60,40 @@ function withDefaults(user: User): User {
 class AppState {
   phase = $state<Phase>('loading');
   users = $state<User[]>([]);
-  user = $state<User | null>(null);
   game = $state<GameId>('flag');
   round = $state<Round | null>(null);
-  playDays = $state<string[]>([]);
   editor = $state<EditorMode | null>(null);
   menuOpen = $state(false);
   statsOpen = $state(false);
   filterOpen = $state(false);
 
+  /** Player picker: one player, or several players taking turns. */
+  pickerMode = $state<PickerMode>('single');
+  /** Player picker, multiplayer: ids of the players who will play. */
+  selectedIds = $state<number[]>([]);
+
+  /** Players of the current session, in turn order. */
+  players = $state<User[]>([]);
+  turn = $state(0);
+  /** Multiplayer: the player whose turn just started, shown in a banner. */
+  banner = $state<User | null>(null);
+  playDaysById = $state<Record<number, string[]>>({});
+
+  /** The player whose turn it is. */
+  user = $derived<User | null>(this.players[this.turn] ?? null);
+  multiplayer = $derived(this.players.length > 1);
+  playDays = $derived(this.user?.id !== undefined ? (this.playDaysById[this.user.id] ?? []) : []);
   dayStreak = $derived(streaks(this.playDays));
-  /** Countries that can be asked, according to the player's filter. */
+  /** Countries that can be asked, according to the current player's filter. */
   pool = $derived(applyFilter(COUNTRIES, this.user?.filter ?? DEFAULT_FILTER));
 
   #db: store.DB | null = null;
-  #stats: Record<GameId, Map<string, ItemStats>> = { flag: new Map(), country: new Map() };
+  #stats = new Map<number, PlayerStats>();
   #recent: string[] = [];
   #mistakes = 0;
   #roundSeq = 0;
+  /** Incremented whenever pending timers must be ignored. */
+  #session = 0;
 
   async init(): Promise<void> {
     try {
@@ -81,28 +108,56 @@ class AppState {
     if (this.users.length === 0) this.editor = 'new';
   }
 
-  // ---------------------------------------------------------------- users
+  // ---------------------------------------------------------------- players
 
-  async chooseUser(user: User): Promise<void> {
-    this.user = { ...withDefaults(user), lastActiveAt: Date.now() };
-    applyTheme(this.user.theme);
+  setPickerMode(mode: PickerMode): void {
+    this.pickerMode = mode;
+  }
+
+  toggleSelected(id: number): void {
+    this.selectedIds = this.selectedIds.includes(id)
+      ? this.selectedIds.filter((x) => x !== id)
+      : [...this.selectedIds, id];
+  }
+
+  /** Starts a multiplayer session with the selected players. */
+  async startMultiplayer(): Promise<void> {
+    const selected = this.users.filter((u) => u.id !== undefined && this.selectedIds.includes(u.id));
+    if (selected.length >= 2) await this.startSession(selected);
+  }
+
+  /** Starts a session with one or more players and shows the game picker. */
+  async startSession(selected: User[]): Promise<void> {
+    this.#session++;
+    const now = Date.now();
+    let players = selected.map((u) => ({ ...withDefaults(u), lastActiveAt: now }));
+    if (players.length > 1) players = turnOrder(players);
+    await Promise.all(players.map((p) => this.#load(p)));
+    this.players = players;
+    this.turn = 0;
+    this.banner = null;
+    this.round = null;
     this.#recent = [];
-    if (this.#db && this.user.id !== undefined) {
-      const id = this.user.id;
-      const [days, flag, country] = await Promise.all([
-        store.getPlayDays(this.#db, id),
-        store.getStats(this.#db, id, 'flag'),
-        store.getStats(this.#db, id, 'country'),
-      ]);
-      this.playDays = days;
-      this.#stats = { flag, country };
-    } else {
-      this.playDays = [];
-      this.#stats = { flag: new Map(), country: new Map() };
-    }
-    await this.#saveUser();
+    applyTheme(players[0].theme);
+    await Promise.all(this.players.map((p) => this.#saveUser(p)));
     this.editor = null;
     this.phase = 'pickGame';
+  }
+
+  async #load(player: User): Promise<void> {
+    if (player.id === undefined) return;
+    if (!this.#db) {
+      this.#stats.set(player.id, this.#stats.get(player.id) ?? emptyStats());
+      return;
+    }
+    const id = player.id;
+    const [days, flag, country] = await Promise.all([
+      store.getPlayDays(this.#db, id),
+      store.getStats(this.#db, id, 'flag'),
+      store.getStats(this.#db, id, 'country'),
+    ]);
+    this.#stats.set(id, { flag, country });
+    this.playDaysById = { ...this.playDaysById, [id]: days };
   }
 
   async createUser(name: string, flag: UserFlag): Promise<void> {
@@ -121,7 +176,13 @@ class AppState {
     };
     const saved = this.#db ? await store.saveUser(this.#db, user) : { ...user, id: -now };
     this.users = [saved, ...this.users];
-    await this.chooseUser(saved);
+    if (this.pickerMode === 'multi') {
+      // Stay in the player picker, with the new player selected.
+      this.selectedIds = [...this.selectedIds, saved.id!];
+      this.editor = null;
+    } else {
+      await this.startSession([saved]);
+    }
   }
 
   async updateUser(name: string, flag: UserFlag): Promise<void> {
@@ -129,41 +190,47 @@ class AppState {
     this.user.name = name;
     this.user.flag = flag;
     this.editor = null;
-    await this.#saveUser();
+    await this.#saveUser(this.user);
   }
 
   switchUser(): void {
+    this.#session++;
     this.menuOpen = false;
     this.round = null;
-    this.user = null;
+    this.banner = null;
+    this.players = [];
+    this.turn = 0;
     this.phase = 'pickUser';
   }
 
   setDifficulty(d: Difficulty): void {
     if (!this.user || this.user.difficulty === d) return;
     this.user.difficulty = d;
-    void this.#saveUser();
-    if (this.phase === 'playing') this.newRound();
+    void this.#saveUser(this.user);
+    if (this.phase === 'playing' && !this.banner) this.newRound();
   }
 
   setFilter(filter: CountryFilter): void {
     if (!this.user) return;
     this.user.filter = filter;
     this.#recent = [];
-    void this.#saveUser();
-    if (this.phase === 'playing') this.newRound();
+    void this.#saveUser(this.user);
+    if (this.phase === 'playing' && !this.banner) this.newRound();
   }
 
+  /** Light/dark mode applies to everyone playing. */
   toggleTheme(): void {
     if (!this.user) return;
-    this.user.theme = this.user.theme === 'dark' ? 'light' : 'dark';
-    applyTheme(this.user.theme);
-    void this.#saveUser();
+    const theme: Theme = this.user.theme === 'dark' ? 'light' : 'dark';
+    for (const p of this.players) {
+      p.theme = theme;
+      void this.#saveUser(p);
+    }
+    applyTheme(theme);
   }
 
-  async #saveUser(): Promise<void> {
-    if (!this.user) return;
-    const snapshot = $state.snapshot(this.user) as User;
+  async #saveUser(player: User): Promise<void> {
+    const snapshot = $state.snapshot(player) as User;
     if (this.#db) await store.saveUser(this.#db, snapshot);
     this.users = this.users.map((u) => (u.id === snapshot.id ? snapshot : u));
   }
@@ -173,7 +240,11 @@ class AppState {
   /** Downloads the current player's data as a JSON file. */
   exportUser(): void {
     if (!this.user) return;
-    const data = buildExport($state.snapshot(this.user) as User, this.#stats, this.playDays);
+    const data = buildExport(
+      $state.snapshot(this.user) as User,
+      { flag: this.statsFor('flag'), country: this.statsFor('country') },
+      this.playDays,
+    );
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -198,8 +269,10 @@ class AppState {
   // ---------------------------------------------------------------- games
 
   startGame(game: GameId): void {
+    this.#session++;
     this.game = game;
     this.menuOpen = false;
+    this.banner = null;
     this.#recent = [];
     this.phase = 'playing';
     this.newRound();
@@ -216,7 +289,7 @@ class AppState {
     const pool = this.pool;
     const { target, options } = pickRound(
       pool,
-      this.#stats[this.game],
+      this.statsFor(this.game),
       this.user.adapt[this.game],
       OPTION_COUNT[this.user.difficulty],
       this.#recent,
@@ -230,64 +303,92 @@ class AppState {
     this.round = { id: ++this.#roundSeq, target, options, wrong: [], solved: false };
   }
 
+  /** Runs `fn` after `ms`, unless the round or session changed meanwhile. */
+  #later(ms: number, fn: () => void): void {
+    const roundId = this.round?.id;
+    const session = this.#session;
+    setTimeout(() => {
+      if (this.round?.id === roundId && this.#session === session && this.phase === 'playing') fn();
+    }, ms);
+  }
+
   /** Handles the selection of an option in the current round. */
   answer(code: string): AnswerResult {
     const round = this.round;
     const user = this.user;
-    if (!round || !user || round.solved || round.wrong.includes(code)) return null;
-    this.#markPlayedToday();
+    if (!round || !user || round.solved || this.banner || round.wrong.includes(code)) return null;
+    this.#markPlayedToday(user);
     const game = this.game;
 
     if (code === round.target.code) {
       round.solved = true;
       playCorrect();
       if (this.#mistakes === 0) {
-        void this.#record(game, code, false);
+        this.#record(user, game, code, false);
         user.perfectRun++;
         user.bestPerfectRun = Math.max(user.bestPerfectRun, user.perfectRun);
       }
       user.adapt[game] = nextK(user.adapt[game], this.#mistakes);
-      void this.#saveUser();
-      const id = round.id;
-      setTimeout(() => {
-        if (this.round?.id === id && this.phase === 'playing') this.newRound();
-      }, NEXT_ROUND_DELAY_MS);
+      void this.#saveUser(user);
+      this.#later(NEXT_ROUND_DELAY_MS, () => this.newRound());
       return 'correct';
     }
 
     round.wrong.push(code);
     playWrong();
     // The wrongly chosen item was not recognised either.
-    void this.#record(game, code, true);
+    this.#record(user, game, code, true);
     if (this.#mistakes === 0) {
       // The target counts as missed once per round.
-      void this.#record(game, round.target.code, true);
+      this.#record(user, game, round.target.code, true);
       user.perfectRun = 0;
-      void this.#saveUser();
     }
     this.#mistakes++;
+
+    if (this.multiplayer) {
+      // A mistake ends the turn: show the right answer, then pass the turn.
+      round.solved = true;
+      user.adapt[game] = nextK(user.adapt[game], this.#mistakes);
+      this.#later(REVEAL_MS, () => this.#passTurn());
+    }
+    void this.#saveUser(user);
     return 'wrong';
   }
 
-  async #record(game: GameId, code: string, incorrect: boolean): Promise<void> {
-    const map = this.#stats[game];
-    const next = recordGuess(map.get(code), incorrect);
-    map.set(code, next);
-    if (this.#db && this.user?.id !== undefined) {
-      await store.putStat(this.#db, { userId: this.user.id, game, code, ...next });
-    }
+  #passTurn(): void {
+    this.turn = nextTurn(this.turn, this.players.length);
+    const player = this.user;
+    if (!player) return;
+    this.banner = player;
+    speak(player.name);
+    this.#later(TURN_BANNER_MS, () => {
+      this.banner = null;
+      this.newRound();
+    });
   }
 
-  #markPlayedToday(): void {
+  #record(user: User, game: GameId, code: string, incorrect: boolean): void {
+    if (user.id === undefined) return;
+    const stats = this.#stats.get(user.id) ?? emptyStats();
+    this.#stats.set(user.id, stats);
+    const next = recordGuess(stats[game].get(code), incorrect);
+    stats[game].set(code, next);
+    if (this.#db) void store.putStat(this.#db, { userId: user.id, game, code, ...next });
+  }
+
+  #markPlayedToday(user: User): void {
     const today = dayKey();
-    if (this.playDays.includes(today) || !this.user) return;
-    this.playDays = [...this.playDays, today];
-    if (this.#db && this.user.id !== undefined) void store.addPlayDay(this.#db, this.user.id, today);
+    if (user.id === undefined) return;
+    const days = this.playDaysById[user.id] ?? [];
+    if (days.includes(today)) return;
+    this.playDaysById = { ...this.playDaysById, [user.id]: [...days, today] };
+    if (this.#db) void store.addPlayDay(this.#db, user.id, today);
   }
 
-  /** Stats of the current user for a game. */
+  /** Stats of the current player for a game. */
   statsFor(game: GameId): ReadonlyMap<string, ItemStats> {
-    return this.#stats[game];
+    const id = this.user?.id;
+    return (id !== undefined ? this.#stats.get(id)?.[game] : undefined) ?? new Map();
   }
 }
 

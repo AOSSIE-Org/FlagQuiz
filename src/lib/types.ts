@@ -10,8 +10,33 @@ export const OPTION_COUNT: Record<Difficulty, number> = { easy: 3, medium: 6, ha
 
 export type Theme = 'light' | 'dark';
 
-export type Pattern = 'vbands' | 'hbands' | 'nordic' | 'diagonal' | 'hoist' | 'disc';
-export const PATTERNS: readonly Pattern[] = ['vbands', 'hbands', 'nordic', 'diagonal', 'hoist', 'disc'];
+export type Pattern =
+  | 'vbands'
+  | 'hbands'
+  | 'nordic'
+  | 'diagonal'
+  | 'hoist'
+  | 'disc'
+  | 'rhombus'
+  | 'cross'
+  | 'starDisc'
+  | 'crescent'
+  | 'canton'
+  | 'stars';
+export const PATTERNS: readonly Pattern[] = [
+  'vbands',
+  'hbands',
+  'nordic',
+  'diagonal',
+  'hoist',
+  'disc',
+  'rhombus',
+  'cross',
+  'starDisc',
+  'crescent',
+  'canton',
+  'stars',
+];
 
 export const CONTINENTS: readonly Continent[] = ['AF', 'AS', 'EU', 'NA', 'SA', 'OC', 'AN'];
 

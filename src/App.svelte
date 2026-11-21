@@ -10,6 +10,7 @@
   import FilterModal from './components/FilterModal.svelte';
   import StatsModal from './components/StatsModal.svelte';
   import Streaks from './components/Streaks.svelte';
+  import TurnBanner from './components/TurnBanner.svelte';
   import UserPicker from './components/UserPicker.svelte';
 
   onMount(() => {
@@ -45,6 +46,10 @@
     <GamePicker />
   {/if}
 
+  {#if app.banner}
+    <TurnBanner player={app.banner} />
+  {/if}
+
   <div class="rotate" aria-hidden="true">
     <span class="phone"><Smartphone size="100%" /></span>
     <RotateCw size={48} />
@@ -54,7 +59,7 @@
 <style>
   .app {
     --header-h: clamp(40px, 9vmin, 64px);
-    --side-reserve: clamp(130px, 21vw, 260px);
+    --side-reserve: clamp(150px, 25vw, 320px);
     position: relative;
     height: 100%;
     display: grid;

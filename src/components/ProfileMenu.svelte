@@ -13,6 +13,7 @@
     X,
   } from '@lucide/svelte';
   import { app, shareApp } from '../lib/app.svelte';
+  import { upcoming } from '../lib/turns';
   import { DIFFICULTIES } from '../lib/types';
   import CustomFlag from './CustomFlag.svelte';
   import DifficultyIcon from './DifficultyIcon.svelte';
@@ -61,8 +62,18 @@
       title={user.name}
       onclick={() => (app.menuOpen = !app.menuOpen)}
     >
-      <CustomFlag flag={user.flag} />
+      <span class="me-name">{user.name}</span>
+      <span class="me-flag"><CustomFlag flag={user.flag} /></span>
     </button>
+
+    {#if app.multiplayer && !app.menuOpen}
+      <!-- Who plays next, in order. -->
+      <ol class="queue" aria-label="Next players">
+        {#each upcoming(app.players, app.turn) as next (next.id)}
+          <li title={next.name} aria-label={next.name}><CustomFlag flag={next.flag} /></li>
+        {/each}
+      </ol>
+    {/if}
 
     {#if app.menuOpen}
       <div class="menu" role="menu" aria-label="Menu">
@@ -123,19 +134,54 @@
     position: relative;
   }
   .me {
-    display: block;
-    height: clamp(36px, 9vmin, 58px);
-    aspect-ratio: 3 / 2;
-    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: clamp(6px, 1.5vmin, 12px);
+    border-radius: 8px;
     transition: transform 0.12s ease;
   }
   .me:hover {
-    transform: scale(1.05);
+    transform: scale(1.04);
   }
-  .me :global(svg) {
+  .me-name {
+    max-width: clamp(70px, 14vw, 200px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 800;
+    font-size: clamp(16px, 3.6vmin, 26px);
+  }
+  .me-flag {
+    display: block;
+    height: clamp(36px, 9vmin, 58px);
+    aspect-ratio: 3 / 2;
+    flex-shrink: 0;
+  }
+  .me-flag :global(svg) {
     width: 100%;
     height: 100%;
     border-radius: 6px;
+  }
+  .queue {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    display: flex;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    pointer-events: none;
+  }
+  .queue li {
+    height: clamp(14px, 3.6vmin, 22px);
+    aspect-ratio: 3 / 2;
+    opacity: 0.8;
+  }
+  .queue :global(svg) {
+    width: 100%;
+    height: 100%;
+    border-radius: 3px;
   }
   .menu {
     position: absolute;

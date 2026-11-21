@@ -68,7 +68,15 @@ Apply these unless the user explicitly says otherwise.
 
 **Players and progress**
 - Players have a name and a custom flag (3 colours from a kid-friendly palette
-  + one of several patterns); the flag is their avatar.
+  or a custom colour picker, + one of ~12 patterns: stripes, crosses, circles,
+  rhombuses, stars, moons); the flag is their avatar, shown top right with the
+  name to its left. In the editor, patterns come before colours.
+- Multiplayer on one device: a 👤/👥 toggle in the player picker; in 👥 mode
+  tapping toggles players and ▶ starts. Players take turns in round-robin,
+  lowest best run first; a mistake reveals the answer and passes the turn with
+  a banner that shows and speaks the next player's name. Difficulty, filters
+  and statistics stay per player, so children of different ages can play
+  together.
 - Per player, per game and per item: a difficulty score `s` (starts at 0.5,
   `s' = 0.9·s + 0.1·z`, z = 1 if wrong) plus correct/incorrect counts. An item
   is mastered when `s < 0.2`.

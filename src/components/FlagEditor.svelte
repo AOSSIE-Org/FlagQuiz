@@ -20,6 +20,8 @@
   let slot = $state(0);
   let saving = $state(false);
   let valid = $derived(name.trim().length > 0);
+  /** Whether the colour of the selected slot is not one of the palette colours. */
+  let isCustom = $derived(!PALETTE.includes(flag.colors[slot]));
 
   /** Cancel is possible except when creating the very first user. */
   let canCancel = $derived(mode === 'edit' || app.users.length > 0);
@@ -57,6 +59,22 @@
     </div>
 
     <div class="right">
+      <div class="patterns" role="radiogroup" aria-label="Pattern">
+        {#each PATTERNS as pattern (pattern)}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={flag.pattern === pattern}
+            aria-label={pattern}
+            class="pattern"
+            class:active={flag.pattern === pattern}
+            onclick={() => (flag.pattern = pattern)}
+          >
+            <CustomFlag {flag} {pattern} />
+          </button>
+        {/each}
+      </div>
+
       <div class="slots" role="radiogroup" aria-label="Colour to change">
         {#each flag.colors as color, i (i)}
           <button
@@ -87,23 +105,22 @@
             onclick={() => (flag.colors[slot] = color)}
           ></button>
         {/each}
+        <!-- Any other colour, with the system colour picker. -->
+        <label
+          class="swatch custom"
+          class:active={isCustom}
+          style:--custom={isCustom ? flag.colors[slot] : null}
+          title="Other colour"
+        >
+          <span class="visually-hidden">Other colour</span>
+          <input
+            type="color"
+            value={flag.colors[slot].toLowerCase()}
+            oninput={(e) => (flag.colors[slot] = e.currentTarget.value.toUpperCase())}
+          />
+        </label>
       </div>
 
-      <div class="patterns" role="radiogroup" aria-label="Pattern">
-        {#each PATTERNS as pattern (pattern)}
-          <button
-            type="button"
-            role="radio"
-            aria-checked={flag.pattern === pattern}
-            aria-label={pattern}
-            class="pattern"
-            class:active={flag.pattern === pattern}
-            onclick={() => (flag.pattern = pattern)}
-          >
-            <CustomFlag {flag} {pattern} />
-          </button>
-        {/each}
-      </div>
     </div>
 
     <div class="actions">
@@ -199,7 +216,7 @@
   }
   .palette {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(7, 1fr);
     gap: clamp(5px, 1.4vmin, 10px);
   }
   .swatch {
@@ -212,6 +229,30 @@
     width: 100%;
     max-width: 7.5dvh;
   }
+  .swatch.custom {
+    position: relative;
+    cursor: pointer;
+    background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
+  }
+  .swatch.custom[style*='--custom'] {
+    background:
+      radial-gradient(circle, var(--custom) 52%, transparent 54%),
+      conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
+  }
+  .swatch.custom input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+  }
+  .swatch.custom:focus-within {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
   .swatch.active {
     outline: 3px solid var(--text);
     outline-offset: 2px;
@@ -220,6 +261,7 @@
   .patterns {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
+    row-gap: clamp(4px, 1vmin, 8px);
     gap: clamp(5px, 1.4vmin, 10px);
   }
   .pattern {
