@@ -9,12 +9,16 @@ adapt its files instead of starting from scratch.
 index.html                 meta tags (OG/Twitter/JSON-LD), icons, theme-color
 vite.config.ts             base './', svelte(), VitePWA({...}), vitest config
 pwa-assets.config.ts       icon generation from public/<app>-logo.svg
-scripts/fetch-*.mjs        reproducible data + asset generation
-public/                    flags/images, logo, PWA icons, og-image.png
+scripts/fetch-*.mjs        reproducible data + asset generation (countries, capitals + photos, map)
+scripts/build-credits.mjs  credits.html from the data files (brand-styled, donation card)
+public/                    flags, photos, brand logos, fonts (for credits.html), PWA icons,
+                           og-image.png, screenshots/ (manifest), credits.html
+SECURITY.md, BestPracticesChecklist.md   filled in (see SKILL.md)
 src/
-  main.ts                  font + global CSS + mount(App)
+  main.ts                  install listener first, then font + global CSS + mount(App)
   app.css                  brand tokens (light/dark), resets, .icon-btn
-  App.svelte               header (Streaks | ProfileMenu), <main> game, modals, rotate overlay
+  App.svelte               header (Streaks | ProfileMenu), <main> game, modals, turn banner,
+                           install help, full-screen button, splash, rotate overlay
   data/*.ts                generated content (code, name, ratio, population, continents, …)
   lib/
     types.ts               GameId, Difficulty, Pattern, User, ItemStats, filters
@@ -23,21 +27,29 @@ src/
     db.ts                  idb schema + versioned migrations                  (tested with fake-indexeddb)
     transfer.ts            export/import JSON + strict validation             (pure, tested)
     turns.ts               multiplayer turn order and round-robin              (pure, tested)
-    speech.ts              speak() with local-voice preference and de-duplication
-    sound.ts               Web Audio chime / bonk
+    adultCheck.ts          grown-ups-only equations for destructive actions   (pure, tested)
+    speech.ts              robust speak(), on/off switch                       (tested with a fake engine)
+    sound.ts               Web Audio chime / bonk, on/off switch
+    install.svelte.ts      PWA install state: beforeinstallprompt, platform, standalone
     palette.ts             avatar colours, randomFlag()
     app.svelte.ts          AppState class with $state/$derived; rounds, answers, persistence
   components/
     Modal.svelte           scrim + dialog, Escape/backdrop close when allowed, focus handling
-    UserPicker.svelte      player tiles, ➕ new, ⬆️ import
+    Splash.svelte          logo, gold app name, "made by" + AOSSIE logo; ~4 s, tap to skip
+    UserPicker.svelte      👤/👥 toggle, player tiles, ➕ new, ⬆️ import, 🗑 delete mode, rounds stepper
+    DeletePlayer.svelte    grown-ups-only confirmation (equation)
     FlagEditor.svelte      name, 3 colour slots, palette, pattern previews
     GamePicker.svelte      one illustrated tile per game
-    ProfileMenu.svelte     avatar button + icon menu
-    Streaks.svelte         🔥 days, ⭐ perfect rounds
+    ProfileMenu.svelte     name + avatar button, next players' flags, icon menu (same-size items)
+    Streaks.svelte         🔥 days, ⭐ perfect rounds, ✅ correct answers
+    InstallHelp.svelte     how to install where there is no install prompt (iOS, others)
+    FullscreenButton.svelte  discreet toggle, lower-right corner
     StatsModal.svelte      bests, calendar, accuracy rings, mastered items (fitted)
     FilterModal.svelte     restrict the content pool
     TurnBanner.svelte      multiplayer: next player's flag and name
-    Guess*.svelte          one component per game, presentational
+    Guess*.svelte          one component per game, presentational (map game loads its data lazily)
+    CapitalPhotos.svelte   four photos: 2×2, or one row in wide short spaces (container query)
+    GameIcon.svelte        one icon per game (statistics)
     CustomFlag.svelte      SVG avatar renderer (viewBox 0 0 30 20)
     Flag.svelte            image fitted to a size container, real aspect ratio
 ```
@@ -46,10 +58,13 @@ src/
 
 | Store | Key | Value |
 | --- | --- | --- |
-| `users` | `id` (autoIncrement) | name, flag, difficulty, theme, filter, adapt (k per game), perfectRun, bestPerfectRun, createdAt, lastActiveAt |
+| `users` | `id` (autoIncrement) | name, flag, difficulty, theme, filter, adapt (k per game), perfectRun, bestPerfectRun, correctCount, createdAt, lastActiveAt |
 | `stats` | `[userId, game, code]` (+ indexes `byUserGame`, `byUser`) | `s`, `c`, `d` |
 | `playDays` | `[userId, date]` (+ index `byUser`) | — |
+| `settings` | `"settings"` | device-wide: speech on/off, sounds on/off, multiplayer rounds per turn |
 
+- Use a `perGame(fn)` helper for per-game records, so adding a game is a type
+  error everywhere it must be handled; fill missing games in old records.
 - Use autoIncrement numeric ids: `crypto.randomUUID` is unavailable over plain HTTP.
 - Bump the DB version for every schema/meaning change and migrate in
   `upgrade(db, oldVersion, newVersion, tx)`. Also fill new user fields with
@@ -81,6 +96,8 @@ answer(code):
 - Keep per-player caches keyed by user id (stats maps, play days).
 - Guard every delayed action (next round, reveal, banner) with both the round
   id and a session counter that is bumped on switching players or games.
+- Count rounds per turn and pass the turn after the configured maximum (after
+  the 1 s correct-answer delay), as well as after a mistake.
 - Keep picker state (single/multi, selected ids) in the app state, not in the
   picker component: the editor modal replaces the picker while creating a
   player.
@@ -166,16 +183,65 @@ answer(code):
 - **Hover styles** must not override result colours (`:hover:not(.wrong)`).
 - **`beforeinstallprompt`** fires early: register the listener in a module
   imported first in `main.ts`.
+- **Safari grid percentages**: `width: min(100%, …)` (or `%` widths) inside a
+  grid column sized by its content resolve against the content in WebKit, so
+  items overflow into the next column; Chrome looks fine. Give grid areas
+  explicit tracks (`grid-template-columns: minmax(0, 1fr)`) and
+  `min-width: 0`. Always verify layouts in Playwright's WebKit too.
+- **Endless animations block Playwright**: elements that wiggle (e.g. delete
+  mode) never become "stable"; click them with `{ force: true }`.
+- **Wikidata capitals** can point to the wrong item (Nicaragua's pointed to a
+  new item without photo or coordinates) or lack an English label (shown as a
+  Q-id); pin items and names by code in the script. Several best-rank values
+  (South Africa, Bolivia…) need a curated choice.
+- **Landmark gaps**: some cities record few landmarks as "located in" them
+  (Tallinn, Managua). The geo fallback times out; use the images of the
+  city's English Wikipedia article instead (`prop=images`), filtered for
+  maps, flags, seals and logos. Then review every item's photos by name: drop
+  unsuitable subjects (a regex on titles and file names), unlabelled items
+  (Q-ids), duplicates under different names, and non-landmarks.
+- **Precaching photos**: add `webp` to `globPatterns`; ~1,100 files / 16 MB
+  precache in ~2 s locally. Check offline by waiting until `caches` hold all
+  entries, then `setOffline(true)` and reload.
+- **Template CI that can't pass as is**: gitleaks needs `GITLEAKS_LICENSE`
+  for organization repos and Dependabot runs don't get Actions secrets → skip
+  with `if: github.actor != 'dependabot[bot]'`. Dependency Review needs the
+  repository's dependency graph → gate with
+  `if: vars.DEPENDENCY_REVIEW_ENABLED == 'true'` and document how to enable it
+  (changing repository settings may be refused by the permission system).
+  Tell Dependabot to ignore major versions the toolchain can't use yet
+  (TypeScript 7 for svelte-check).
+- **Vulnerabilities in transitive dependencies**: fix with npm `overrides`
+  scoped to the parent (e.g. `"workbox-build": { "glob": "^14" }`) after
+  checking the parent only uses APIs that still exist; verify with the OSV
+  batch API (below). A pasted OSV report may come from an older commit — check
+  the scan of the latest commit first.
+- **First push**: gitleaks fails scanning `root^..head` on a repo's first push
+  (no parent); it is not a leak. Confirm with a manual full-history run.
 - **Template workflows** reference actions by SHA; pin new workflows the same
   way (`gh api repos/<owner>/<action>/git/ref/tags/<tag>`).
+
+## Checking dependencies against OSV
+
+```js
+// node --input-type=module: all packages in package-lock.json against https://osv.dev
+const lock = JSON.parse(await (await import('node:fs/promises')).readFile('package-lock.json', 'utf8'));
+const queries = [...new Map(Object.entries(lock.packages).filter(([k, v]) => k && v.version)
+  .map(([k, v]) => { const name = k.split('node_modules/').pop(); return [`${name}@${v.version}`, { package: { name, ecosystem: 'npm' }, version: v.version }]; })).values()];
+const { results } = await (await fetch('https://api.osv.dev/v1/querybatch', { method: 'POST', body: JSON.stringify({ queries }) })).json();
+console.log(results.flatMap((r, i) => (r.vulns ? [`${queries[i].package.name}@${queries[i].version}`] : [])));
+```
 
 ## Verification script skeleton (playwright-core)
 
 ```js
-import { chromium } from 'playwright-core';
+import { chromium, webkit } from 'playwright-core';
+// Run everything in both engines: system Chrome and Playwright's WebKit
+// (`npx playwright@<playwright-core version> install webkit`).
 const browser = await chromium.launch({
   executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
 });
+// const browser = await webkit.launch();
 const ctx = await browser.newContext({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true });
 await ctx.addInitScript(() => {
   window.__spoken = [];

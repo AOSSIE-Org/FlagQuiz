@@ -124,15 +124,13 @@
 
 ## ✅ Project Checklist
 
-The template's checklist categories (protocol, smart contracts, mobile app store releases, AI/ML components) do not apply to Flag Quiz, which is a static, local-only web app. Its own checklist:
-
 - [x] **The web app**:
    - [x] uses the colours and typeface of the [AOSSIE brand guidelines](https://github.com/AOSSIE-Org/Info/blob/main/Brand.md).
    - [x] has good metadata and a preview image for sharing on social media (Open Graph, X/Twitter cards).
    - [x] works offline and can be installed as a PWA.
    - [x] stores all data locally (IndexedDB) and makes no network requests at runtime.
    - [x] fits on one screen on desktop and on phones in landscape.
-   - [ ] is deployed to [flagquiz.aossie.org](https://flagquiz.aossie.org/).
+   - [x] is deployed to [flagquiz.aossie.org](https://flagquiz.aossie.org/).
 
 ---
 
@@ -348,6 +346,12 @@ Every push to `main` is built, tested and deployed to [flagquiz.aossie.org](http
 ⭐ Don't forget to star this repository if you find it useful! ⭐
 
 Thank you for considering contributing to this project! Contributions are highly appreciated and welcomed. To ensure smooth collaboration, please refer to our [Contribution Guidelines](./CONTRIBUTING.md).
+
+---
+
+## 🔐 Security
+
+Please report vulnerabilities privately, as described in [SECURITY.md](./SECURITY.md).
 
 ---
 

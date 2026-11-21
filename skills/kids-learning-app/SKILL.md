@@ -1,11 +1,11 @@
 ---
 name: kids-learning-app
-description: Plan, build, verify and ship a small, purely local educational web game for young children (e.g. learning flags, capitals, animals, letters, numbers, shapes, colours, maps) with AOSSIE's stack and conventions — Svelte 5 + TypeScript + Vite, IndexedDB storage, offline PWA that also works as a plain static site, AOSSIE branding, icon-first minimal UI that fits one screen without scrolling, multiple players with custom flag avatars, spoken prompts, adaptive difficulty, streaks and statistics, JSON export/import, social sharing metadata, AOSSIE Template-Repo initialization with all TODOs filled, and GitHub Pages deployment. Use when asked to create a new learning app, quiz or game for kids, or to extend one built this way.
-compatibility: Needs Node.js 20+, npm, git and network access (to fetch the template repo, brand assets and open data). A Chromium-based browser plus playwright-core is strongly recommended for visual verification. The GitHub CLI (gh) is used for repository and Pages checks.
+description: Plan, build, verify and ship a small, purely local educational web game for young children (e.g. learning flags, capitals, maps, animals, letters, numbers, shapes, colours) with AOSSIE's stack and conventions — Svelte 5 + TypeScript + Vite, IndexedDB storage, offline PWA that also works as a plain static site and installs on phones, AOSSIE branding, icon-first minimal UI that fits one screen without scrolling, spoken prompts, multiple players and multiplayer turns, adaptive difficulty, streaks and statistics, JSON export/import, grown-ups-only deletion, credits and donation pages, social sharing metadata, the AOSSIE Template-Repo with every TODO and checklist filled, CI and GitHub Pages deployment. Use when asked to create a new learning app, quiz or game for kids, or to extend one built this way.
+compatibility: Needs Node.js 20+, npm, git, the GitHub CLI (gh) and network access (template repo, brand assets, open data). playwright-core with the system Chrome and Playwright's WebKit build (`npx playwright install webkit`) is required for verification in both browser engines.
 metadata:
-  version: "1.0"
+  version: "1.1"
   category: app-generation
-  origin: Distilled from building Flag Quiz (https://github.com/AOSSIE-Org/FlagQuiz); see prompts/ in that repo.
+  origin: Distilled from building Flag Quiz (https://github.com/AOSSIE-Org/FlagQuiz); the full conversation is in prompts/1.md of that repo.
 user-invocable: true
 ---
 
@@ -14,213 +14,209 @@ user-invocable: true
 ## Purpose
 
 Build a small educational game for young children that runs entirely in the
-browser, stores everything locally, works offline, and follows AOSSIE's
-branding and repository conventions. The reference implementation is
-**Flag Quiz** (this repository): reuse its structure and code wherever the new
-subject allows.
+browser, stores everything locally, works offline, installs on phones, and
+follows AOSSIE's branding and repository conventions. The reference
+implementation is **Flag Quiz** (this repository): reuse its structure and code
+wherever the new subject allows.
 
 Read [references/architecture.md](references/architecture.md) before writing
-code. It has the module layout, the data model, the adaptive algorithm, and
-the pitfalls that cost time while building Flag Quiz.
+code. It has the module layout, data model, algorithms, data pipelines, and the
+pitfalls that cost time while building Flag Quiz.
 
-## Non-negotiable requirements
+## Requirements
 
-Apply these unless the user explicitly says otherwise.
+Apply all of these unless the user explicitly says otherwise. They are what the
+user asked for, or corrected, while building Flag Quiz.
 
-**Locality and privacy**
-- No backend, no accounts, no analytics, no network requests at runtime. Fonts,
-  icons, images and data are bundled.
-- All player data lives in IndexedDB (via `idb`). Tolerate IndexedDB being
-  unavailable: the app must still run, just without saving.
-- Built with a relative base (`base: './'`) so `dist/` works from any static
-  host and sub-folder. Offline support comes from a service worker
-  (`vite-plugin-pwa`) that registers only where supported (HTTPS/localhost).
+### Locality and privacy
+- No backend, no accounts, no analytics, no runtime requests to other
+  origins. Fonts, icons, images, map and data are bundled and served from the
+  app's own origin.
+- All data lives in IndexedDB (via `idb`): players, per-item statistics, play
+  days and device-wide settings. The app must still run if IndexedDB is
+  unavailable (just without saving).
+- Relative base (`base: './'`): `dist/` works from any static host and folder.
+- PWA (`vite-plugin-pwa`): **everything is precached at install, photos
+  included**, so every game works offline. The service worker registers only
+  where supported, so the same build also works as a plain static site.
 
-**Audience: young children**
-- As little text as possible. Prefer intuitive icons (Lucide). Every icon-only
-  button has an `aria-label` and a `title`.
-- Prompts and answers are spoken with the Web Speech API (prefer local voices).
-  Speak on hover (mouse only) and on click. On touch screens, add an explicit
-  🔊 button wherever hover would be the only way to hear something.
-- Feedback is immediate and visual + audible: green ✓ and a chime (Web Audio,
-  no audio files) for correct; red border/text, a shake, and a reveal of what
-  was actually picked for wrong answers. Next round after ~1 s.
-- Big touch targets, playful but calm animations, `prefers-reduced-motion`
-  respected.
+### Audience: young children
+- As little text as possible; intuitive icons (Lucide). Every icon-only button
+  has an `aria-label` and a `title`.
+- Prompts and answers are read aloud (Web Speech API, local voices preferred):
+  on round start, on click, and on hover with a mouse. On touch screens add an
+  explicit 🔊 button wherever hover would be the only way to hear something.
+  Don't speak an option that merely appears under a stationary mouse when a new
+  round is rendered; only a deliberate hover (leave and re-enter) speaks.
+- Feedback: correct → green ✓, chime (Web Audio, no files), next round after
+  **1 s**; wrong → red border/text, shake, and a reveal of what was picked
+  (its name, flag, capital or position), also read aloud.
+- Big touch targets; calm animations; `prefers-reduced-motion` respected.
 
-**Layout**
-- One page, `100dvh`, `overflow: hidden`, never scrolls, at 1280×720 and on a
-  phone in landscape (844×390). Show a "rotate your phone" overlay in portrait
-  on small screens.
-- No footer, no navigation bar. Top-left: streaks (🔥 days in a row, ⭐ rounds
-  without mistakes), side by side and large. Top-right: profile button that
-  looks like the player's custom flag and opens an icon menu.
-- Everything else happens in modals: pick/create player, pick game, edit
-  player, statistics, settings/filters.
+### Layout and shell
+- One page, `100dvh`, never scrolls — at 1280×720 and on a phone in landscape
+  (844×390). A "rotate your phone" overlay in portrait on small screens.
+- No footer, no navigation bar, no logo in the header (the AOSSIE logo is on
+  the splash screen and credits page instead).
+- Top left: 🔥 days in a row, ⭐ rounds in a row without mistakes, ✅ total
+  correct answers — side by side, large.
+- Top right: the current player's name, then their custom flag as the profile
+  button. In multiplayer, the next players' small flags appear below it.
+- Profile menu (all buttons the same size; no wider controls): light/dark,
+  edit player, difficulty (one button cycling 3 → 6 → 9 options, showing a
+  mini grid), choose items (e.g. continents + top N by population), statistics,
+  read-aloud on/off, sound effects on/off, share, save data (export), install
+  app (phones/tablets only), credits ⓘ, donate ☕ (gold,
+  https://buymeacoffee.com/aossie), change game, switch player.
+- Everything else happens in modals: pick/create/import/delete players,
+  pick game (illustrated tiles, e.g. real flags, photos, "Aa Ee Oo"), edit
+  player, statistics, filters.
+- Splash screen at start, **~4 s**, tap to skip: app logo, app name in
+  **AOSSIE gold**, and "made by" **above** AOSSIE's **green-and-gold**
+  secondary logo.
+- A discreet full-screen toggle in the lower-right corner (hidden where the
+  Fullscreen API is unavailable, e.g. iPhone Safari).
 
-**Branding** ([AOSSIE Brand.md](https://github.com/AOSSIE-Org/Info/blob/main/Brand.md))
-- Colours as CSS variables: Golden Wallet `#FFCD00`, Baggy Green `#00843D`,
-  dark `#121212`, white `#FFFFFF`, muted `#7A7A7A`. Red is only for errors.
-- Inter (bundled with `@fontsource-variable/inter`).
-- Light and dark mode (per player, defaulting to the system preference).
-- Ask whether the AOSSIE logo should be shown. Flag Quiz started with the
-  secondary logo top-left and later removed it to make room for the streaks.
+### Branding ([AOSSIE Brand.md](https://github.com/AOSSIE-Org/Info/blob/main/Brand.md))
+- CSS variables: Golden Wallet `#FFCD00`, Baggy Green `#00843D`, dark
+  `#121212`, white `#FFFFFF`, muted grey `#7A7A7A`; red only for errors.
+- Inter (bundled via `@fontsource-variable/inter`); light and dark mode
+  (per player, defaulting to the system preference).
+- The same look on every page the app ships, including the credits page.
 
-**Players and progress**
-- Players have a name and a custom flag (3 colours from a kid-friendly palette
-  or a custom colour picker, + one of ~12 patterns: stripes, crosses, circles,
-  rhombuses, stars, moons); the flag is their avatar, shown top right with the
-  name to its left. In the editor, patterns come before colours.
-- Multiplayer on one device: a 👤/👥 toggle in the player picker; in 👥 mode
-  tapping toggles players and ▶ starts. Players take turns in round-robin,
-  lowest best run first; a mistake reveals the answer and passes the turn with
-  a banner that shows and speaks the next player's name. Difficulty, filters
-  and statistics stay per player, so children of different ages can play
-  together.
-- Per player, per game and per item: a difficulty score `s` (starts at 0.5,
-  `s' = 0.9·s + 0.1·z`, z = 1 if wrong) plus correct/incorrect counts. An item
-  is mastered when `s < 0.2`.
-- Adaptive selection: draw the target and the distractors with weight `s^k`;
-  `k` rises after perfect rounds and falls with mistakes. Don't repeat recent
-  targets.
-- Record play days (local `YYYY-MM-DD`) for streaks; keep current and best
-  "rounds without mistakes".
-- Statistics modal: streaks and bests, 4-week calendar, accuracy per game, and
-  all mastered items — the modal grows to fit them and never overflows.
-- Export a player as JSON (menu) and import it as a new player (player picker),
-  validating every field of the untrusted file.
-- Deleting players is for grown-ups only: a small, faded 🗑 in the player
-  picker enters delete mode, and confirming requires solving a linear equation
-  (e.g. `7x − 23 = 2x + 52`), with a new equation after every wrong answer.
-- Multiplayer turns also end after a configurable number of rounds in a row
-  (default 3, set next to the player selection).
-- Menu switches for text-to-speech and for sound effects (device-wide settings
-  stored in IndexedDB), a ⓘ credits page, and a total "correct answers" counter
-  next to the streaks.
+### Players, games and progress
+- Players: a name plus a custom flag avatar — 3 colours (kid-friendly palette
+  of ~13 including white, grey and black, plus a rainbow "any colour" picker)
+  and ~12 patterns (stripes, crosses, circles, rhombuses, stars, moons…).
+  In the editor, patterns come before colours.
+- Difficulty (3, 6 or 9 options) is **per player**, so children of different
+  ages can play together.
+- Per player, per game and per item: difficulty score `s` (starts 0.5,
+  `s' = 0.9·s + 0.1·z`, z = 1 if wrong) and correct/incorrect counts; mastered
+  when `s < 0.2`. Adaptive selection weights items by `s^k`, with `k` going up
+  after perfect rounds and down with mistakes; no recent repeats.
+- Filters chosen by the player (e.g. continents, and the N most populous among
+  them; defaults: all, 100). If the filter leaves too few items, fill the
+  distractors from the whole set.
+- Statistics modal: streaks and bests, 4-week calendar, accuracy and all
+  mastered items per game; it grows to fit them and never overflows.
+- Multiplayer on one device: 👤/👥 toggle in the player picker; in 👥 mode tap
+  to select players, set "rounds in a row per player" (default 3) next to the
+  selection, then ▶. Lowest best run plays first; round-robin; the turn passes
+  after a mistake (answer revealed first) or after the maximum rounds; a
+  banner shows and says the next player's name.
+- Export a player as JSON and import it as a new player; validate every field
+  of the untrusted file.
+- Deleting players is grown-ups only: a small, faded 🗑 enters delete mode;
+  confirming requires solving a linear equation (new one after each mistake).
 
-**Shell**
-- Splash screen at start: app logo, name and "made by" + AOSSIE's secondary
-  logo (ink version on light, coloured on dark), ~2 s, tap to skip.
-- Discreet full-screen toggle in the lower-right corner (Fullscreen API;
-  hidden where unsupported, e.g. iPhone Safari).
-- Installable PWA: an "Install app" menu button shown only on phones/tablets
-  when not already installed. Android: keep `beforeinstallprompt` and call
-  `prompt()`. iOS: show Share → Add to Home Screen with icons. Manifest with
-  `id`, `display: fullscreen`, `orientation`, maskable icons, `screenshots`
-  (wide + narrow); `apple-mobile-web-app-*` meta tags.
+### Content
+- Use open data with clear licences, generated by reproducible scripts, with
+  attribution in the README and on the credits page.
+- Photos (e.g. Wikimedia Commons via Wikidata): representative landmarks,
+  freely licensed, small WebP files, with author/licence/source kept.
+  **Review every item's photos**, filter out anything unsuitable for children
+  (war, violence, prisons, slavery, genocide, adult topics) and fix data errors
+  by hand in the script. Leave out politically contested answers (e.g.
+  contested capitals) and say so.
+- Maps: Natural Earth projected at build time; tiny places get large tappable
+  markers; zoom/pan.
 
-**Content-rich games (when the subject needs them)**
-- Maps: Natural Earth via world-atlas, projected at build time with d3-geo
-  into SVG paths; round tappable markers for tiny countries; wheel/pinch/±
-  zoom and drag; wrong taps label the tapped country on the map.
-- Photos: Wikimedia Commons, chosen via Wikidata (the place's main image plus
-  its most famous landmarks), resized with sharp to small WebP files, with
-  author/licence/source kept for a credits page. Precache them with the rest
-  of the app (~20 KB each as 360×240 WebP) so every game works offline.
+### Credits, donations, sharing
+- `credits.html`, generated by a script and styled with the brand: title is
+  just the app name; a paragraph about the licence; "Source code: …" in its own
+  paragraph; then a highlighted card saying AOSSIE is a not-for-profit, written
+  to encourage donations (no ads, no data collection, free for every child;
+  even a coffee helps) and welcoming contributions, with a button to
+  https://buymeacoffee.com/aossie; data sources; photo credits grouped by item;
+  "made by" AOSSIE logo footer.
+- Share button: `navigator.share`, falling back to copying the link.
+- Social metadata: title, description, canonical URL, Open Graph + Twitter
+  tags with an absolute 1200×630 `og-image.png`, JSON-LD `WebApplication`.
+- Installable on phones: "Install app" menu item only on mobile and only when
+  not installed; Android uses `beforeinstallprompt`, iOS shows Share → Add to
+  Home Screen; manifest with `id`, `display: fullscreen`, orientation,
+  maskable icons, screenshots; `apple-mobile-web-app-*` meta tags.
 
-**Repository**
-- Initialize from [AOSSIE-Org/Template-Repo](https://github.com/AOSSIE-Org/Template-Repo)
-  and fill **every** TODO (README, CONTRIBUTING, PRIVACY, MAINTAINERS, issue
-  templates, even comments). Don't confuse instructions that merely mention
-  "TODO" (e.g. in `.coderabbit.yaml`) with placeholders.
-- Social metadata in `index.html`: title, description, canonical URL, Open
-  Graph + Twitter card tags with an absolute 1200×630 `og-image.png`, and
-  JSON-LD `WebApplication`.
-- Share button in the menu: `navigator.share`, falling back to copying the link.
-- CI workflow (check, test, build) and a GitHub Pages deploy workflow, with
-  actions pinned to commit SHAs like the template's workflows.
+### Repository and CI
+- Initialize from [AOSSIE-Org/Template-Repo](https://github.com/AOSSIE-Org/Template-Repo).
+  Fill **every** TODO (README, CONTRIBUTING, PRIVACY, MAINTAINERS, issue
+  templates, comments) — and the unticked checklists: the README project
+  checklist and `BestPracticesChecklist.md` (tick only what is true, with
+  evidence; `[~]` + justification for N/A; leave the rest open and say why).
+  Add a `SECURITY.md`. Text that merely mentions "TODO" (e.g. in
+  `.coderabbit.yaml`) is not a placeholder.
+- CI (type-check, tests, build) and a GitHub Pages deploy workflow on every
+  push to `main`, actions pinned to commit SHAs.
+- Make every template workflow pass. If one needs a secret or setting the repo
+  lacks, skip or gate it (see the reference) rather than leave it red.
+- Keep dependencies free of known vulnerabilities (npm `overrides` for
+  transitive ones) and verify against the OSV database.
 
 ## Workflow
 
 ### 1. Clarify, then plan
-
-Research before asking: read the template repo, the brand guide and candidate
-data sources (licence, completeness, freshness, whether the API still exists).
-Then present a concise plan and a numbered list of decisions, each with 2–3
-lettered options and the recommended one first, so the user can answer like
-"1 - c, 2 - a". Typical decisions:
-
-1. Scope of the content set (e.g. UN members only vs. all ISO territories).
-2. Data/asset source (licence, accuracy).
-3. Custom avatar design (number of patterns).
-4. How touch users hear spoken text.
-5. What counts as a mistake for the statistics.
-6. Language(s).
-7. Offline/PWA.
-8. App name, domain, GitHub repo name, maintainers (GitHub + Discord handles).
-
-Never guess the GitHub repository name or people's real names; ask, or use
-what the user gave and say so.
+Research first (template, brand guide, data sources: licence, completeness,
+freshness, whether the API still exists — Flag Quiz found one retired). Then
+present a concise plan and numbered decisions with 2–3 lettered options,
+recommended first, so the user can answer "1 - c, 2 - a". Typical decisions:
+scope of the content, data sources, avatar design, how touch users hear text,
+what counts as a mistake, language(s), offline/PWA, and name, domain, GitHub
+repo and maintainers (GitHub + Discord handles). Never guess the repo name or
+people's real names. When a request is ambiguous ("counter of correct
+guesses"), pick a sensible reading and say so. If a link the user gives can't
+be read, say so and use standard practice.
 
 ### 2. Scaffold
-
-1. Copy the template files (without `.git`) into the repo. Append Node entries
-   (`node_modules/`, `dist/`, `dev-dist/`, …) to its `.gitignore`.
-2. Create `package.json` by hand and install the latest versions:
-   `svelte @sveltejs/vite-plugin-svelte vite typescript@^6 svelte-check
-   @tsconfig/svelte vitest fake-indexeddb vite-plugin-pwa
-   @vite-pwa/assets-generator workbox-window svgo` (dev) and
-   `idb @lucide/svelte @fontsource-variable/inter`. Check peer dependency
-   ranges (`npm view <pkg> peerDependencies`) — e.g. svelte-check didn't
-   support TypeScript 7.
-3. Trim `.github/dependabot.yml` to the ecosystems used (npm, GitHub Actions).
+Copy the template (without `.git`); add Node entries to `.gitignore`; create
+`package.json` and install current versions (`svelte`, `vite`,
+`@sveltejs/vite-plugin-svelte`, `typescript@^6`, `svelte-check`,
+`@tsconfig/svelte`, `vitest`, `fake-indexeddb`, `vite-plugin-pwa`,
+`@vite-pwa/assets-generator`, `workbox-window`, `svgo`, `sharp`; runtime `idb`,
+`@lucide/svelte`, `@fontsource-variable/inter`). Check peer ranges
+(`npm view <pkg> peerDependencies`). Trim `dependabot.yml` to npm + Actions.
 
 ### 3. Data and assets
-
-Write a reproducible script (`scripts/fetch-<data>.mjs`, exposed as an npm
-script) that downloads the content from pinned sources, optimises images with
-SVGO, and generates a typed `src/data/*.ts` file with a "generated, do not
-edit" header naming sources, licences and the date. Then:
-
-- Look for duplicates that would make a question ambiguous (e.g. byte-identical
-  flags of territories and their sovereign state) and remove them.
-- Cross-check numbers against a second source and report agreement.
-- Keep display names short and child-friendly (override official names).
-- Record attribution (CC BY etc.) in the README and generated file.
-
-Create the app logo as an SVG, generate PWA icons with
-`npx pwa-assets-generator`, and render the 1200×630 social image by
-screenshotting an HTML page with Chrome.
+One reproducible script per dataset (`scripts/fetch-*.mjs`, npm scripts),
+pinned sources, typed `src/data/*.ts` with a "generated" header naming sources,
+licences and date. Remove ambiguous duplicates, cross-check numbers against a
+second source, keep names short and child-friendly, review content for
+children. Make the logo SVG, PWA icons (`npx pwa-assets-generator`) and the
+1200×630 social image (screenshot of an HTML page). `scripts/build-credits.mjs`
+regenerates the credits page from the data without re-downloading.
 
 ### 4. Build
+Pure, unit-tested logic in `src/lib/*.ts`; one Svelte 5 runes state class in
+`src/lib/app.svelte.ts` holding game logic shared by all games; presentational
+components in `src/components/`.
 
-Follow the module layout in [references/architecture.md](references/architecture.md):
-pure, unit-tested logic in `src/lib/*.ts`; one Svelte 5 runes state class in
-`src/lib/app.svelte.ts`; components in `src/components/`. Keep the game logic
-(round creation, answering, scoring) in the state class so all games share it,
-and keep components presentational.
+### 5. Verify — in real browsers, both engines
+Run `npm run check`, `npm test`, `npm run build`, `vite preview`, then drive
+the app with playwright-core in **Chrome and WebKit** (Safari layout bugs don't
+show in Chrome):
+- Screenshot every screen at 1280×720 and 844×390 (touch), light and dark,
+  every difficulty, and **look at the screenshots**; also check a range of
+  sizes (e.g. 740×360 to 1440×900) for overflow programmatically.
+- Assert no scrolling, no `pageerror`/console errors.
+- Trace speech (`speechSynthesis` start/end/error events) and test the speech
+  module with a fake engine.
+- Offline: wait until the precache is complete, go offline, reload, play.
+- Export/import (download event, `setInputFiles`, a bad file), stress cases
+  (e.g. every item mastered), multiplayer turn order and limits, deletion.
 
-### 5. Verify — always in a real browser
-
-Unit tests are necessary but not sufficient. Run `npm run check`, `npm test`,
-`npm run build`, then `vite preview` and drive the app with playwright-core
-and the system Chrome:
-
-- Screenshot every screen at 1280×720 and 844×390 (touch), light and dark, all
-  difficulty levels, and **look at the screenshots**.
-- Assert `scrollWidth/scrollHeight` equal the viewport (no scrolling).
-- Assert there are no `pageerror` or console errors.
-- Spy on `speechSynthesis.speak` (via `addInitScript`) to test what is spoken.
-- Test offline: wait for `navigator.serviceWorker.ready`, go offline, reload.
-- Test export (download event) and import (`setInputFiles`), including a bad
-  file and a stress case (e.g. every item mastered) for the statistics modal.
-
-Fix what the screenshots reveal (spacing, contrast of swatches in dark mode,
-distorted previews, labels far from their images) and re-run.
-
-### 6. Document and ship
-
-- Fill all template TODOs; README gets features, tech stack, data sources and
-  licences, Mermaid architecture and user-flow diagrams, key journeys, commands,
-  deployment notes and screenshots (`docs/screenshots/`).
-- PRIVACY: local storage only, what is stored, no third parties, speech-engine
-  caveat, export/import, share, children, free.
-- Save the conversation in `prompts/` if the user asks (their prompts verbatim,
-  the assistant's final replies; no tool output).
-- Commit only when asked. Push only when asked.
+### 6. Document, record, ship
+- README (features, stack, data and licences, Mermaid architecture and user
+  flow, journeys, commands, deployment, screenshots), PRIVACY, CONTRIBUTING,
+  SECURITY, checklists, skill — keep them current with every change.
+- Keep a running log of the conversation in `prompts/1.md` and update it in
+  every turn: the user's prompts verbatim, the assistant's final replies, no
+  tool output.
+- Commit and push only when asked; split unrelated changes into separate
+  commits; after pushing, wait for the workflows and check the live site.
+- When a vulnerability or CI report comes in, check which commit it refers to
+  before changing anything — it may already be fixed.
 
 ## Reporting
-
-When reporting back, lead with what works and how it was verified (sizes,
-modes, tests), then list the decisions you made on the user's behalf and what
-was not verified (real devices, Safari, audio playback).
+Lead with what works and how it was verified (engines, sizes, modes, tests),
+then the decisions made on the user's behalf, then what wasn't verified (real
+devices, audio playback, browsers not tested).
